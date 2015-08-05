@@ -1,0 +1,221 @@
+html,
+body {
+    height: 100%;
+}
+
+.wrap {
+    min-height: 100%;
+    height: auto;
+    margin: 0 auto -60px;
+    padding: 0 0 60px;
+}
+
+.wrap > .container {
+    padding: 70px 15px 20px;
+}
+
+.footer {
+    height: 60px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.jumbotron {
+    text-align: center;
+    background-color: transparent;
+}
+
+.jumbotron .btn {
+    font-size: 21px;
+    padding: 14px 24px;
+}
+
+.not-set {
+    color: #c55;
+    font-style: italic;
+}
+
+/* add sorting icons to gridview sort links */
+a.asc:after, a.desc:after {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    padding-left: 5px;
+}
+
+a.asc:after {
+    content: /*"\e113"*/ "\e151";
+}
+
+a.desc:after {
+    content: /*"\e114"*/ "\e152";
+}
+
+.sort-numerical a.asc:after {
+    content: "\e153";
+}
+
+.sort-numerical a.desc:after {
+    content: "\e154";
+}
+
+.sort-ordinal a.asc:after {
+    content: "\e155";
+}
+
+.sort-ordinal a.desc:after {
+    content: "\e156";
+}
+
+.grid-view th {
+    white-space: nowrap;
+}
+
+.hint-block {
+    display: block;
+    margin-top: 5px;
+    color: #999;
+}
+
+.error-summary {
+    color: #a94442;
+    background: #fdf7f7;
+    border-left: 3px solid #eed3d7;
+    padding: 10px 20px;
+    margin: 0 0 15px 0;
+}
+
+.page-title {
+    margin-top: 0 !important;
+    /*padding-top: 5px;*/
+    float: left;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+a:focus {
+    outline: none !important;
+}
+
+.panel-body {
+    /* padding: 0 !important;*/
+}
+
+.panel-default {
+    /* border: 0 !important;*/
+    box-shadow: none !important;
+}
+
+.grid-view thead tr.filters td {
+    padding-bottom: 15px !important;
+}
+
+.grid-view tbody tr td {
+    /*padding: 14px 10px !important;*/
+    height: 50px;
+}
+
+.m-tb-20 {
+    margin: 20px 0;
+}
+
+.jq-selectbox.no-trigger {
+    float: left;
+}
+
+.jq-selectbox.no-trigger .jq-selectbox__trigger {
+    display: none;
+}
+
+.jq-selectbox.no-trigger .jq-selectbox__select {
+    padding: 0px 10px !important;
+}
+
+.date-filter-input {
+    margin-left: 35px;
+    width: 97px !important;
+}
+
+.grid-view tbody tr .quick-actions {
+    display: none;
+}
+
+.grid-view tbody tr:hover .quick-actions {
+    display: block;
+}
+
+.grid-view .table > thead > tr > th {
+    border-bottom: 1px solid #ddd;
+}
+
+.quick-actions {
+    font-size: 0.9em;
+    margin-top: 2px;
+}
+
+.quick-actions a {
+    padding-right: 5px;
+
+}
+
+.quick-actions a:before {
+    content: '';
+    border-left: 1px solid silver;
+    padding-left: 5px;
+}
+
+.quick-actions a:first-child:before {
+    content: none;
+}
+
+.record-info .form-group {
+    margin-bottom: 5px;
+}
+
+.record-info .form-group .btn {
+    width: 48%;
+}
+
+.ui-datepicker {
+    z-index: 999 !important;
+}
+
+.record-info .jq-selectbox {
+    display: block !important;
+}
+
+#page-wrapper {
+    background-color: #F5F5F5 !important;
+}
+
+.footer {
+    background-color: #edecec !important;
+}
+
+.breadcrumb {
+    background-color: #fff !important;
+    border: 1px solid #DDDDDD;
+    margin-bottom: 15px !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(2n+1) {
+    background-color: #F9F9F9 !important;
+}
+
+div.jq-selectbox.form-control {
+    border: none !important;
+    padding: 0 !important;
+}
+
+.sidebar .active > a > .arrow::before {
+    content: "\25B2" !important;
+}
+
+.sidebar .arrow::before {
+    content: "\25BC" !important;
+}

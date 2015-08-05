@@ -1,0 +1,37 @@
+.widget-height-1 .panel,
+.widget-height-1-5 .panel,
+.widget-height-2 .panel,
+.widget-height-3 .panel,
+.widget-height-4 .panel,
+.widget-height-5 .panel,
+.widget-height-6 .panel {
+    overflow: hidden;
+}
+
+.widget-height-1 .panel {
+    height: 90px;
+}
+
+.widget-height-1-5 .panel {
+    height: 145px;
+}
+
+.widget-height-2 .panel {
+    height: 200px;
+}
+
+.widget-height-3 .panel {
+    height: 310px;
+}
+
+.widget-height-4 .panel {
+    height: 420px;
+}
+
+.widget-height-5 .panel {
+    height: 530px;
+}
+
+.widget-height-6 .panel {
+    height: 640px;
+}

@@ -1,0 +1,221 @@
+<?php
+
+namespace yeesoft;
+
+use Yii;
+use yii\helpers\ArrayHelper;
+
+class Yee extends \yii\base\Module
+{
+    const SESSION_LAST_ATTEMPT = '_um_last_attempt';
+    const SESSION_ATTEMPT_COUNT = '_um_attempt_count';
+
+    /**
+     * If set true, then on registration username will be validated as email
+     *
+     * @var bool
+     */
+    public $useEmailAsLogin = false;
+
+    /**
+     * Works only if $useEmailAsLogin = true
+     *
+     * If set true, then on after registration message with activation code will be sent
+     * to user email and after confirmation user status will be "active"
+     *
+     * @var bool
+     * @see $useEmailAsLogin
+     */
+    public $emailConfirmationRequired = false;
+
+    /**
+     * Params for mailer
+     * They will be merged with $_defaultMailerOptions
+     *
+     * @var array
+     * @see $_defaultMailerOptions
+     */
+    public $mailerOptions = [];
+
+    /**
+     * Default options for mailer
+     *
+     * @var array
+     */
+    protected $_defaultMailerOptions = [
+        'from' => '', // If empty it will be - [Yii::$app->params['adminEmail'] => Yii::$app->name . ' robot']
+        'registrationFormViewFile' => '/mail/registrationEmailConfirmation',
+        'passwordRecoveryFormViewFile' => '/mail/passwordRecoveryMail',
+        'confirmEmailFormViewFile' => '/mail/emailConfirmationMail',
+    ];
+
+    /**
+     * Permission that will be assigned automatically for everyone, so you can assign
+     * routes like "site/index" to this permission and those routes will be available for everyone
+     *
+     * Basically it's permission for guests (and of course for everyone else)
+     *
+     * @var string
+     */
+    public $commonPermissionName = 'commonPermission';
+
+    /**
+     * After how many seconds confirmation token will be invalid
+     *
+     * @var int
+     */
+    public $confirmationTokenExpire = 3600; // 1 hour
+
+    /**
+     * Roles that will be assigned to user registered via user-management/auth/registration
+     *
+     * @var array
+     */
+    public $rolesAfterRegistration = [];
+
+    /**
+     * Pattern that will be applied for names on registration.
+     * Default pattern allows user enter only numbers and letters.
+     *
+     * This will not be used if $useEmailAsLogin set as true !
+     *
+     * @var string
+     */
+    public $registrationRegexp = '/^(\w|\d)+$/';
+
+    /**
+     * Pattern that will be applied for names on registration. It contain regexp that should NOT be in username
+     * Default pattern doesn't allow anything having "admin"
+     *
+     * This will not be used if $useEmailAsLogin set as true !
+     *
+     * @var string
+     */
+    public $registrationBlackRegexp = '/^(.)*admin(.)*$/i';
+
+    /**
+     * How much attempts user can made to login or recover password in $attemptsTimeout seconds interval
+     *
+     * @var int
+     */
+    public $maxAttempts = 5;
+
+    /**
+     * Number of seconds after attempt counter to login or recover password will reset
+     *
+     * @var int
+     */
+    public $attemptsTimeout = 60;
+
+    /**
+     * Options for registration and password recovery captcha
+     *
+     * @var array
+     */
+    public $captchaOptions = [
+        'class' => 'yii\captcha\CaptchaAction',
+        'minLength' => 4,
+        'maxLength' => 6,
+        'offset' => 7
+    ];
+
+    /**
+     * Table aliases
+     *
+     * @var string
+     */
+    public $user_table = '{{%user}}';
+    public $user_visit_log_table = '{{%user_visit_log}}';
+    public $auth_item_table = '{{%auth_item}}';
+    public $auth_item_child_table = '{{%auth_item_child}}';
+    public $auth_item_group_table = '{{%auth_item_group}}';
+    public $auth_assignment_table = '{{%auth_assignment}}';
+    public $auth_rule_table = '{{%auth_rule}}';
+    //public $controllerNamespace   = 'yeesoft\usermanagement\controllers';
+
+    /**
+     * @p
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->prepareMailerOptions();
+    }
+
+    /**
+     * I18N helper
+     *
+     * @param string $category
+     * @param string $message
+     * @param array $params
+     * @param null|string $language
+     *
+     * @return string
+     */
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        if (!isset(Yii::$app->i18n->translations['yii2-yee-core/*'])) {
+            Yii::$app->i18n->translations['yii2-yee-core/*'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'en',
+                'basePath' => '@vendor/yeesoft/yii2-yee-core/messages',
+                'fileMap' => [
+                    'yii2-yee-core/back' => 'back.php',
+                    'yii2-yee-core/front' => 'front.php',
+                ],
+            ];
+        }
+
+        return Yii::t('yii2-yee-core/' . $category, $message, $params,
+            $language);
+    }
+
+    /**
+     * Check how much attempts user has been made in X seconds
+     *
+     * @return bool
+     */
+    public function checkAttempts()
+    {
+        $lastAttempt = Yii::$app->session->get(static::SESSION_LAST_ATTEMPT);
+
+        if ($lastAttempt) {
+            $attemptsCount = Yii::$app->session->get(static::SESSION_ATTEMPT_COUNT,
+                0);
+
+            Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT,
+                ++$attemptsCount);
+
+            // If last attempt was made more than X seconds ago then reset counters
+            if (($lastAttempt + $this->attemptsTimeout) < time()) {
+                Yii::$app->session->set(static::SESSION_LAST_ATTEMPT, time());
+                Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, 1);
+
+                return true;
+            } elseif ($attemptsCount > $this->maxAttempts) {
+                return false;
+            }
+
+            return true;
+        }
+
+        Yii::$app->session->set(static::SESSION_LAST_ATTEMPT, time());
+        Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, 1);
+
+        return true;
+    }
+
+    /**
+     * Merge given mailer options with default
+     */
+    protected function prepareMailerOptions()
+    {
+        if (!isset($this->mailerOptions['from'])) {
+            $this->mailerOptions['from'] = [Yii::$app->params['adminEmail'] => Yii::$app->name . ' robot'];
+        }
+
+        $this->mailerOptions = ArrayHelper::merge($this->_defaultMailerOptions,
+            $this->mailerOptions);
+    }
+}
