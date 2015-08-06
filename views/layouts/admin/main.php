@@ -1,7 +1,7 @@
 <?php
 
 use backend\assets\AppAsset;
-use yeesoft\menu\widgets\Menu;
+use yeesoft\widgets\menu\Menu;
 use yeesoft\widgets\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;

@@ -2,6 +2,7 @@
 
 namespace yeesoft\components;
 
+use yeesoft\helpers\AuthHelper;
 use Yii;
 
 /**

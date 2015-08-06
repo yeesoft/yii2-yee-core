@@ -36,7 +36,7 @@ class YeeAsset extends AssetBundle
             'yii\web\YiiAsset',
             'yii\bootstrap\BootstrapAsset',
         ];
-        
+
         parent::init();
     }
 }

@@ -2,7 +2,7 @@
 
 use yii\db\Schema;
 
-class m150319_155941_init_role_permission_tables extends \yii\db\Migration
+class m150319_155941_init_yee_core extends \yii\db\Migration
 {
     const user_table = 'user';
     const auth_rule_table = 'auth_rule';
@@ -10,7 +10,7 @@ class m150319_155941_init_role_permission_tables extends \yii\db\Migration
     const auth_item_child_table = 'auth_item_child';
     const auth_item_group_table = 'auth_item_group';
     const auth_assignment_table = 'auth_assignment';
-    const user_visit_log_table = 'user_visit_log_table';
+    const user_visit_log_table = 'user_visit_log';
 
     public function up()
     {

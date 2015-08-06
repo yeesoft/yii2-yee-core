@@ -2,7 +2,7 @@
 
 namespace yeesoft\controllers\admin;
 
-use yeesoft\base\YeeAsset;
+use yeesoft\assets\YeeAsset;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
@@ -59,7 +59,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      *
      * @var string
      */
-    public $layout = '@vendor/yeesoft/yii2-yee-base/views/layouts/admin-main.php';
+    public $layout = '@vendor/yeesoft/yii2-yee-core/views/layouts/admin/main.php';
 
     public function behaviors()
     {
