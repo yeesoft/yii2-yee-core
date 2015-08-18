@@ -7,7 +7,7 @@ use yii\web\JqueryAsset;
 
 /**
  * Class YeeAsset
- * @package yeesoft\base
+ * @package yeesoft\core
  */
 class YeeAsset extends AssetBundle
 {
