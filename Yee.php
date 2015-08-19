@@ -11,22 +11,13 @@ class Yee extends \yii\base\Module
     const SESSION_ATTEMPT_COUNT = '_um_attempt_count';
 
     /**
-     * If set true, then on registration username will be validated as email
-     *
-     * @var bool
-     */
-    public $useEmailAsLogin = false;
-
-    /**
-     * Works only if $useEmailAsLogin = true
-     *
      * If set true, then on after registration message with activation code will be sent
      * to user email and after confirmation user status will be "active"
      *
      * @var bool
      * @see $useEmailAsLogin
      */
-    public $emailConfirmationRequired = false;
+    public $emailConfirmationRequired = true;
 
     /**
      * Params for mailer
@@ -44,9 +35,10 @@ class Yee extends \yii\base\Module
      */
     protected $_defaultMailerOptions = [
         'from' => '', // If empty it will be - [Yii::$app->params['adminEmail'] => Yii::$app->name . ' robot']
-        'registrationFormViewFile' => '/mail/registrationEmailConfirmation',
-        'passwordRecoveryFormViewFile' => '/mail/passwordRecoveryMail',
-        'confirmEmailFormViewFile' => '/mail/emailConfirmationMail',
+        'signup-confirmation' => '/mail/signup-email-confirmation-html',
+        'password-reset-mail' => '/mail/password-reset-html',
+        'confirm-email' => '/mail/email-confirmation-html',
+
     ];
 
     /**
@@ -67,7 +59,7 @@ class Yee extends \yii\base\Module
     public $confirmationTokenExpire = 3600; // 1 hour
 
     /**
-     * Roles that will be assigned to user registered via user-management/auth/registration
+     * Roles that will be assigned to user registered via /auth/signup
      *
      * @var array
      */
@@ -81,7 +73,7 @@ class Yee extends \yii\base\Module
      *
      * @var string
      */
-    public $registrationRegexp = '/^(\w|\d)+$/';
+    public $usernameRegexp = '/^(\w|\d)+$/';
 
     /**
      * Pattern that will be applied for names on registration. It contain regexp that should NOT be in username
@@ -91,7 +83,7 @@ class Yee extends \yii\base\Module
      *
      * @var string
      */
-    public $registrationBlackRegexp = '/^(.)*admin(.)*$/i';
+    public $usernameBlackRegexp = '/^(.)*admin(.)*$/i';
 
     /**
      * How much attempts user can made to login or recover password in $attemptsTimeout seconds interval
@@ -114,9 +106,12 @@ class Yee extends \yii\base\Module
      */
     public $captchaOptions = [
         'class' => 'yii\captcha\CaptchaAction',
-        'minLength' => 4,
-        'maxLength' => 6,
-        'offset' => 7
+        'minLength' => 5,
+        'maxLength' => 5,
+        'height' => 45,
+        'width' => 100,
+        'fontFile' => '@vendor/yeesoft/yii2-yee-auth/fonts/lightweight.ttf',
+        'padding' => 0
     ];
 
     /**
@@ -212,10 +207,9 @@ class Yee extends \yii\base\Module
     protected function prepareMailerOptions()
     {
         if (!isset($this->mailerOptions['from'])) {
-            $this->mailerOptions['from'] = [Yii::$app->params['adminEmail'] => Yii::$app->name . ' robot'];
+            $this->mailerOptions['from'] = [Yii::$app->params['adminEmail'] => Yii::$app->name];
         }
 
-        $this->mailerOptions = ArrayHelper::merge($this->_defaultMailerOptions,
-            $this->mailerOptions);
+        $this->mailerOptions = ArrayHelper::merge($this->_defaultMailerOptions, $this->mailerOptions);
     }
 }

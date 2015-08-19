@@ -83,18 +83,32 @@ class User extends UserIdentity
     {
         try {
             Yii::$app->db->createCommand()
-                ->insert(Yii::$app->getModule('yee')->auth_assignment_table,
-                    [
-                        'user_id' => $userId,
-                        'item_name' => $roleName,
-                        'created_at' => time(),
-                    ])->execute();
+                ->insert(Yii::$app->getModule('yee')->auth_assignment_table, [
+                    'user_id' => $userId,
+                    'item_name' => $roleName,
+                    'created_at' => time(),
+                ])->execute();
 
             AuthHelper::invalidatePermissions();
 
             return true;
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    /**
+     * Assign roles to user
+     *
+     * @param int $userId
+     * @param array $roles
+     *
+     * @return bool
+     */
+    public function assignRoles(array $roles)
+    {
+        foreach ($roles as $role) {
+            User::assignRole($this->id, $role);
         }
     }
 
@@ -109,8 +123,7 @@ class User extends UserIdentity
     public static function revokeRole($userId, $roleName)
     {
         $result = Yii::$app->db->createCommand()
-                ->delete(Yii::$app->getModule('yee')->auth_assignment_table,
-                    ['user_id' => $userId, 'item_name' => $roleName])
+                ->delete(Yii::$app->getModule('yee')->auth_assignment_table, ['user_id' => $userId, 'item_name' => $roleName])
                 ->execute() > 0;
 
         if ($result) {
@@ -135,8 +148,7 @@ class User extends UserIdentity
 
         AuthHelper::ensurePermissionsUpToDate();
 
-        return array_intersect($roles,
-            Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
+        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
     }
 
     /**
@@ -153,8 +165,7 @@ class User extends UserIdentity
 
         AuthHelper::ensurePermissionsUpToDate();
 
-        return in_array($permission,
-            Yii::$app->session->get(AuthHelper::SESSION_PREFIX_PERMISSIONS, []));
+        return in_array($permission, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_PERMISSIONS, []));
     }
 
     /**
@@ -185,8 +196,7 @@ class User extends UserIdentity
 
         AuthHelper::ensurePermissionsUpToDate();
 
-        return Route::isRouteAllowed($baseRoute,
-            Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
+        return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
     }
 
     /**
@@ -338,8 +348,7 @@ class User extends UserIdentity
     public function getRoles()
     {
         return $this->hasMany(Role::className(), ['name' => 'item_name'])
-            ->viaTable(Yii::$app->getModule('yee')->auth_assignment_table,
-                ['user_id' => 'id']);
+            ->viaTable(Yii::$app->getModule('yee')->auth_assignment_table, ['user_id' => 'id']);
     }
 
     /**
@@ -419,8 +428,7 @@ class User extends UserIdentity
 
     public function getCreatedDate()
     {
-        return date(Yii::$app->settings->get('general.dateformat'),
-            ($this->isNewRecord) ? time() : $this->created_at);
+        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->created_at);
     }
 
     public function getCreatedDateTime()
