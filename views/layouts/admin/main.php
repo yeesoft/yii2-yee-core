@@ -42,10 +42,9 @@ AppAsset::register($this);
         ]);
 
         $menuItems = [
-
-            ['label' => str_replace('http://', '',
-                Yii::$app->urlManager->hostInfo), 'url' => Yii::$app->urlManager->hostInfo],
+            ['label' => str_replace('http://', '', Yii::$app->urlManager->hostInfo), 'url' => Yii::$app->urlManager->hostInfo],
         ];
+
         if (Yii::$app->user->isGuest) {
             $menuItems[] = ['label' => 'Login', 'url' => ['/auth/login']];
         } else {

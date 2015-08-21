@@ -51,8 +51,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      * @var array
      */
     protected $_implementedActions = ['index', 'view', 'create', 'update', 'delete',
-        'toggle-attribute',
-        'bulk-activate', 'bulk-deactivate', 'bulk-delete', 'grid-sort', 'grid-page-size'];
+        'toggle-attribute', 'bulk-activate', 'bulk-deactivate', 'bulk-delete', 'grid-sort', 'grid-page-size'];
 
     /**
      * Layout file for admin panel

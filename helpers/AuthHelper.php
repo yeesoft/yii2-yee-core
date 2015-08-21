@@ -97,6 +97,11 @@ class AuthHelper
             $route = Url::toRoute($route);
         }
 
+        // URL starts with http
+        if (!is_array($route) && (substr($route, 0, 4) === "http")) {
+            return $route;
+        }
+
         if (Yii::$app->getUrlManager()->showScriptName === true) {
             $baseUrl = Yii::$app->getRequest()->scriptUrl;
         } else {

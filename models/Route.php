@@ -139,6 +139,8 @@ class Route extends AbstractItem
      */
     public static function isRouteAllowed($route, $allowedRoutes)
     {
+        $route = rtrim(Yii::$app->getRequest()->getBaseUrl(), '/') . $route;
+
         if (in_array($route, $allowedRoutes)) {
             return true;
         }
@@ -152,8 +154,9 @@ class Route extends AbstractItem
                 $allowedRouteArray = explode('/', $allowedRoute);
                 array_splice($allowedRouteArray, -1);
 
-                if (array_diff($routeArray, $allowedRouteArray) === array())
+                if (array_diff($routeArray, $allowedRouteArray) === array()) {
                     return true;
+                }
             }
         }
 

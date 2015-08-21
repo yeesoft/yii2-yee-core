@@ -28,7 +28,7 @@ use yii\helpers\ArrayHelper;
  */
 class User extends UserIdentity
 {
-    const STATUS_ACTIVE = 1;
+    const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 0;
     const STATUS_BANNED = -1;
 
@@ -148,7 +148,8 @@ class User extends UserIdentity
 
         AuthHelper::ensurePermissionsUpToDate();
 
-        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
+        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, []))
+        !== [];
     }
 
     /**
@@ -189,6 +190,10 @@ class User extends UserIdentity
         }
 
         $baseRoute = AuthHelper::unifyRoute($route);
+
+        if (substr($baseRoute, 0, 4) === "http") {
+            return true;
+        }
 
         if (Route::isFreeAccess($baseRoute)) {
             return true;

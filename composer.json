@@ -2,7 +2,8 @@
   "name": "yeesoft/yii2-yee-core",
   "description": "Yee (Yii2 based CMS) Core Module",
   "require": {
-    "ikimea/browser": "*"
+    "ikimea/browser": "*",
+    "yiisoft/yii2-jui": "*"
   },
   "autoload": {
     "psr-4": {
