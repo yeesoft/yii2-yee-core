@@ -112,8 +112,7 @@ class YeeHelper
             $string = preg_replace('/[^a-zA-Z0-9=\s—–-]+/u', '', $string);
             $string = preg_replace('/[=\s—–-]+/u', $replacement, $string);
         } else {
-            $string = str_replace(array_keys(static::$transliteration),
-                static::$transliteration, $string);
+            $string = str_replace(array_keys(static::$transliteration), static::$transliteration, $string);
             $string = preg_replace('/[^\p{L}\p{Nd}]+/u', $replacement, $string);
         }
 
@@ -148,5 +147,18 @@ class YeeHelper
 
             return $ip;
         }
+    }
+
+    /**
+     * Check by string class name if class implements interface
+     *
+     * @param string $classNamespace
+     * @param string $interface
+     * @return boolean
+     */
+    public static function isImplemented($classNamespace, $interface)
+    {
+        $interfaces = class_implements($classNamespace);
+        return isset($interfaces[$interface]);
     }
 }

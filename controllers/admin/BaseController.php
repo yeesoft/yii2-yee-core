@@ -3,11 +3,15 @@
 namespace yeesoft\controllers\admin;
 
 use yeesoft\assets\YeeAsset;
+use yeesoft\helpers\YeeHelper;
+use yeesoft\models\OwnerAccess;
+use yeesoft\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
+use yii\helpers\StringHelper;
 use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
 
@@ -62,15 +66,14 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
 
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['post'],
-                    ],
+        return ArrayHelper::merge(parent::behaviors(), [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
                 ],
-            ]);
+            ],
+        ]);
     }
 
     public function init()
@@ -85,19 +88,25 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionIndex()
     {
+        $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
+        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
 
         if ($searchModel) {
-            $dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
+            $searchName = StringHelper::basename($searchModel::className());
+            $params = Yii::$app->request->getQueryParams();
+
+            if ($restrictAccess) {
+                $params[$searchName][$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+            }
+
+            $dataProvider = $searchModel->search($params);
         } else {
-            $modelClass = $this->modelClass;
-            $dataProvider = new ActiveDataProvider([
-                'query' => $modelClass::find(),
-            ]);
+            $restrictParams = ($restrictAccess) ? [$modelClass::getOwnerField() => Yii::$app->user->identity->id] : [];
+            $dataProvider = new ActiveDataProvider(['query' => $modelClass::find()->where($restrictParams)]);
         }
 
-        return $this->renderIsAjax('index',
-            compact('dataProvider', 'searchModel'));
+        return $this->renderIsAjax('index', compact('dataProvider', 'searchModel'));
     }
 
     /**
@@ -109,10 +118,9 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionView($id)
     {
-        return $this->renderIsAjax('view',
-            [
-                'model' => $this->findModel($id),
-            ]);
+        return $this->renderIsAjax('view', [
+            'model' => $this->findModel($id),
+        ]);
     }
 
     /**
@@ -172,6 +180,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionToggleAttribute($attribute, $id)
     {
+        //TODO: Restrict owner access
         $model = $this->findModel($id);
         $model->{$attribute} = ($model->{$attribute} == 1) ? 0 : 1;
         $model->save(false);
@@ -184,11 +193,14 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            $where = ['id' => Yii::$app->request->post('selection', [])];
 
-            $modelClass::updateAll(
-                ['status' => 1],
-                ['id' => Yii::$app->request->post('selection', [])]
-            );
+            if ($restrictAccess) {
+                $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+            }
+
+            $modelClass::updateAll(['status' => 1], $where);
         }
     }
 
@@ -199,11 +211,14 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            $where = ['id' => Yii::$app->request->post('selection', [])];
 
-            $modelClass::updateAll(
-                ['status' => 0],
-                ['id' => Yii::$app->request->post('selection', [])]
-            );
+            if ($restrictAccess) {
+                $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+            }
+
+            $modelClass::updateAll(['status' => 0], $where);
         }
     }
 
@@ -214,9 +229,16 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
 
             foreach (Yii::$app->request->post('selection', []) as $id) {
-                $model = $modelClass::findOne($id);
+                $where = ['id' => $id];
+
+                if ($restrictAccess) {
+                    $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+                }
+
+                $model = $modelClass::findOne($where);
 
                 if ($model) $model->delete();
             }
@@ -309,9 +331,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
-            if ($this->enableOnlyActions !== [] AND in_array($action->id,
-                    $this->_implementedActions) AND !in_array($action->id,
-                    $this->enableOnlyActions)
+            if ($this->enableOnlyActions !== [] AND in_array($action->id, $this->_implementedActions) AND
+                !in_array($action->id, $this->enableOnlyActions)
             ) {
                 throw new NotFoundHttpException('Page not found');
             }

@@ -2,6 +2,8 @@
 
 namespace yeesoft\behaviors;
 
+use yeesoft\helpers\YeeHelper;
+use yeesoft\models\OwnerAccess;
 use yeesoft\models\Route;
 use yeesoft\models\User;
 use Yii;
@@ -66,7 +68,18 @@ class AccessFilter extends ActionFilter
         }
 
         if (User::canRoute($route)) {
-            return true;
+            $modelId = Yii::$app->getRequest()->getQueryParam('id');
+            $modelClass = (isset($this->owner->modelClass)) ? $this->owner->modelClass : null;
+
+            //Check access for owners
+            if ($modelClass && YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()) && $modelId) {
+                $model = $modelClass::findOne(['id' => $modelId]);
+                if ($model && Yii::$app->user->identity->id == $model->{$modelClass::getOwnerField()}) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
         }
 
         if (isset($this->denyCallback)) {
@@ -90,8 +103,7 @@ class AccessFilter extends ActionFilter
         if (Yii::$app->user->getIsGuest()) {
             Yii::$app->user->loginRequired();
         } else {
-            throw new ForbiddenHttpException(Yii::t('yii',
-                'You are not allowed to perform this action.'));
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
     }
 }

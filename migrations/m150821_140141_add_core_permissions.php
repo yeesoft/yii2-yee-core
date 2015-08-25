@@ -21,7 +21,7 @@ class m150821_140141_add_core_permissions extends Migration
         $this->insert('auth_item', ['name' => '/admin/site/index', 'type' => '3', 'created_at' => '1440180000', 'updated_at' => '1440180000']);
         $this->insert('auth_item', ['name' => 'commonPermission', 'type' => '2', 'description' => 'Common permission', 'created_at' => '1440180000', 'updated_at' => '1440180000']);
         $this->insert('auth_item', ['name' => 'changeOwnPassword', 'type' => '2', 'description' => 'Change own password', 'group_code' => 'userCommonPermissions', 'created_at' => '1440180000', 'updated_at' => '1440180000']);
-        $this->insert('auth_item', ['name' => 'viewDashboard', 'type' => '2', 'description' => 'View Dashboard', 'group_code' => 'dashboard', 'created_at' => '1440180000', 'updated_at' => '1440180000']);
+        $this->insert('auth_item', ['name' => 'viewDashboard', 'type' => '2', 'description' => 'View dashboard', 'group_code' => 'dashboard', 'created_at' => '1440180000', 'updated_at' => '1440180000']);
 
         $this->insert('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/']);
         $this->insert('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/site/index']);

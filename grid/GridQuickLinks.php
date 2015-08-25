@@ -2,6 +2,10 @@
 
 namespace yeesoft\grid;
 
+use yeesoft\helpers\YeeHelper;
+use yeesoft\models\OwnerAccess;
+use yeesoft\models\User;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
@@ -145,20 +149,25 @@ class GridQuickLinks extends Widget
             $model = $this->model;
             $formName = $this->searchModel->formName();
 
-
             if (!$this->options) {
 
                 $this->options = $this->defaultOptions;
 
                 if (is_array($this->labels)) {
-                    $this->options = ArrayHelper::merge($this->options,
-                        self::addKeyToValue($this->labels, 'label')
+                    $this->options = ArrayHelper::merge($this->options, self::addKeyToValue($this->labels, 'label')
                     );
                 }
             }
 
             foreach ($this->options as $option) {
                 if (($this->showCount)) {
+
+                    if ((YeeHelper::isImplemented($model, OwnerAccess::class)
+                        && !User::hasPermission($model::getOwnerAccessPermission()))
+                    ) {
+                        $option['filterWhere'][$model::getOwnerField()] = Yii::$app->user->identity->id;
+                    }
+
                     $count = $model::find()->filterWhere($option['filterWhere'])->count();
                     $count = " ({$count})";
                 }
@@ -190,10 +199,9 @@ class GridQuickLinks extends Widget
      */
     protected static function addKeyToValue($array, $key)
     {
-        array_walk($array,
-            function (&$value) use ($key) {
-                $value = [$key => $value];
-            }
+        array_walk($array, function (&$value) use ($key) {
+            $value = [$key => $value];
+        }
         );
 
         return $array;
