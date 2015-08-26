@@ -25,7 +25,6 @@ class m150821_140141_add_core_permissions extends Migration
 
         $this->insert('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/']);
         $this->insert('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/site/index']);
-        $this->insert('auth_item_child', ['parent' => 'changeOwnPassword', 'child' => '/auth/change-own-password']);
         $this->insert('auth_item_child', ['parent' => 'administrator', 'child' => 'author']);
         $this->insert('auth_item_child', ['parent' => 'moderator', 'child' => 'author']);
         $this->insert('auth_item_child', ['parent' => 'administrator', 'child' => 'moderator']);
@@ -44,7 +43,6 @@ class m150821_140141_add_core_permissions extends Migration
 
         $this->delete('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/']);
         $this->delete('auth_item_child', ['parent' => 'viewDashboard', 'child' => '/admin/site/index']);
-        $this->delete('auth_item_child', ['parent' => 'changeOwnPassword', 'child' => '/auth/change-own-password']);
         $this->delete('auth_item_child', ['parent' => 'administrator', 'child' => 'author']);
         $this->delete('auth_item_child', ['parent' => 'moderator', 'child' => 'author']);
         $this->delete('auth_item_child', ['parent' => 'administrator', 'child' => 'moderator']);
