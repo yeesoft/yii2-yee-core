@@ -219,5 +219,5 @@ More info: [Advanced Application Template Installation](https://github.com/yiiso
   1. Install [Yee Post Module](https://github.com/yeesoft/yii2-yee-post)
   1. Install [Yee Page Module](https://github.com/yeesoft/yii2-yee-page)
   1. Install [Comments Module](https://github.com/yeesoft/yii2-comments)
-  1. Install [Yee Comments Module](https://github.com/yeesoft/yii2-yee-comments)
+  1. Install [Yee Comments Module](https://github.com/yeesoft/yii2-yee-comment)
   1. Install [Gii Generator For Yee](https://github.com/yeesoft/yii2-yee-generator)
