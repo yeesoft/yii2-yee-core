@@ -3,7 +3,7 @@
 use yii\db\Migration;
 use yii\db\Schema;
 
-class m150719_174321_init_menus extends Migration
+class m150319_194321_init_menus extends Migration
 {
 
     public function up()
