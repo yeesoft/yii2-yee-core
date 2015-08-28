@@ -212,4 +212,13 @@ class Yee extends \yii\base\Module
 
         $this->mailerOptions = ArrayHelper::merge($this->_defaultMailerOptions, $this->mailerOptions);
     }
+
+    /**
+     * Returns an HTML hyperlink that can be displayed on your Web page.
+     * @return string
+     */
+    public static function powered()
+    {
+        return '<a href="http://www.yee-soft.com/" rel="external">Yee CMS</a>';
+    }
 }
