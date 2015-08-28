@@ -29,6 +29,7 @@ class m150319_194321_init_menus extends Migration
                 'label' => Schema::TYPE_STRING . '(255) COLLATE utf8_unicode_ci NOT NULL',
                 'parent_id' => Schema::TYPE_STRING . "(64) COLLATE utf8_unicode_ci DEFAULT ''",
                 'image' => Schema::TYPE_STRING . '(24) COLLATE utf8_unicode_ci DEFAULT NULL',
+                'alwaysVisible' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
                 'order' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
             ], $tableOptions);
 

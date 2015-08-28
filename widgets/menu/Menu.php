@@ -119,6 +119,7 @@ class Menu extends \yii\base\Widget
         $subItems = Menu::generateSubItems($link['id'], $menuLinks);
 
         $item['label'] = $icon . $link['label'];
+        $item['visible'] = $link['alwaysVisible'];
 
         if ($link['link']) {
             $url = parse_url($link['link']);

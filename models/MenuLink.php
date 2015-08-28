@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  * @property string $link
  * @property string $label
  * @property string $parent_id
+ * @property integer $alwaysVisible
  * @property string $image
  * @property integer $order
  *
@@ -35,7 +36,7 @@ class MenuLink extends \yii\db\ActiveRecord
     {
         return [
             [['id', 'menu_id', 'label'], 'required'],
-            [['order'], 'integer'],
+            [['order', 'alwaysVisible'], 'integer'],
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
@@ -54,6 +55,7 @@ class MenuLink extends \yii\db\ActiveRecord
             'link' => 'Link',
             'label' => 'Label',
             'parent_id' => 'Parent Link',
+            'alwaysVisible' => 'Always Visible',
             'image' => 'Icon',
             'order' => 'Order',
         ];
