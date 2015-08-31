@@ -1,6 +1,6 @@
 <?php
 
-use yeesoft\assets\MetisMenuAsset;
+use yeesoft\widgets\metismenu\assets\MetisMenuAsset;
 use yeesoft\widgets\Nav;
 
 /* @var $this yii\web\View */
