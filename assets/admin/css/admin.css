@@ -141,6 +141,12 @@ a:focus {
 
 .grid-view tbody tr .quick-actions {
     display: none;
+    margin-top: -18px;
+}
+
+.grid-view .action-title {
+    display: inline-block;
+    padding-bottom: 20px;
 }
 
 .grid-view tbody tr:hover .quick-actions {
@@ -269,3 +275,5 @@ div.jq-selectbox.form-control {
         margin-left: auto;
     }
 }
+
+

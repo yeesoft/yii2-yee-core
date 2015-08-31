@@ -52,7 +52,7 @@ class TitleActionColumn extends \yii\grid\DataColumn
      *
      * @see buttons
      */
-    public $template = '{title} <div class="quick-actions"> {buttons} </div>';
+    public $template = '<span class="action-title">{title}</span> <div class="quick-actions"> {buttons} </div>';
     public $buttonsTemplate = '{update} {view} {delete}';
 
     /**
