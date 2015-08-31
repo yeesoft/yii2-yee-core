@@ -2,6 +2,7 @@
 
 namespace yeesoft\models;
 
+use yeesoft\helpers\MenuHelper;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -62,5 +63,76 @@ class Menu extends \yii\db\ActiveRecord
     public static function getList()
     {
         return ArrayHelper::map(self::find()->asArray()->all(), 'id', 'title');
+    }
+
+    /**
+     * get list of menus
+     * @return array
+     */
+    public static function getMenuItems($menu_id)
+    {
+        $links = self::findOne($menu_id)
+            ->getLinks()
+            ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
+            ->asArray()->all();
+
+        return self::generateNavigationItems($links);
+    }
+
+    private static function generateNavigationItems($links)
+    {
+        $items = [];
+        $linksByParent = [];
+
+        foreach ($links as $link) {
+            $linksByParent[$link['parent_id']][] = $link;
+        }
+
+        foreach ($linksByParent[''] as $link) {
+            $items[] = self::generateItem($link, $linksByParent);
+        }
+
+        return $items;
+    }
+
+    private static function generateItem($link, $menuLinks)
+    {
+        $item = [];
+        $icon = (!empty($link['image'])) ? MenuHelper::generateIcon($link['image']) . ' '
+            : '';
+
+        $subItems = self::generateSubItems($link['id'], $menuLinks);
+
+        $item['label'] = $icon . $link['label'];
+
+        if (isset($link['alwaysVisible']) && $link['alwaysVisible']) {
+            $item['visible'] = true;
+        }
+
+        if ($link['link']) {
+            $url = parse_url($link['link']);
+            $item['url'] = (isset($url['scheme'])) ? $link['link'] : [$link['link']];
+        }
+
+        if (is_array($subItems)) {
+            $item['items'] = $subItems;
+        }
+
+        return $item;
+    }
+
+    private static function generateSubItems($parent_id, $menuLinks)
+    {
+        if (isset($menuLinks[$parent_id])) {
+            $items = [];
+
+            foreach ($menuLinks[$parent_id] as $link) {
+                $items[] = self::generateItem($link, $menuLinks);
+            }
+
+            return $items;
+        }
+
+        return NULL;
     }
 }

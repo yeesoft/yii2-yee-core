@@ -14,7 +14,7 @@ class YeeAsset extends AssetBundle
 
     public function init()
     {
-        $this->sourcePath = __DIR__ . '/source';
+        $this->sourcePath = __DIR__ . '/admin';
 
         $this->js = [
             'js/admin.js',

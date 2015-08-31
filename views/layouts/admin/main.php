@@ -1,9 +1,10 @@
 <?php
 
 use backend\assets\AppAsset;
-use yeesoft\widgets\formstyler\assets\FormStylerAsset;
+use yeesoft\assets\FormStylerAsset;
+use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
-use yeesoft\widgets\metismenu\MetisMenu;
+use yeesoft\models\Menu;
 use yeesoft\widgets\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
@@ -15,6 +16,7 @@ use yii\widgets\Breadcrumbs;
 AppAsset::register($this);
 FormStylerAsset::register($this);
 YeeAsset::register($this);
+MetisMenuAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -68,21 +70,18 @@ YeeAsset::register($this);
         ?>
 
         <!-- SIDEBAR NAV -->
-        <?=
-        MetisMenu::widget([
-            'id' => 'admin-main-menu',
-            'dropDownCaret' => '<span class="arrow"></span>',
-            'wrapper' => [
-                '<div class="navbar-default sidebar metismenu" role="navigation">',
-                '</div>'
-            ],
-            'options' => [
-                ['class' => 'nav side-menu'],
-                ['class' => 'nav nav-second-level'],
-                ['class' => 'nav nav-third-level']
-            ],
-        ])
-        ?>
+        <div class="navbar-default sidebar metismenu" role="navigation">
+            <?= Nav::widget([
+                'encodeLabels' => false,
+                'dropDownCaret' => '<span class="arrow"></span>',
+                'options' => [
+                    ['class' => 'nav side-menu'],
+                    ['class' => 'nav nav-second-level'],
+                    ['class' => 'nav nav-third-level']
+                ],
+                'items' => Menu::getMenuItems('admin-main-menu'),
+            ]) ?>
+        </div>
         <!-- !SIDEBAR NAV -->
     </nav>
 

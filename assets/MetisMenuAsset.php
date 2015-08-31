@@ -1,6 +1,6 @@
 <?php
 
-namespace yeesoft\widgets\metismenu\assets;
+namespace yeesoft\assets;
 
 use yii\web\AssetBundle;
 

@@ -6,8 +6,8 @@ use yeesoft\helpers\AuthHelper;
 use Yii;
 
 /**
- * Class UserConfig
- * @package yeesoft\usermanagement\components
+ * Class User
+ * @package yeesoft\components
  */
 class User extends \yii\web\User
 {

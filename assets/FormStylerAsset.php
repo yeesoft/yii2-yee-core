@@ -1,6 +1,6 @@
 <?php
 
-namespace yeesoft\widgets\formstyler\assets;
+namespace yeesoft\assets;
 
 use yii\web\AssetBundle;
 
@@ -10,12 +10,12 @@ use yii\web\AssetBundle;
  */
 class FormStylerAsset extends AssetBundle
 {
-    public $js      = ['js/jquery.formstyler.min.js'];
-    public $css     = ['css/jquery.formstyler.css'];
+    public $js = ['js/jquery.formstyler.min.js'];
+    public $css = ['css/jquery.formstyler.css'];
     public $depends = ['yii\web\JqueryAsset'];
 
     public function init()
     {
-        $this->sourcePath = __DIR__.'/source';
+        $this->sourcePath = __DIR__ . '/formstyler';
     }
 }
