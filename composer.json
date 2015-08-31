@@ -5,7 +5,7 @@
     "ikimea/browser": "*",
     "yiisoft/yii2-jui": "*",
     "bower-asset/metisMenu": "*",
-    "bower-asset/jquery-form-styler": "*"
+    "bower-asset/jQueryFormStyler": "*"
   },
   "autoload": {
     "psr-4": {
