@@ -3,7 +3,8 @@
   "description": "Yee (Yii2 based CMS) Core Module",
   "require": {
     "ikimea/browser": "*",
-    "yiisoft/yii2-jui": "*"
+    "yiisoft/yii2-jui": "*",
+    "bower-asset/metisMenu": "*"
   },
   "autoload": {
     "psr-4": {
