@@ -1,18 +1,18 @@
 <?php
 
-namespace yeesoft\widgets\menu;
+namespace yeesoft\widgets\metismenu;
 
 use yeesoft\helpers\MenuHelper;
 use yeesoft\models\Menu as MenuModel;
 
 /**
- * Yee Menu widget.
+ * MetisMenu widget for Yee CMS.
  *
  * The widget renders menu by ID.
  *
  * Example:
  * <pre>
- * echo Menu::widget([
+ * echo MetisMenu::widget([
  * &nbsp; 'id' => 'main-menu',
  * &nbsp; 'dropDownCaret' => '<span class="arrow"></span>',
  * &nbsp; 'wrapper' => [
@@ -27,7 +27,7 @@ use yeesoft\models\Menu as MenuModel;
  *   ]);
  * </pre>
  */
-class Menu extends \yii\base\Widget
+class MetisMenu extends \yii\base\Widget
 {
     /**
      * Menu model id
@@ -42,7 +42,7 @@ class Menu extends \yii\base\Widget
      *
      * @var array
      */
-    public $wrapper = ['', ''];
+    public $wrapper = ['<div class="metismenu">', '</div>'];
 
     /**
      * Menu and submenus options.
@@ -89,9 +89,9 @@ class Menu extends \yii\base\Widget
             ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
             ->asArray()->all();
 
-        $this->items = Menu::generateNavigationItems($links, $this->options);
+        $this->items = self::generateNavigationItems($links, $this->options);
 
-        return $this->render('menu', get_object_vars($this));
+        return $this->render('metis-menu', get_object_vars($this));
     }
 
     private static function generateNavigationItems($links, $options)
@@ -104,7 +104,7 @@ class Menu extends \yii\base\Widget
         }
 
         foreach ($linksByParent[''] as $link) {
-            $items[] = Menu::generateItem($link, $linksByParent, $options);
+            $items[] = self::generateItem($link, $linksByParent, $options);
         }
 
         return $items;
@@ -116,7 +116,7 @@ class Menu extends \yii\base\Widget
         $icon = (!empty($link['image'])) ? MenuHelper::generateIcon($link['image']) . ' '
             : '';
 
-        $subItems = Menu::generateSubItems($link['id'], $menuLinks);
+        $subItems = self::generateSubItems($link['id'], $menuLinks);
 
         $item['label'] = $icon . $link['label'];
 
@@ -142,7 +142,7 @@ class Menu extends \yii\base\Widget
             $items = [];
 
             foreach ($menuLinks[$parent_id] as $link) {
-                $items[] = Menu::generateItem($link, $menuLinks);
+                $items[] = self::generateItem($link, $menuLinks);
             }
 
             return $items;

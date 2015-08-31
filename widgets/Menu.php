@@ -5,12 +5,12 @@ namespace yeesoft\widgets;
 use yeesoft\models\User;
 
 /**
- * Class GhostNav
+ * Class Menu
  *
  * Show only those items in navigation menu which user can see
  * If item has no "visible" key, than "visible"=>User::canRoute($item['url') will be added
  *
- * @package yeesoft\usermanagement\components
+ * @package yeesoft\widgets
  */
 class Menu extends \yii\widgets\Menu
 {

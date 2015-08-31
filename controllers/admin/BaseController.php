@@ -2,7 +2,6 @@
 
 namespace yeesoft\controllers\admin;
 
-use yeesoft\assets\YeeAsset;
 use yeesoft\helpers\YeeHelper;
 use yeesoft\models\OwnerAccess;
 use yeesoft\models\User;
@@ -76,12 +75,6 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         ]);
     }
 
-    public function init()
-    {
-        parent::init();
-        YeeAsset::register($this->view);
-    }
-
     /**
      * Lists all models.
      * @return mixed
@@ -90,7 +83,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
-        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+            && !User::hasPermission($modelClass::getOwnerAccessPermission()));
 
         if ($searchModel) {
             $searchName = StringHelper::basename($searchModel::className());
@@ -193,7 +187,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
@@ -211,7 +206,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
@@ -229,7 +225,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
 
             foreach (Yii::$app->request->post('selection', []) as $id) {
                 $where = ['id' => $id];
@@ -331,6 +328,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
+
             if ($this->enableOnlyActions !== [] AND in_array($action->id, $this->_implementedActions) AND
                 !in_array($action->id, $this->enableOnlyActions)
             ) {

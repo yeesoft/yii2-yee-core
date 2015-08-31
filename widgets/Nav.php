@@ -8,12 +8,12 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /**
- * Class GhostNav
+ * Class Nav
  *
  * Show only those items in navigation menu which user can see.
- * If item has no "visible" key, than "visible"=>User::canRoute($item['url') will be added.
+ * If item has no "visible" key, than "visible" => User::canRoute($item['url') will be added.
  *
- * GhostNav support sub-dropdown menus. Submenus has no nested level limit.
+ * Nav support sub-dropdown menus. Submenus has no nested level limit.
  *
  * @var array $options setting for menu and submenus
  *
@@ -29,7 +29,7 @@ use yii\helpers\Html;
  *   [ 'class' => 'nav nav-third-level']
  * ]
  *
- * @package yeesoft\usermanagement\components
+ * @package yeesoft\widgets
  */
 class Nav extends \yii\bootstrap\Nav
 {

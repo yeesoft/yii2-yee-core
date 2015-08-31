@@ -1,3 +1,4 @@
+/********* METIS-MENU SCRIPTS START ************/
 $(function () {
     $('.side-menu').metisMenu();
 });
@@ -26,7 +27,6 @@ $(function () {
     });
 
     var url = window.location;
-
 
     var current = $('ul.side-menu a[href]').filter(function () {
         return this.href == url || this.href == url + '/';
@@ -67,7 +67,42 @@ $(function () {
         element.addClass('active');
     }
 });
+/********* METIS-MENU SCRIPTS END ************/
 
+/********* FORM-STYLE SCRIPTS START ************/
+(function ($) {
+    function initStyler() {
+        $('input:checkbox').styler();
+        $('input:radio').styler();
+        $('input:file').not(".fileinput-button input:file").styler({
+            filePlaceholder: "no file selected",
+            fileBrowse: "Choose File",
+        });
+        $('select').styler({
+            selectPlaceholder: "Select...",
+            selectSearchNotFound: "Nothing found",
+            selectSearchPlaceholder: "Search..."
+        });
+
+        $('.select-on-check-all').on('click', function () {
+            var checkAllCheckbox = $(this).find('input:checkbox.select-on-check-all');
+            $('.grid-view input:checkbox').not($(checkAllCheckbox)).each(function () {
+                this.checked = $(checkAllCheckbox).prop("checked");
+                $(this).trigger('refresh');
+            });
+        });
+    }
+
+    $(function () {
+        initStyler();
+    });
+
+    $(document).on('pjax:complete', function () {
+        initStyler();
+    });
+
+})(jQuery);
+/********* FORM-STYLE SCRIPTS END ************/
 
 $(function () {
     setTimeout(function () {

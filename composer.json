@@ -4,7 +4,8 @@
   "require": {
     "ikimea/browser": "*",
     "yiisoft/yii2-jui": "*",
-    "bower-asset/metisMenu": "*"
+    "bower-asset/metisMenu": "*",
+    "bower-asset/jquery-form-styler": "*"
   },
   "autoload": {
     "psr-4": {

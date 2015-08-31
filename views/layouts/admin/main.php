@@ -1,7 +1,9 @@
 <?php
 
 use backend\assets\AppAsset;
-use yeesoft\widgets\menu\Menu;
+use yeesoft\assets\FormStylerAsset;
+use yeesoft\assets\YeeAsset;
+use yeesoft\widgets\metismenu\MetisMenu;
 use yeesoft\widgets\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
@@ -11,6 +13,8 @@ use yii\widgets\Breadcrumbs;
 /* @var $content string */
 
 AppAsset::register($this);
+YeeAsset::register($this);
+FormStylerAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -65,11 +69,11 @@ AppAsset::register($this);
 
         <!-- SIDEBAR NAV -->
         <?=
-        Menu::widget([
+        MetisMenu::widget([
             'id' => 'admin-main-menu',
             'dropDownCaret' => '<span class="arrow"></span>',
             'wrapper' => [
-                '<div class="navbar-default sidebar" role="navigation">',
+                '<div class="navbar-default sidebar metismenu" role="navigation">',
                 '</div>'
             ],
             'options' => [
