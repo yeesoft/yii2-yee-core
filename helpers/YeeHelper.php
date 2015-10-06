@@ -161,4 +161,23 @@ class YeeHelper
         $interfaces = class_implements($classNamespace);
         return isset($interfaces[$interface]);
     }
+
+    /**
+     * Remove file or directory
+     *
+     * @param string $path
+     * @return boolean
+     */
+    public static function recursiveDelete($path)
+    {
+        if (is_file($path)) {
+            return @unlink($path);
+        } elseif (is_dir($path)) {
+            $scan = glob(rtrim($path, '/').'/*');
+            foreach ($scan as $index => $newPath) {
+                self::recursiveDelete($newPath);
+            }
+            return @rmdir($path);
+        }
+    }
 }
