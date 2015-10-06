@@ -127,6 +127,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = new $this->modelClass;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('crudMessage', 'Your item has been created.');
             return $this->redirect($this->getRedirectPage('create', $model));
         }
 
@@ -146,6 +147,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) AND $model->save()) {
+            Yii::$app->session->setFlash('crudMessage', 'Your item has been updated.');
             return $this->redirect($this->getRedirectPage('update', $model));
         }
 
@@ -165,6 +167,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = $this->findModel($id);
         $model->delete();
 
+        Yii::$app->session->setFlash('crudMessage', 'Your item has been deleted.');
         return $this->redirect($this->getRedirectPage('delete', $model));
     }
 

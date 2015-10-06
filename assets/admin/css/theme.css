@@ -6005,7 +6005,7 @@ a.thumbnail.active {
 }
 
 .alert {
-    padding: 15px;
+    padding: 5px 15px;
     margin-bottom: 20px;
     border: 1px solid transparent;
     border-radius: 4px;
@@ -6057,17 +6057,17 @@ a.thumbnail.active {
 }
 
 .alert-info {
-    background-color: #d9edf7;
-    border-color: #bce8f1;
-    color: #3a87ad;
+    background-color: #dfe2f1;
+    border-color: #c7d1e6;
+    color: #43618e;
 }
 
 .alert-info hr {
-    border-top-color: #a6e1ec;
+    border-top-color: #bbc4d8;
 }
 
 .alert-info .alert-link {
-    color: #2d6987;
+    color: #4c5997;
 }
 
 .alert-warning {

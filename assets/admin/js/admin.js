@@ -104,6 +104,10 @@ $(function () {
 })(jQuery);
 /********* FORM-STYLE SCRIPTS END ************/
 
+$(".alert").fadeTo(2000, 500).slideUp(500, function(){
+    $(".alert").alert('close');
+});
+
 $(function () {
     setTimeout(function () {
         // $('.glyphicon-select').remove();

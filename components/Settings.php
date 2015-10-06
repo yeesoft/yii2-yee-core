@@ -98,7 +98,7 @@ class Settings extends Component
     }
 
     /**
-     * Set setting value for the given key and group.
+     * Set setting value for the given key and group or create new setting field if it not exists.
      * You can use dot notation to separate the group from the key:
      * ~~~
      * $value = $settings->get('group.key');
@@ -109,11 +109,12 @@ class Settings extends Component
      * $value = $settings->get(['group', 'key']);
      * ~~~
      *
-     * @param $key
-     * @param $value
+     * @param $key - setting key
+     * @param $value - setting new value
+     * @param $description - description field in order of creating new setting field
      * @return boolean
      */
-    public function set($key, $value)
+    public function set($key, $value, $description = NULL)
     {
         $model = $this->modelClass;
         $key = self::explodeKey($key);
@@ -126,12 +127,18 @@ class Settings extends Component
         if ($setting) {
             $setting->value = $value;
             $setting->save();
-
-            if ($this->cache instanceof Cache) {
-                $this->cache->delete($this->cacheKey . $group . $key);
-            }
-
             unset($this->_data[$group][$key]);
+        } else {
+            $setting = new $model();
+            $setting->group = $group;
+            $setting->key = $key;
+            $setting->value = $value;
+            $setting->description = $description;
+            $setting->save();
+        }
+
+        if ($this->cache instanceof Cache) {
+            $this->cache->flush();
         }
     }
 

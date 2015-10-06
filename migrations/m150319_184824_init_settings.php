@@ -41,6 +41,9 @@ class m150319_184824_init_settings extends Migration
 
         $this->insert('setting',
             ['group' => 'general', 'key' => 'timezone', 'value' => 'Europe/London']);
+        
+        $this->insert('setting',
+            ['group' => 'reading', 'key' => 'page_size', 'value' => '10', 'description' => 'The number of items per page.']);
     }
 
     public function down()
