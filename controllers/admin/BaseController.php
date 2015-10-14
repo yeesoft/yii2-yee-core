@@ -2,6 +2,7 @@
 
 namespace yeesoft\controllers\admin;
 
+use yeesoft\helpers\LanguageHelper;
 use yeesoft\helpers\YeeHelper;
 use yeesoft\models\OwnerAccess;
 use yeesoft\models\User;
@@ -293,7 +294,23 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         $modelClass = $this->modelClass;
 
-        if (($model = $modelClass::findOne($id)) !== null) {
+        if (LanguageHelper::isMultilingual(new $modelClass)) {
+            $condition = [];
+            $primaryKey = $modelClass::primaryKey();
+            $query = $modelClass::find();
+
+            if (isset($primaryKey[0])) {
+                $condition = [$primaryKey[0] => $id];
+            } else {
+                throw new InvalidConfigException('"' . Pos . '" must have a primary key.');
+            }
+
+            $model = $query->andWhere($condition)->multilingual()->one();
+        } else {
+            $model = $modelClass::findOne($id);
+        }
+
+        if ($model !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));

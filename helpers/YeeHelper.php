@@ -173,7 +173,7 @@ class YeeHelper
         if (is_file($path)) {
             return @unlink($path);
         } elseif (is_dir($path)) {
-            $scan = glob(rtrim($path, '/').'/*');
+            $scan = glob(rtrim($path, '/') . '/*');
             foreach ($scan as $index => $newPath) {
                 self::recursiveDelete($newPath);
             }

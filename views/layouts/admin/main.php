@@ -97,10 +97,12 @@ MetisMenuAsset::register($this);
                     ])
                     ?>
 
-                    <?php if(Yii::$app->session->hasFlash('crudMessage')): ?>
+                    <?php if (Yii::$app->session->hasFlash('crudMessage')): ?>
                         <div class="alert alert-info alert-dismissible" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                              <?= Yii::$app->session->getFlash('crudMessage') ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <?= Yii::$app->session->getFlash('crudMessage') ?>
                         </div>
                     <?php endif; ?>
 

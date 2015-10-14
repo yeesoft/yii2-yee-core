@@ -2,6 +2,8 @@
 
 namespace yeesoft\models;
 
+use omgdef\multilingual\MultilingualQuery;
+use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\MenuHelper;
 use yii\helpers\ArrayHelper;
 
@@ -22,6 +24,23 @@ class Menu extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'menu';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'multilingual' => [
+                'class' => MultilingualBehavior::className(),
+                'langForeignKey' => 'menu_id',
+                'tableName' => "{{%menu_lang}}",
+                'attributes' => [
+                    'title'
+                ]
+            ],
+        ];
     }
 
     /**
@@ -134,5 +153,14 @@ class Menu extends \yii\db\ActiveRecord
         }
 
         return NULL;
+    }
+
+    /**
+     * @inheritdoc
+     * @return MultilingualQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new MultilingualQuery(get_called_class());
     }
 }
