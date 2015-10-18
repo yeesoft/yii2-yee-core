@@ -4,6 +4,7 @@ namespace yeesoft\grid\columns;
 
 use Closure;
 use yeesoft\helpers\Html;
+use yeesoft\Yee;
 use Yii;
 use yii\helpers\Url;
 
@@ -117,35 +118,34 @@ class TitleActionColumn extends \yii\grid\DataColumn
         if (!isset($this->buttons['view'])) {
             $this->buttons['view'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yii::t('yii', 'View'),
-                    'aria-label' => Yii::t('yii', 'View'),
+                    'title' => Yee::t('yee', 'View'),
+                    'aria-label' => Yee::t('yee', 'View'),
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
-                return Html::a('View', $url, $options);
+                return Html::a(Yee::t('yee', 'View'), $url, $options);
             };
         }
         if (!isset($this->buttons['update'])) {
             $this->buttons['update'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yii::t('yii', 'Update'),
-                    'aria-label' => Yii::t('yii', 'Update'),
+                    'title' => Yee::t('yee', 'Edit'),
+                    'aria-label' => Yee::t('yee', 'Edit'),
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
-                return Html::a('Edit', $url, $options);
+                return Html::a(Yee::t('yee', 'Edit'), $url, $options);
             };
         }
         if (!isset($this->buttons['delete'])) {
             $this->buttons['delete'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yii::t('yii', 'Delete'),
-                    'aria-label' => Yii::t('yii', 'Delete'),
-                    'data-confirm' => Yii::t('yii',
-                        'Are you sure you want to delete this item?'),
+                    'title' => Yee::t('yee', 'Delete'),
+                    'aria-label' => Yee::t('yee', 'Delete'),
+                    'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                     'data-method' => 'post',
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
 
-                return Html::a('Delete', $url, $options);
+                return Html::a(Yee::t('yee', 'Delete'), $url, $options);
             };
         }
     }

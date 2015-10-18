@@ -1,6 +1,7 @@
 <?php
 namespace yeesoft\grid;
 
+use yeesoft\Yee;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
@@ -61,8 +62,8 @@ class GridBulkActions extends Widget
     {
         parent::init();
 
-        $this->promptText = $this->promptText ? $this->promptText : '--- With selected ---';
-        $this->confirmationText = $this->confirmationText ? $this->confirmationText : 'Delete elements?';
+        $this->promptText = $this->promptText ? $this->promptText : Yee::t('yee', '--- With selected ---');
+        $this->confirmationText = $this->confirmationText ? $this->confirmationText : Yii::t('yii', 'Are you sure you want to delete this item?');
     }
 
     /**
@@ -89,9 +90,9 @@ class GridBulkActions extends Widget
     {
         if (!$this->actions) {
             $this->actions = [
-                Url::to(['bulk-activate']) => 'Activate',
-                Url::to(['bulk-deactivate']) => 'Deactivate',
-                '----' => [Url::to(['bulk-delete']) => 'Delete'],
+                Url::to(['bulk-activate']) => Yee::t('yee', 'Activate'),
+                Url::to(['bulk-deactivate']) => Yee::t('yee', 'Deactivate'),
+                '----' => [Url::to(['bulk-delete']) => Yee::t('yee', 'Delete')],
             ];
         }
 

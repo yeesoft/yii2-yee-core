@@ -5,6 +5,7 @@ namespace yeesoft\models;
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\MenuHelper;
+use yeesoft\Yee;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -62,8 +63,8 @@ class Menu extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'title' => 'Title',
+            'id' => Yee::t('yee', 'ID'),
+            'title' => Yee::t('yee', 'Title'),
         ];
     }
 
