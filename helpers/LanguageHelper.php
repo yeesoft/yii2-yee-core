@@ -53,4 +53,13 @@ class LanguageHelper
 
         return Yii::$app->params['languages'];
     }
+
+    /**
+     * @param $language
+     * @return string
+     */
+    public static function getLanguageBaseName($language)
+    {
+        return substr($language, 0, 2);
+    }
 }

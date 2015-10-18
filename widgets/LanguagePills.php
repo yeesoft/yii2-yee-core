@@ -23,7 +23,7 @@ class LanguagePills extends \yii\base\Widget
 
             foreach ($languages as $key => $language) {
                 $class = (($key === $defaultLanguage) ? 'class="active"' : '');
-                $content .= '<li ' . $class . '><a data-toggle="pill" href="#' . $key . '">' . $language . '</a></li>';
+                $content .= '<li ' . $class . '><a data-lang="' . $key . '" data-toggle="pill" href="#' . $key . '">' . $language . '</a></li>';
             }
             $content .= '</ul>';
         }

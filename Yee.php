@@ -135,7 +135,20 @@ class Yee extends \yii\base\Module
     {
         parent::init();
 
+        $this->registerTranslations();
         $this->prepareMailerOptions();
+    }
+
+    public function registerTranslations()
+    {
+        Yii::$app->i18n->translations['yii2-yee-core/*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@vendor/yeesoft/yii2-yee-core/messages',
+            'fileMap' => [
+                'yii2-yee-core/yee' => 'yee.php',
+            ],
+        ];
     }
 
     /**
@@ -150,20 +163,7 @@ class Yee extends \yii\base\Module
      */
     public static function t($category, $message, $params = [], $language = null)
     {
-        if (!isset(Yii::$app->i18n->translations['yii2-yee-core/*'])) {
-            Yii::$app->i18n->translations['yii2-yee-core/*'] = [
-                'class' => 'yii\i18n\PhpMessageSource',
-                'sourceLanguage' => 'en',
-                'basePath' => '@vendor/yeesoft/yii2-yee-core/messages',
-                'fileMap' => [
-                    'yii2-yee-core/back' => 'back.php',
-                    'yii2-yee-core/front' => 'front.php',
-                ],
-            ];
-        }
-
-        return Yii::t('yii2-yee-core/' . $category, $message, $params,
-            $language);
+        return Yii::t('yii2-yee-core/' . $category, $message, $params, $language);
     }
 
     /**
