@@ -47,7 +47,8 @@ class m150319_194321_init_menus extends Migration
 
         $this->addForeignKey('fk_menu_link', 'menu_link', 'menu_id', 'menu', 'id', 'CASCADE');
 
-        $this->insert('menu', ['id' => 'admin-main-menu', 'title' => 'Main Admin Panel Menu']);
+        $this->insert('menu', ['id' => 'admin-main-menu']);
+        $this->insert('menu_lang', ['menu_id' => 'admin-main-menu','language' => 'en', 'title' => 'Main Admin Panel Menu']);
 
         $this->insert('menu_link', [
             'id' => 'dashboard', 'menu_id' => 'admin-main-menu', 'link' => '/',
