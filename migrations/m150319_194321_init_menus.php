@@ -26,7 +26,7 @@ class m150319_194321_init_menus extends Migration
             'title' => Schema::TYPE_TEXT . ' NOT NULL',
         ], $tableOptions);
 
-        $this->createIndex('menu_lang_post_id', 'menu_lang', 'post_id');
+        $this->createIndex('menu_lang_post_id', 'menu_lang', 'menu_id');
         $this->createIndex('menu_lang_language', 'menu_lang', 'language');
         $this->addForeignKey('fk_menu_lang', 'menu_lang', 'menu_id', 'menu', 'id', 'CASCADE', 'CASCADE');
 
