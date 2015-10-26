@@ -4,9 +4,9 @@
  */
 ?>
 <?php
-use yeesoft\Yee;
 use yii\helpers\Html;
 use yii\web\View;
+use yeesoft\Yee;
 
 ?>
 <div class="<?= $this->context->wrapperClass ?>">

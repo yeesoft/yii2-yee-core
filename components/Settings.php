@@ -83,18 +83,18 @@ class Settings extends Component
      * @param null $default Default value
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get($key, $default = NULL, $language = -1)
     {
         $key = self::explodeKey($key);
 
         $group = $key[0];
         $key = $key[1];
 
-        if (!isset($this->_data[$group][$key])) {
-            $this->load($group, $key);
+        if (!isset($this->_data[$group][$key][$language])) {
+            $this->load($group, $key, $language);
         }
 
-        return (isset($this->_data[$group][$key])) ? $this->_data[$group][$key] : $default;
+        return (isset($this->_data[$group][$key][$language])) ? $this->_data[$group][$key][$language] : $default;
     }
 
     /**
@@ -119,20 +119,22 @@ class Settings extends Component
         $model = $this->modelClass;
         $key = self::explodeKey($key);
 
+        $language = isset($key[2]) ? $key[2] : NULL ;
         $group = $key[0];
         $key = $key[1];
-
-        $setting = $model::getSetting($group, $key);
+        
+        $setting = $model::getSetting($group, $key, $language);
 
         if ($setting) {
             $setting->value = $value;
             $setting->save();
-            unset($this->_data[$group][$key]);
+            unset($this->_data[$group][$key][$language]);
         } else {
             $setting = new $model();
             $setting->group = $group;
             $setting->key = $key;
             $setting->value = $value;
+            $setting->language = $language;
             $setting->description = $description;
             $setting->save();
         }
@@ -150,10 +152,10 @@ class Settings extends Component
      * @param type $default Default value
      * @return mixed
      */
-    protected function getFromDB($group, $key, $default = NULL)
+    protected function getFromDB($group, $key, $language = NULL, $default = NULL)
     {
         $model = $this->modelClass;
-        $setting = $model::getSetting($group, $key);
+        $setting = $model::getSetting($group, $key, $language);
         return ($setting) ? $setting->value : $default;
     }
 
@@ -163,23 +165,23 @@ class Settings extends Component
      * @param string $group Setting group
      * @param string $key Setting key
      */
-    protected function load($group, $key)
+    protected function load($group, $key, $language = NULL)
     {
         $value = NULL;
 
         if ($this->cache instanceof Cache) {
-            $value = $this->cache->get($this->cacheKey . $group . $key);
+            $value = $this->cache->get($this->cacheKey . $group . $key . $language);
 
             if ($value === false) {
-                $value = $this->getFromDB($group, $key);
-                $this->cache->set($this->cacheKey . $group . $key, $value);
+                $value = $this->getFromDB($group, $key, $language);
+                $this->cache->set($this->cacheKey . $group . $key . $language, $value);
             }
         } else {
-            $value = $this->getFromDB($group, $key);
+            $value = $this->getFromDB($group, $key, $language);
         }
 
         if ($value !== NULL) {
-            $this->_data[$group][$key] = $value;
+            $this->_data[$group][$key][$language] = $value;
         }
     }
 
@@ -193,13 +195,13 @@ class Settings extends Component
     {
         if (is_string($key)) {
             $array = explode('.', $key);
-            if (count($array) == 2) {
-                return [$array[0], $array[1]];
+            if (count($array) == 2 || count($array) == 3) {
+                return $array;
             } else {
                 throw new InvalidParamException();
             }
         }
-        if (is_array($key) && count($key) == 2) {
+        if (is_array($key) && (count($key) == 2 || count($key) == 3)) {
             return $key;
         }
 

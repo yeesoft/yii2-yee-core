@@ -5,8 +5,8 @@ namespace yeesoft\models;
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\MenuHelper;
-use yeesoft\Yee;
 use yii\helpers\ArrayHelper;
+use yeesoft\Yee;
 
 /**
  * This is the model class for table "menu".

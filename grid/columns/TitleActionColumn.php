@@ -4,9 +4,9 @@ namespace yeesoft\grid\columns;
 
 use Closure;
 use yeesoft\helpers\Html;
-use yeesoft\Yee;
 use Yii;
 use yii\helpers\Url;
+use yeesoft\Yee;
 
 /**
  * TitleActionColumn is a column for the [[GridView]] widget that displays action

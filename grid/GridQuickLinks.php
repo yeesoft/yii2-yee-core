@@ -5,11 +5,11 @@ namespace yeesoft\grid;
 use yeesoft\helpers\YeeHelper;
 use yeesoft\models\OwnerAccess;
 use yeesoft\models\User;
-use yeesoft\Yee;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
+use yeesoft\Yee;
 
 class GridQuickLinks extends Widget
 {
@@ -125,7 +125,7 @@ class GridQuickLinks extends Widget
     {
         parent::init();
 
-        if (!$this->defaultOptions) {
+        if(!$this->defaultOptions){
             $this->defaultOptions = [
                 'all' => ['label' => Yee::t('yee', 'All'), 'filterWhere' => []],
                 'active' => ['label' => Yee::t('yee', 'Active'), 'filterWhere' => ['status' => 1]],
@@ -135,7 +135,7 @@ class GridQuickLinks extends Widget
 
     }
 
-    /**
+        /**
      * @throws \yii\base\InvalidConfigException
      * @return string
      */

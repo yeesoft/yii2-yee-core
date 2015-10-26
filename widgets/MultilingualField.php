@@ -13,6 +13,8 @@ class MultilingualField extends \yii\widgets\ActiveField
 {
     public $language = NULL;
 
+    public $multilingual = FALSE;
+
     public function init()
     {
         parent::init();
@@ -20,7 +22,7 @@ class MultilingualField extends \yii\widgets\ActiveField
         $languages = Yii::$app->params['languages'];
         $isCurrentLanguage = (Yii::$app->language == $this->language);
 
-        if ($this->language !== NULL && LanguageHelper::isMultilingual($this->model)) {
+        if ($this->language !== NULL && (LanguageHelper::isMultilingual($this->model) || $this->multilingual)) {
             $languageLabel = $languages[$this->language];
             $inputLabel = $this->model->getAttributeLabel($this->attribute) . ((count($languages) > 1) ? " [$languageLabel]" : '');
 

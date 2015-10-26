@@ -29,7 +29,7 @@ class Setting extends \yii\db\ActiveRecord
     {
         return [
             [['key'], 'required'],
-            [['value'], 'string'],
+            [['value', 'language'], 'string'],
             [['key', 'group'], 'string', 'max' => 64],
         ];
     }
@@ -43,6 +43,7 @@ class Setting extends \yii\db\ActiveRecord
             'key' => 'Key',
             'group' => 'Group',
             'value' => 'Value',
+            'language' => 'Language',
         ];
     }
 
@@ -53,8 +54,8 @@ class Setting extends \yii\db\ActiveRecord
      * @param type $key
      * @return type
      */
-    public static function getSetting($group, $key)
+    public static function getSetting($group, $key, $language = NULL)
     {
-        return self::findOne(['group' => $group, 'key' => $key]);
+        return self::findOne(['group' => $group, 'key' => $key, 'language' => $language]);
     }
 }

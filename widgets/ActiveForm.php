@@ -16,12 +16,16 @@ class ActiveForm extends DefaultActiveForm
     {
         $fields = [];
 
-        if (LanguageHelper::isMultilingual($model) && $model->hasLangAttribute($attribute)) {
-            $languages = array_keys(LanguageHelper::getModelLanguages($model));
+        $isMultilingualOption = (isset($options['multilingual']) && $options['multilingual']);
+        $isMultilingualAttribute = (LanguageHelper::isMultilingual($model) && $model->hasLangAttribute($attribute));
+
+        if ($isMultilingualOption || $isMultilingualAttribute) {
+            $languages = array_keys(LanguageHelper::getLanguages());
 
             foreach ($languages as $language) {
                 $fields[] = parent::field($model, $attribute, array_merge($options, ['language' => $language]));
             }
+
         } else {
             return parent::field($model, $attribute, $options);
         }

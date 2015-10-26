@@ -1,11 +1,11 @@
 <?php
 namespace yeesoft\grid;
 
-use yeesoft\Yee;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\Url;
+use yeesoft\Yee;
 
 class GridBulkActions extends Widget
 {
