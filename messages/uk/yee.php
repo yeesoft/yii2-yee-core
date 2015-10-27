@@ -8,6 +8,8 @@ return [
     'Content' => 'Вміст',
     'Create' => 'Створити',
     'Create {item}' => 'Створити {item}',
+    'Login' => 'Ввійти',
+    'Logout {username}' => 'Вийти {username}',
     'Created' => 'Створено',
     'Delete' => 'Видалити',
     'Edit' => 'Редагувати',
@@ -31,4 +33,7 @@ return [
     'Deactivate' => 'Деактивувати',
     'Inactive' => 'Неактивні',
     '--- With selected ---' => '--- З вибраним ---',
+    'Open' => 'Відкрито',
+    'Closed' => 'Закрито',
+    'Control Panel' => 'Панель Управління',
 ];

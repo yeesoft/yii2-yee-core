@@ -12,6 +12,11 @@ class MultilingualBehavior extends OriginalMultilingualBehavior
     /**
      * @inheritdoc
      */
+    public $requireTranslations = true;
+
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         parent::init();

@@ -6,6 +6,7 @@ use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
 use yeesoft\models\Menu;
 use yeesoft\widgets\Nav;
+use yeesoft\Yee;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
@@ -36,7 +37,7 @@ MetisMenuAsset::register($this);
 
         <?php
         NavBar::begin([
-            'brandLabel' => '<b style="font-size:1.1em;">Yee</b> Control Panel',
+            'brandLabel' => '<b style="font-size:1.1em;">Yee</b> ' . Yee::t('yee', 'Control Panel'),
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-static-top',
@@ -52,14 +53,15 @@ MetisMenuAsset::register($this);
         ];
 
         if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Login', 'url' => ['/auth/login']];
+            $menuItems[] = ['label' => Yee::t('yee', 'Login'), 'url' => ['/auth/login']];
         } else {
             $menuItems[] = [
-                'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+                'label' => Yee::t('yee', 'Logout {username}', ['username' => Yii::$app->user->identity->username]),
                 'url' => Yii::$app->urlManager->hostInfo . '/auth/logout',
                 'linkOptions' => ['data-method' => 'post']
             ];
         }
+        
         echo Nav::widget([
             'encodeLabels' => false,
             'options' => ['class' => 'navbar-nav navbar-right'],
@@ -85,17 +87,11 @@ MetisMenuAsset::register($this);
         <!-- !SIDEBAR NAV -->
     </nav>
 
-
     <div id="page-wrapper">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <?=
-                    Breadcrumbs::widget([
-                        'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs']
-                            : [],
-                    ])
-                    ?>
+                    <?= Breadcrumbs::widget(['links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : []]) ?>
 
                     <?php if (Yii::$app->session->hasFlash('crudMessage')): ?>
                         <div class="alert alert-info alert-dismissible" role="alert">
@@ -108,20 +104,18 @@ MetisMenuAsset::register($this);
 
                     <?= $content ?>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
 </div>
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left"><a href="http://www.yee-soft.com/" rel="external">Yee</a> Control
-            Panel &copy; <?= date('Y') ?></p>
-
+        <p class="pull-left">
+            <a href="http://www.yee-soft.com/" rel="external">Yee</a>
+            <?= Yee::t('yee', 'Control Panel') ?> &copy; <?= date('Y') ?>
+        </p>
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
