@@ -107,16 +107,3 @@ $(function () {
 $(".alert").fadeTo(2000, 500).slideUp(500, function () {
     $(".alert").alert('close');
 });
-
-$(function () {
-    //language pills for switching multilingual fields
-    $('div[data-toggle="multilang"]').not('.in').hide();
-
-    $(document).on('click', '.language-pills a', function (e) {
-        var lang = $(this).attr('data-lang');
-        $('div[data-toggle="multilang"]').hide();
-        $('div[data-lang="' + lang + '"]').show();
-    });
-});
-
-

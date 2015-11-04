@@ -275,13 +275,3 @@ div.jq-selectbox.form-control {
         margin-left: auto;
     }
 }
-
-.language-pills {
-    margin-top: -8px;
-}
-
-.language-pills > li > a {
-    font-size: 0.8em;
-    padding: 1px 7px;
-    border-radius: 2px;
-}

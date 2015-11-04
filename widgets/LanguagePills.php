@@ -4,6 +4,7 @@ namespace yeesoft\widgets;
 
 use yeesoft\helpers\LanguageHelper;
 use Yii;
+use yeesoft\assets\LanguagePillsAsset;
 
 
 /**
@@ -14,6 +15,8 @@ class LanguagePills extends \yii\base\Widget
 
     public function run()
     {
+        LanguagePillsAsset::register($this->view);
+
         $content = '';
         $languages = LanguageHelper::getLanguages();
         $defaultLanguage = Yii::$app->language;

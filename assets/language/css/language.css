@@ -1,0 +1,13 @@
+.language-pills {
+    margin-top: -8px;
+}
+
+.language-pills > li > a {
+    font-size: 0.8em !important;
+    padding: 1px 7px !important;
+    border-radius: 2px !important;
+}
+
+#fileinfo .language-pills {
+    margin-top: -28px;
+}
