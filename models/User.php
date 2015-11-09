@@ -211,9 +211,9 @@ class User extends UserIdentity
     public static function getStatusList()
     {
         return array(
-            self::STATUS_ACTIVE => Yee::t('back', 'Active'),
-            self::STATUS_INACTIVE => Yee::t('back', 'Inactive'),
-            self::STATUS_BANNED => Yee::t('back', 'Banned'),
+            self::STATUS_ACTIVE => Yee::t('yee', 'Active'),
+            self::STATUS_INACTIVE => Yee::t('yee', 'Inactive'),
+            self::STATUS_BANNED => Yee::t('yee', 'Banned'),
         );
     }
 
@@ -303,7 +303,7 @@ class User extends UserIdentity
             ]);
 
             if ($exists AND $exists->id != $this->id) {
-                $this->addError('email', Yee::t('front', 'This E-mail already exists'));
+                $this->addError('email', Yee::t('yee', 'This e-mail already exists'));
             }
         }
     }
@@ -318,7 +318,7 @@ class User extends UserIdentity
 
             foreach ($ips as $ip) {
                 if (!filter_var(trim($ip), FILTER_VALIDATE_IP)) {
-                    $this->addError('bind_to_ip', Yee::t('back', "Wrong format. Enter valid IPs separated by comma"));
+                    $this->addError('bind_to_ip', Yee::t('yee', "Wrong format. Enter valid IPs separated by comma"));
                 }
             }
         }
@@ -330,20 +330,20 @@ class User extends UserIdentity
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'username' => Yee::t('back', 'Login'),
-            'superadmin' => Yee::t('back', 'Superadmin'),
-            'confirmation_token' => 'Confirmation Token',
-            'registration_ip' => Yee::t('back', 'Registration IP'),
-            'bind_to_ip' => Yee::t('back', 'Bind to IP'),
-            'status' => Yee::t('back', 'Status'),
-            'gridRoleSearch' => Yee::t('back', 'Roles'),
-            'created_at' => Yee::t('back', 'Created'),
-            'updated_at' => Yee::t('back', 'Updated'),
-            'password' => Yee::t('back', 'Password'),
-            'repeat_password' => Yee::t('back', 'Repeat password'),
-            'email_confirmed' => Yee::t('back', 'E-mail confirmed'),
-            'email' => 'E-mail',
+            'id' => Yee::t('yee', 'ID'),
+            'username' => Yee::t('yee', 'Login'),
+            'superadmin' => Yee::t('yee', 'Superadmin'),
+            'confirmation_token' => Yee::t('yee', 'Confirmation Token'),
+            'registration_ip' => Yee::t('yee', 'Registration IP'),
+            'bind_to_ip' => Yee::t('yee', 'Bind to IP'),
+            'status' => Yee::t('yee', 'Status'),
+            'gridRoleSearch' => Yee::t('yee', 'Roles'),
+            'created_at' => Yee::t('yee', 'Created'),
+            'updated_at' => Yee::t('yee', 'Updated'),
+            'password' => Yee::t('yee', 'Password'),
+            'repeat_password' => Yee::t('yee', 'Repeat password'),
+            'email_confirmed' => Yee::t('yee', 'E-mail confirmed'),
+            'email' => Yee::t('yee', 'E-mail'),
         ];
     }
 

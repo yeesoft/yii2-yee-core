@@ -199,14 +199,14 @@ abstract class AbstractItem extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'name' => Yee::t('back', 'Code'),
-            'description' => Yee::t('back', 'Description'),
-            'rule_name' => Yee::t('back', 'Rule'),
-            'group_code' => Yee::t('back', 'Group'),
-            'data' => Yee::t('back', 'Data'),
-            'type' => Yee::t('back', 'Type'),
-            'created_at' => Yee::t('back', 'Created'),
-            'updated_at' => Yee::t('back', 'Updated'),
+            'name' => Yee::t('yee', 'Code'),
+            'description' => Yee::t('yee', 'Role'),
+            'rule_name' => Yee::t('yee', 'Rule'),
+            'group_code' => Yee::t('yee', 'Group'),
+            'data' => Yee::t('yee', 'Data'),
+            'type' => Yee::t('yee', 'Type'),
+            'created_at' => Yee::t('yee', 'Created'),
+            'updated_at' => Yee::t('yee', 'Updated'),
         ];
     }
 

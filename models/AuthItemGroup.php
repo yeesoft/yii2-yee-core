@@ -55,10 +55,10 @@ class AuthItemGroup extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'name' => Yee::t('back', 'Name'),
-            'code' => Yee::t('back', 'Code'),
-            'created_at' => Yee::t('back', 'Created'),
-            'updated_at' => Yee::t('back', 'Updated'),
+            'name' => Yee::t('yee', 'Name'),
+            'code' => Yee::t('yee', 'Code'),
+            'created_at' => Yee::t('yee', 'Created'),
+            'updated_at' => Yee::t('yee', 'Updated'),
         ];
     }
 }

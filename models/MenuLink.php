@@ -2,7 +2,10 @@
 
 namespace yeesoft\models;
 
+use omgdef\multilingual\MultilingualQuery;
+use yeesoft\behaviors\MultilingualBehavior;
 use yii\helpers\ArrayHelper;
+use yeesoft\Yee;
 
 /**
  * This is the model class for table "menu_link".
@@ -32,6 +35,23 @@ class MenuLink extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public function behaviors()
+    {
+        return [
+            'multilingual' => [
+                'class' => MultilingualBehavior::className(),
+                'langForeignKey' => 'link_id',
+                'tableName' => "{{%menu_link_lang}}",
+                'attributes' => [
+                    'label'
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -40,7 +60,7 @@ class MenuLink extends \yii\db\ActiveRecord
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.'],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yee::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.') ],
         ];
     }
 
@@ -50,14 +70,14 @@ class MenuLink extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'menu_id' => 'Menu',
-            'link' => 'Link',
-            'label' => 'Label',
-            'parent_id' => 'Parent Link',
-            'alwaysVisible' => 'Always Visible',
-            'image' => 'Icon',
-            'order' => 'Order',
+            'id' => Yee::t('yee', 'ID'),
+            'menu_id' => Yee::t('yee','Menu'),
+            'link' => Yee::t('yee', 'Link'),
+            'label' => Yee::t('yee', 'Label'),
+            'parent_id' => Yee::t('yee','Parent Link'),
+            'alwaysVisible' => Yee::t('yee','Always Visible'),
+            'image' => Yee::t('yee', 'Icon'),
+            'order' => Yee::t('yee', 'Order'),
         ];
     }
 
@@ -66,7 +86,7 @@ class MenuLink extends \yii\db\ActiveRecord
      */
     public function getMenu()
     {
-        return $this->hasOne(Menu::className(), ['id' => 'menu_id']);
+        return $this->hasOne(Menu::className(), ['id' => 'menu_id'])->joinWith('translations');
     }
 
     /**
@@ -75,17 +95,26 @@ class MenuLink extends \yii\db\ActiveRecord
      */
     public function getSiblings()
     {
-        $siblings = MenuLink::find()
+        $siblings = MenuLink::find()->joinWith('translations')
             ->andFilterWhere(['like', 'menu_id', $this->menu_id])
-            ->andFilterWhere(['!=', 'id', $this->id])
-            ->asArray()->all();
+            ->andFilterWhere(['!=', 'menu_link.id', $this->id])
+            ->all();
 
         $list = ArrayHelper::map(
             $siblings, 'id',
             function ($array, $default) {
-                return $array['label'] . ' [' . $array['id'] . ']';
+                return $array->label . ' [' . $array->id . ']';
             });
 
-        return ArrayHelper::merge([NULL => 'No Parent'], $list);
+        return ArrayHelper::merge([NULL => Yee::t('yee','No Parent')], $list);
+    }
+
+    /**
+     * @inheritdoc
+     * @return MultilingualQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new MultilingualQuery(get_called_class());
     }
 }

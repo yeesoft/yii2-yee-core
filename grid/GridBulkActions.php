@@ -92,7 +92,7 @@ class GridBulkActions extends Widget
             $this->actions = [
                 Url::to(['bulk-activate']) => Yee::t('yee', 'Activate'),
                 Url::to(['bulk-deactivate']) => Yee::t('yee', 'Deactivate'),
-                '----' => [Url::to(['bulk-delete']) => Yee::t('yee', 'Delete')],
+                Url::to(['bulk-delete']) => Yee::t('yee', 'Delete'),
             ];
         }
 

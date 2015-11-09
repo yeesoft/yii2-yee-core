@@ -103,15 +103,15 @@ class UserVisitLog extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'token' => 'Token',
-            'ip' => 'IP',
-            'language' => Yee::t('back', 'Language'),
-            'browser' => Yee::t('back', 'Browser'),
-            'os' => Yee::t('back', 'OS'),
-            'user_agent' => Yee::t('back', 'User agent'),
-            'user_id' => Yee::t('back', 'User'),
-            'visit_time' => Yee::t('back', 'Visit Time'),
+            'id' => Yee::t('yee', 'ID'),
+            'token' => Yee::t('yee', 'Token'),
+            'ip' => Yee::t('yee', 'IP'),
+            'language' => Yee::t('yee', 'Language'),
+            'browser' => Yee::t('yee', 'Browser'),
+            'os' => Yee::t('yee', 'OS'),
+            'user_agent' => Yee::t('yee', 'User agent'),
+            'user_id' => Yee::t('yee', 'User'),
+            'visit_time' => Yee::t('yee', 'Visit Time'),
         ];
     }
 

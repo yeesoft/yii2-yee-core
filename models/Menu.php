@@ -53,7 +53,7 @@ class Menu extends \yii\db\ActiveRecord
             [['id', 'title'], 'required'],
             [['id'], 'string', 'max' => 64],
             [['title'], 'string', 'max' => 255],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.'],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' =>  Yee::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -69,11 +69,11 @@ class Menu extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return \omgdef\multilingual\MultilingualQuery
      */
     public function getLinks()
     {
-        return $this->hasMany(MenuLink::className(), ['menu_id' => 'id']);
+        return $this->hasMany(MenuLink::className(), ['menu_id' => 'id'])->joinWith('translations');
     }
 
     /**
@@ -94,7 +94,7 @@ class Menu extends \yii\db\ActiveRecord
         $links = self::findOne($menu_id)
             ->getLinks()
             ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
-            ->asArray()->all();
+            ->all();
 
         return self::generateNavigationItems($links);
     }
@@ -105,7 +105,7 @@ class Menu extends \yii\db\ActiveRecord
         $linksByParent = [];
 
         foreach ($links as $link) {
-            $linksByParent[$link['parent_id']][] = $link;
+            $linksByParent[$link->parent_id][] = $link;
         }
 
         foreach ($linksByParent[''] as $link) {
@@ -118,20 +118,19 @@ class Menu extends \yii\db\ActiveRecord
     private static function generateItem($link, $menuLinks)
     {
         $item = [];
-        $icon = (!empty($link['image'])) ? MenuHelper::generateIcon($link['image']) . ' '
-            : '';
+        $icon = (!empty($link->image)) ? MenuHelper::generateIcon($link->image) . ' ' : '';
 
-        $subItems = self::generateSubItems($link['id'], $menuLinks);
+        $subItems = self::generateSubItems($link->id, $menuLinks);
 
-        $item['label'] = $icon . $link['label'];
+        $item['label'] = $icon . $link->label;
 
-        if (isset($link['alwaysVisible']) && $link['alwaysVisible']) {
+        if (isset($link->alwaysVisible) && $link->alwaysVisible) {
             $item['visible'] = true;
         }
 
-        if ($link['link']) {
-            $url = parse_url($link['link']);
-            $item['url'] = (isset($url['scheme'])) ? $link['link'] : [$link['link']];
+        if ($link->link) {
+            $url = parse_url($link->link);
+            $item['url'] = (isset($url['scheme'])) ? $link->link : [$link->link];
         }
 
         if (is_array($subItems)) {

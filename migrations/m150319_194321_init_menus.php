@@ -34,7 +34,6 @@ class m150319_194321_init_menus extends Migration
             'id' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
             'menu_id' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
             'link' => Schema::TYPE_STRING . '(255) COLLATE utf8_unicode_ci DEFAULT NULL',
-            'label' => Schema::TYPE_STRING . '(255) COLLATE utf8_unicode_ci NOT NULL',
             'parent_id' => Schema::TYPE_STRING . "(64) COLLATE utf8_unicode_ci DEFAULT ''",
             'image' => Schema::TYPE_STRING . '(24) COLLATE utf8_unicode_ci DEFAULT NULL',
             'alwaysVisible' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
@@ -45,21 +44,32 @@ class m150319_194321_init_menus extends Migration
         $this->createIndex('link_menu_id', 'menu_link', 'menu_id');
         $this->createIndex('link_parent_id', 'menu_link', 'parent_id');
 
+        $this->createTable('menu_link_lang', [
+            'id' => 'pk',
+            'link_id' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
+            'language' => Schema::TYPE_STRING . '(6) NOT NULL',
+            'label' => Schema::TYPE_STRING . '(255) COLLATE utf8_unicode_ci NOT NULL',
+        ], $tableOptions);
+
+        $this->createIndex('menu_link_lang_link_id', 'menu_link_lang', 'link_id');
+        $this->createIndex('menu_link_lang_language', 'menu_link_lang', 'language');
+        $this->addForeignKey('fk_menu_link_lang', 'menu_link_lang', 'link_id', 'menu_link', 'id', 'CASCADE', 'CASCADE');
+
         $this->addForeignKey('fk_menu_link', 'menu_link', 'menu_id', 'menu', 'id', 'CASCADE');
 
         $this->insert('menu', ['id' => 'admin-main-menu']);
         $this->insert('menu_lang', ['menu_id' => 'admin-main-menu','language' => 'en', 'title' => 'Main Admin Panel Menu']);
 
-        $this->insert('menu_link', [
-            'id' => 'dashboard', 'menu_id' => 'admin-main-menu', 'link' => '/',
-            'label' => 'Dashboard', 'image' => 'th-large', 'order' => 1
-        ]);
+        $this->insert('menu_link', ['id' => 'dashboard', 'menu_id' => 'admin-main-menu', 'link' => '/', 'image' => 'th-large', 'order' => 1]);
+        $this->insert('menu_link_lang', ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en' ]);
     }
 
     public function down()
     {
+        $this->dropForeignKey('fk_menu_link_lang', 'menu_link_lang');
         $this->dropForeignKey('fk_menu_link', 'menu_link');
         $this->dropForeignKey('fk_menu_lang', 'menu_link');
+        $this->dropTable('menu_link_lang');
         $this->dropTable('menu_link');
         $this->dropTable('menu_lang');
         $this->dropTable('menu');
