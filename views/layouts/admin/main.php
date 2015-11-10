@@ -10,6 +10,7 @@ use yeesoft\Yee;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
+use yeesoft\widgets\LanguageSelector;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -61,12 +62,14 @@ MetisMenuAsset::register($this);
                 'linkOptions' => ['data-method' => 'post']
             ];
         }
-        
+
         echo Nav::widget([
             'encodeLabels' => false,
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => $menuItems,
         ]);
+
+        echo LanguageSelector::widget(['display' => 'label', 'view' => 'pills']);
 
         NavBar::end();
         ?>
@@ -116,6 +119,7 @@ MetisMenuAsset::register($this);
             <a href="http://www.yee-soft.com/" rel="external">Yee</a>
             <?= Yee::t('yee', 'Control Panel') ?> &copy; <?= date('Y') ?>
         </p>
+
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>

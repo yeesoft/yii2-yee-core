@@ -1,0 +1,8 @@
+.multilingual .nav > li > a { 
+    padding: 1px 5px;
+}
+
+.navbar-static-top .multilingual { 
+    padding-top: 10px;
+    float: right;
+}
