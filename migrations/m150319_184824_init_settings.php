@@ -15,6 +15,7 @@ class m150319_184824_init_settings extends Migration
 
         $this->createTable('setting',
             [
+                'id' => Schema::TYPE_PK,
                 'group' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci DEFAULT "general"',
                 'key' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
                 'language' => Schema::TYPE_STRING . '(6) COLLATE utf8_unicode_ci DEFAULT NULL',
@@ -22,7 +23,7 @@ class m150319_184824_init_settings extends Migration
                 'description' => Schema::TYPE_TEXT . ' COLLATE utf8_unicode_ci DEFAULT NULL',
             ], $tableOptions);
 
-        $this->addPrimaryKey('pk', 'setting', ['group', 'key']);
+        $this->createIndex('setting_group_lang', 'setting', 'group', 'language');
         $this->createIndex('setting_group', 'setting', 'group');
 
         $this->insert('setting',
