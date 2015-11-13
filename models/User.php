@@ -48,6 +48,47 @@ class User extends UserIdentity
     public $repeat_password;
 
     /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return Yii::$app->getModule('yee')->user_table;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            ['username', 'required'],
+            ['username', 'unique'],
+            ['username', 'trim'],
+            [['status', 'email_confirmed'], 'integer'],
+            ['email', 'email'],
+            ['email', 'validateEmailConfirmedUnique'],
+            ['bind_to_ip', 'validateBindToIp'],
+            ['bind_to_ip', 'trim'],
+            ['bind_to_ip', 'string', 'max' => 255],
+            ['password', 'required', 'on' => ['newUser', 'changePassword']],
+            ['password', 'string', 'max' => 255, 'on' => ['newUser', 'changePassword']],
+            ['password', 'trim', 'on' => ['newUser', 'changePassword']],
+            ['repeat_password', 'required', 'on' => ['newUser', 'changePassword']],
+            ['repeat_password', 'compare', 'compareAttribute' => 'password'],
+        ];
+    }
+    
+    /**
      * Store result in session to prevent multiple db requests with multiple calls
      *
      * @param bool $fromSession
@@ -243,52 +284,11 @@ class User extends UserIdentity
     }
 
     /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return Yii::$app->getModule('yee')->user_table;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
-
-    /**
      * Generates new password reset token
      */
     public function generatePasswordResetToken()
     {
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            ['username', 'required'],
-            ['username', 'unique'],
-            ['username', 'trim'],
-            [['status', 'email_confirmed'], 'integer'],
-            ['email', 'email'],
-            ['email', 'validateEmailConfirmedUnique'],
-            ['bind_to_ip', 'validateBindToIp'],
-            ['bind_to_ip', 'trim'],
-            ['bind_to_ip', 'string', 'max' => 255],
-            ['password', 'required', 'on' => ['newUser', 'changePassword']],
-            ['password', 'string', 'max' => 255, 'on' => ['newUser', 'changePassword']],
-            ['password', 'trim', 'on' => ['newUser', 'changePassword']],
-            ['repeat_password', 'required', 'on' => ['newUser', 'changePassword']],
-            ['repeat_password', 'compare', 'compareAttribute' => 'password'],
-        ];
     }
 
     /**

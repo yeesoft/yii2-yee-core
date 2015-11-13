@@ -7,9 +7,12 @@ use yeesoft\Yee;
 /**
  * This is the model class for table "setting".
  *
+ * @property int $id
  * @property string $key
  * @property string $group
+ * @property string $language
  * @property string $value
+ * @property string $description
  *
  * @author Taras Makitra <makitrataras@gmail.com>
  */

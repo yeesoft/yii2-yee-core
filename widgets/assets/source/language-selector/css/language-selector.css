@@ -6,3 +6,12 @@
     padding-top: 10px;
     float: right;
 }
+
+.navbar-static-top .multilingual { 
+    padding-top: 10px;
+    float: right;
+}
+
+.navbar-fixed-top .multilingual {
+    padding-top: 10px;
+}

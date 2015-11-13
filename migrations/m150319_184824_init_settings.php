@@ -23,8 +23,7 @@ class m150319_184824_init_settings extends Migration
                 'description' => Schema::TYPE_TEXT . ' COLLATE utf8_unicode_ci DEFAULT NULL',
             ], $tableOptions);
 
-        $this->createIndex('setting_group_lang', 'setting', 'group', 'language');
-        $this->createIndex('setting_group', 'setting', 'group');
+        $this->createIndex('setting_group_lang', 'setting', ['group', 'key', 'language']);
 
         $this->insert('setting',
             ['group' => 'general', 'key' => 'title', 'language' => 'en', 'value' => 'Yee Site']);
