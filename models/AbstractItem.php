@@ -3,7 +3,6 @@
 namespace yeesoft\models;
 
 use yeesoft\helpers\AuthHelper;
-use yeesoft\Yee;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -199,14 +198,14 @@ abstract class AbstractItem extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'name' => Yee::t('yee', 'Code'),
-            'description' => Yee::t('yee', 'Role'),
-            'rule_name' => Yee::t('yee', 'Rule'),
-            'group_code' => Yee::t('yee', 'Group'),
-            'data' => Yee::t('yee', 'Data'),
-            'type' => Yee::t('yee', 'Type'),
-            'created_at' => Yee::t('yee', 'Created'),
-            'updated_at' => Yee::t('yee', 'Updated'),
+            'name' => Yii::t('yee', 'Code'),
+            'description' => Yii::t('yee', 'Role'),
+            'rule_name' => Yii::t('yee', 'Rule'),
+            'group_code' => Yii::t('yee', 'Group'),
+            'data' => Yii::t('yee', 'Data'),
+            'type' => Yii::t('yee', 'Type'),
+            'created_at' => Yii::t('yee', 'Created'),
+            'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
 

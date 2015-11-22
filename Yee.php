@@ -7,6 +7,11 @@ use yii\helpers\ArrayHelper;
 
 class Yee extends \yii\base\Module
 {
+    /**
+     * Version number of the module.
+     */
+    const VERSION = '0.1-a';
+
     const SESSION_LAST_ATTEMPT = '_um_last_attempt';
     const SESSION_ATTEMPT_COUNT = '_um_attempt_count';
 
@@ -141,29 +146,11 @@ class Yee extends \yii\base\Module
 
     public function registerTranslations()
     {
-        Yii::$app->i18n->translations['yii2-yee-core/*'] = [
-            'class' => 'yii\i18n\PhpMessageSource',
+        Yii::$app->i18n->translations['yee*'] = [
+            'class' => 'yeesoft\i18n\DbMessageSource',
             'sourceLanguage' => 'en-US',
-            'basePath' => '@vendor/yeesoft/yii2-yee-core/messages',
-            'fileMap' => [
-                'yii2-yee-core/yee' => 'yee.php',
-            ],
+            'enableCaching' => true,
         ];
-    }
-
-    /**
-     * I18N helper
-     *
-     * @param string $category
-     * @param string $message
-     * @param array $params
-     * @param null|string $language
-     *
-     * @return string
-     */
-    public static function t($category, $message, $params = [], $language = null)
-    {
-        return Yii::t('yii2-yee-core/' . $category, $message, $params, $language);
     }
 
     /**

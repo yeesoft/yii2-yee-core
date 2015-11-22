@@ -85,7 +85,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
         $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
-            && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+            && !User::hasPermission($modelClass::getFullAccessPermission()));
 
         if ($searchModel) {
             $searchName = StringHelper::basename($searchModel::className());
@@ -192,7 +192,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
             $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
-                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+                && !User::hasPermission($modelClass::getFullAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
@@ -211,7 +211,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
             $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
-                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+                && !User::hasPermission($modelClass::getFullAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
@@ -230,7 +230,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
             $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
-                && !User::hasPermission($modelClass::getOwnerAccessPermission()));
+                && !User::hasPermission($modelClass::getFullAccessPermission()));
 
             foreach (Yii::$app->request->post('selection', []) as $id) {
                 $where = ['id' => $id];

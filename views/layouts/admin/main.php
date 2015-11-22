@@ -6,7 +6,6 @@ use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
 use yeesoft\models\Menu;
 use yeesoft\widgets\Nav;
-use yeesoft\Yee;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
@@ -38,7 +37,7 @@ MetisMenuAsset::register($this);
 
         <?php
         NavBar::begin([
-            'brandLabel' => '<b style="font-size:1.1em;">Yee</b> ' . Yee::t('yee', 'Control Panel'),
+            'brandLabel' => '<b style="font-size:1.1em;">Yee</b> ' . Yii::t('yee', 'Control Panel'),
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-static-top',
@@ -54,10 +53,10 @@ MetisMenuAsset::register($this);
         ];
 
         if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => Yee::t('yee', 'Login'), 'url' => ['/auth/login']];
+            $menuItems[] = ['label' => Yii::t('yee', 'Login'), 'url' => ['/auth/login']];
         } else {
             $menuItems[] = [
-                'label' => Yee::t('yee', 'Logout {username}', ['username' => Yii::$app->user->identity->username]),
+                'label' => Yii::t('yee', 'Logout {username}', ['username' => Yii::$app->user->identity->username]),
                 'url' => Yii::$app->urlManager->hostInfo . '/auth/logout',
                 'linkOptions' => ['data-method' => 'post']
             ];
@@ -117,7 +116,7 @@ MetisMenuAsset::register($this);
     <div class="container">
         <p class="pull-left">
             <a href="http://www.yee-soft.com/" rel="external">Yee</a>
-            <?= Yee::t('yee', 'Control Panel') ?> &copy; <?= date('Y') ?>
+            <?= Yii::t('yee', 'Control Panel') ?> &copy; <?= date('Y') ?>
         </p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>

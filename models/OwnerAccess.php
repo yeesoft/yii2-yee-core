@@ -11,7 +11,7 @@ interface OwnerAccess
     /**
      * Get permission to check whether the access is denied to users who are not authors of item.
      */
-    public static function getOwnerAccessPermission();
+    public static function getFullAccessPermission();
 
     /**
      * Returns name of field in the model indicating the author's id. Is used only when $ownerAccessPermission is set

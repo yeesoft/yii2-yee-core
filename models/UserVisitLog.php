@@ -4,7 +4,6 @@ namespace yeesoft\models;
 
 use Ikimea\Browser\Browser;
 use yeesoft\helpers\YeeHelper;
-use yeesoft\Yee;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -40,8 +39,7 @@ class UserVisitLog extends ActiveRecord
         $model->user_id = $userId;
         $model->token = uniqid();
         $model->ip = YeeHelper::getRealIp();
-        $model->language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],
-            0, 2) : null;
+        $model->language = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2) : null;
         $model->browser = $browser->getBrowser();
         $model->os = $browser->getPlatform();
         $model->user_agent = $browser->getUserAgent();
@@ -103,15 +101,15 @@ class UserVisitLog extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yee::t('yee', 'ID'),
-            'token' => Yee::t('yee', 'Token'),
-            'ip' => Yee::t('yee', 'IP'),
-            'language' => Yee::t('yee', 'Language'),
-            'browser' => Yee::t('yee', 'Browser'),
-            'os' => Yee::t('yee', 'OS'),
-            'user_agent' => Yee::t('yee', 'User agent'),
-            'user_id' => Yee::t('yee', 'User'),
-            'visit_time' => Yee::t('yee', 'Visit Time'),
+            'id' => Yii::t('yee', 'ID'),
+            'token' => Yii::t('yee', 'Token'),
+            'ip' => Yii::t('yee', 'IP'),
+            'language' => Yii::t('yee', 'Language'),
+            'browser' => Yii::t('yee', 'Browser'),
+            'os' => Yii::t('yee', 'OS'),
+            'user_agent' => Yii::t('yee', 'User agent'),
+            'user_id' => Yii::t('yee', 'User'),
+            'visit_time' => Yii::t('yee', 'Visit Time'),
         ];
     }
 
@@ -122,4 +120,25 @@ class UserVisitLog extends ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    /**
+     * Get visit date
+     *
+     * @return string
+     */
+    public function getVisitDate()
+    {
+        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->visit_time);
+    }
+
+    /**
+     * Get visit time
+     *
+     * @return string
+     */
+    public function getVisitTime()
+    {
+        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->visit_time);
+    }
+
 }

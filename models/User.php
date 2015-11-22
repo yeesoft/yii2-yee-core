@@ -4,7 +4,6 @@ namespace yeesoft\models;
 
 use yeesoft\helpers\AuthHelper;
 use yeesoft\helpers\YeeHelper;
-use yeesoft\Yee;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
@@ -252,9 +251,9 @@ class User extends UserIdentity
     public static function getStatusList()
     {
         return array(
-            self::STATUS_ACTIVE => Yee::t('yee', 'Active'),
-            self::STATUS_INACTIVE => Yee::t('yee', 'Inactive'),
-            self::STATUS_BANNED => Yee::t('yee', 'Banned'),
+            self::STATUS_ACTIVE => Yii::t('yee', 'Active'),
+            self::STATUS_INACTIVE => Yii::t('yee', 'Inactive'),
+            self::STATUS_BANNED => Yii::t('yee', 'Banned'),
         );
     }
 
@@ -303,7 +302,7 @@ class User extends UserIdentity
             ]);
 
             if ($exists AND $exists->id != $this->id) {
-                $this->addError('email', Yee::t('yee', 'This e-mail already exists'));
+                $this->addError('email', Yii::t('yee', 'This e-mail already exists'));
             }
         }
     }
@@ -318,7 +317,7 @@ class User extends UserIdentity
 
             foreach ($ips as $ip) {
                 if (!filter_var(trim($ip), FILTER_VALIDATE_IP)) {
-                    $this->addError('bind_to_ip', Yee::t('yee', "Wrong format. Enter valid IPs separated by comma"));
+                    $this->addError('bind_to_ip', Yii::t('yee', "Wrong format. Enter valid IPs separated by comma"));
                 }
             }
         }
@@ -330,20 +329,20 @@ class User extends UserIdentity
     public function attributeLabels()
     {
         return [
-            'id' => Yee::t('yee', 'ID'),
-            'username' => Yee::t('yee', 'Login'),
-            'superadmin' => Yee::t('yee', 'Superadmin'),
-            'confirmation_token' => Yee::t('yee', 'Confirmation Token'),
-            'registration_ip' => Yee::t('yee', 'Registration IP'),
-            'bind_to_ip' => Yee::t('yee', 'Bind to IP'),
-            'status' => Yee::t('yee', 'Status'),
-            'gridRoleSearch' => Yee::t('yee', 'Roles'),
-            'created_at' => Yee::t('yee', 'Created'),
-            'updated_at' => Yee::t('yee', 'Updated'),
-            'password' => Yee::t('yee', 'Password'),
-            'repeat_password' => Yee::t('yee', 'Repeat password'),
-            'email_confirmed' => Yee::t('yee', 'E-mail confirmed'),
-            'email' => Yee::t('yee', 'E-mail'),
+            'id' => Yii::t('yee', 'ID'),
+            'username' => Yii::t('yee', 'Login'),
+            'superadmin' => Yii::t('yee', 'Superadmin'),
+            'confirmation_token' => Yii::t('yee', 'Confirmation Token'),
+            'registration_ip' => Yii::t('yee', 'Registration IP'),
+            'bind_to_ip' => Yii::t('yee', 'Bind to IP'),
+            'status' => Yii::t('yee', 'Status'),
+            'gridRoleSearch' => Yii::t('yee', 'Roles'),
+            'created_at' => Yii::t('yee', 'Created'),
+            'updated_at' => Yii::t('yee', 'Updated'),
+            'password' => Yii::t('yee', 'Password'),
+            'repeat_password' => Yii::t('yee', 'Repeat password'),
+            'email_confirmed' => Yii::t('yee', 'E-mail confirmed'),
+            'email' => Yii::t('yee', 'E-mail'),
         ];
     }
 
@@ -431,14 +430,43 @@ class User extends UserIdentity
         return new UserQuery(get_called_class());
     }
 
+    /**
+     * Get created date
+     *
+     * @return string
+     */
     public function getCreatedDate()
     {
         return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->created_at);
     }
 
-    public function getCreatedDateTime()
+    /**
+     * Get created date
+     *
+     * @return string
+     */
+    public function getUpdatedDate()
     {
-        $format = Yii::$app->settings->get('general.dateformat') . ' ' . Yii::$app->settings->get('general.timeformat');
-        return date($format, ($this->isNewRecord) ? time() : $this->created_at);
+        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->updated_at);
+    }
+
+    /**
+     * Get created time
+     *
+     * @return string
+     */
+    public function getCreatedTime()
+    {
+        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->created_at);
+    }
+
+    /**
+     * Get created time
+     *
+     * @return string
+     */
+    public function getUpdatedTime()
+    {
+        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->updated_at);
     }
 }

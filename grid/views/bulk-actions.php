@@ -6,7 +6,6 @@
 <?php
 use yii\helpers\Html;
 use yii\web\View;
-use yeesoft\Yee;
 
 ?>
 <div class="<?= $this->context->wrapperClass ?>">
@@ -23,7 +22,7 @@ use yeesoft\Yee;
         ]
     ) ?>
 
-    <?= Html::tag('span', Yee::t('yee', 'OK'), [
+    <?= Html::tag('span', Yii::t('yee', 'OK'), [
         'class' => "grid-bulk-ok-button {$this->context->okButtonClass} disabled",
         'id' => "{$this->context->gridId}-ok-button",
         'data-list' => "#{$this->context->gridId}-bulk-actions",

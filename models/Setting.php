@@ -2,7 +2,7 @@
 
 namespace yeesoft\models;
 
-use yeesoft\Yee;
+use Yii;
 
 /**
  * This is the model class for table "setting".
@@ -45,10 +45,10 @@ class Setting extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'key' => Yee::t('yee', 'Key') ,
-            'group' => Yee::t('yee', 'Group'),
-            'value' => Yee::t('yee', 'Value'),
-            'language' => Yee::t('yee', 'Language'),
+            'key' => Yii::t('yee', 'Key') ,
+            'group' => Yii::t('yee', 'Group'),
+            'value' => Yii::t('yee', 'Value'),
+            'language' => Yii::t('yee', 'Language'),
         ];
     }
 

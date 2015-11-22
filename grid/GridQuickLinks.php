@@ -9,7 +9,6 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget;
 use yii\helpers\ArrayHelper;
-use yeesoft\Yee;
 
 class GridQuickLinks extends Widget
 {
@@ -127,9 +126,9 @@ class GridQuickLinks extends Widget
 
         if(!$this->defaultOptions){
             $this->defaultOptions = [
-                'all' => ['label' => Yee::t('yee', 'All'), 'filterWhere' => []],
-                'active' => ['label' => Yee::t('yee', 'Active'), 'filterWhere' => ['status' => 1]],
-                'inactive' => ['label' => Yee::t('yee', 'Inactive'), 'filterWhere' => ['status' => 0]],
+                'all' => ['label' => Yii::t('yee', 'All'), 'filterWhere' => []],
+                'active' => ['label' => Yii::t('yee', 'Active'), 'filterWhere' => ['status' => 1]],
+                'inactive' => ['label' => Yii::t('yee', 'Inactive'), 'filterWhere' => ['status' => 0]],
             ];
         }
 
@@ -174,7 +173,7 @@ class GridQuickLinks extends Widget
                 if (($this->showCount)) {
 
                     if ((YeeHelper::isImplemented($model, OwnerAccess::class)
-                        && !User::hasPermission($model::getOwnerAccessPermission()))
+                        && !User::hasPermission($model::getFullAccessPermission()))
                     ) {
                         $option['filterWhere'][$model::getOwnerField()] = Yii::$app->user->identity->id;
                     }

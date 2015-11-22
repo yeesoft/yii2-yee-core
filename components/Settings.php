@@ -83,7 +83,7 @@ class Settings extends Component
      * @param null $default Default value
      * @return mixed
      */
-    public function get($key, $default = NULL, $language = -1)
+    public function get($key, $default = NULL, $language = NULL)
     {
         $key = self::explodeKey($key);
 
@@ -172,7 +172,7 @@ class Settings extends Component
         if ($this->cache instanceof Cache) {
             $value = $this->cache->get($this->cacheKey . $group . $key . $language);
 
-            if ($value === false) {
+            if (!$value) {
                 $value = $this->getFromDB($group, $key, $language);
                 $this->cache->set($this->cacheKey . $group . $key . $language, $value);
             }

@@ -6,7 +6,7 @@ use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\MenuHelper;
 use yii\helpers\ArrayHelper;
-use yeesoft\Yee;
+use Yii;
 
 /**
  * This is the model class for table "menu".
@@ -53,7 +53,7 @@ class Menu extends \yii\db\ActiveRecord
             [['id', 'title'], 'required'],
             [['id'], 'string', 'max' => 64],
             [['title'], 'string', 'max' => 255],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' =>  Yee::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' =>  Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -63,8 +63,8 @@ class Menu extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yee::t('yee', 'ID'),
-            'title' => Yee::t('yee', 'Title'),
+            'id' => Yii::t('yee', 'ID'),
+            'title' => Yii::t('yee', 'Title'),
         ];
     }
 

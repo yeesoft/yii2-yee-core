@@ -5,8 +5,6 @@ namespace yeesoft\grid\columns;
 use Closure;
 use yeesoft\helpers\Html;
 use Yii;
-use yii\helpers\Url;
-use yeesoft\Yee;
 
 /**
  * TitleActionColumn is a column for the [[GridView]] widget that displays action
@@ -118,34 +116,34 @@ class TitleActionColumn extends \yii\grid\DataColumn
         if (!isset($this->buttons['view'])) {
             $this->buttons['view'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yee::t('yee', 'View'),
-                    'aria-label' => Yee::t('yee', 'View'),
+                    'title' => Yii::t('yee', 'View'),
+                    'aria-label' => Yii::t('yee', 'View'),
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
-                return Html::a(Yee::t('yee', 'View'), $url, $options);
+                return Html::a(Yii::t('yee', 'View'), $url, $options);
             };
         }
         if (!isset($this->buttons['update'])) {
             $this->buttons['update'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yee::t('yee', 'Edit'),
-                    'aria-label' => Yee::t('yee', 'Edit'),
+                    'title' => Yii::t('yee', 'Edit'),
+                    'aria-label' => Yii::t('yee', 'Edit'),
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
-                return Html::a(Yee::t('yee', 'Edit'), $url, $options);
+                return Html::a(Yii::t('yee', 'Edit'), $url, $options);
             };
         }
         if (!isset($this->buttons['delete'])) {
             $this->buttons['delete'] = function ($url, $model, $key) {
                 $options = array_merge([
-                    'title' => Yee::t('yee', 'Delete'),
-                    'aria-label' => Yee::t('yee', 'Delete'),
+                    'title' => Yii::t('yee', 'Delete'),
+                    'aria-label' => Yii::t('yee', 'Delete'),
                     'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                     'data-method' => 'post',
                     'data-pjax' => '0',
                 ], $this->buttonOptions);
 
-                return Html::a(Yee::t('yee', 'Delete'), $url, $options);
+                return Html::a(Yii::t('yee', 'Delete'), $url, $options);
             };
         }
     }

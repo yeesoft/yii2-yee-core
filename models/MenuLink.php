@@ -5,7 +5,7 @@ namespace yeesoft\models;
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
 use yii\helpers\ArrayHelper;
-use yeesoft\Yee;
+use Yii;
 
 /**
  * This is the model class for table "menu_link".
@@ -60,7 +60,7 @@ class MenuLink extends \yii\db\ActiveRecord
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yee::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.') ],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.') ],
         ];
     }
 
@@ -70,14 +70,14 @@ class MenuLink extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yee::t('yee', 'ID'),
-            'menu_id' => Yee::t('yee','Menu'),
-            'link' => Yee::t('yee', 'Link'),
-            'label' => Yee::t('yee', 'Label'),
-            'parent_id' => Yee::t('yee','Parent Link'),
-            'alwaysVisible' => Yee::t('yee','Always Visible'),
-            'image' => Yee::t('yee', 'Icon'),
-            'order' => Yee::t('yee', 'Order'),
+            'id' => Yii::t('yee', 'ID'),
+            'menu_id' => Yii::t('yee','Menu'),
+            'link' => Yii::t('yee', 'Link'),
+            'label' => Yii::t('yee', 'Label'),
+            'parent_id' => Yii::t('yee','Parent Link'),
+            'alwaysVisible' => Yii::t('yee','Always Visible'),
+            'image' => Yii::t('yee', 'Icon'),
+            'order' => Yii::t('yee', 'Order'),
         ];
     }
 
@@ -106,7 +106,7 @@ class MenuLink extends \yii\db\ActiveRecord
                 return $array->label . ' [' . $array->id . ']';
             });
 
-        return ArrayHelper::merge([NULL => Yee::t('yee','No Parent')], $list);
+        return ArrayHelper::merge([NULL => Yii::t('yee','No Parent')], $list);
     }
 
     /**

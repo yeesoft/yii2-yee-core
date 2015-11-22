@@ -2,7 +2,6 @@
 
 namespace yeesoft\models;
 
-use yeesoft\Yee;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -55,10 +54,10 @@ class AuthItemGroup extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'name' => Yee::t('yee', 'Name'),
-            'code' => Yee::t('yee', 'Code'),
-            'created_at' => Yee::t('yee', 'Created'),
-            'updated_at' => Yee::t('yee', 'Updated'),
+            'name' => Yii::t('yee', 'Name'),
+            'code' => Yii::t('yee', 'Code'),
+            'created_at' => Yii::t('yee', 'Created'),
+            'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
 }
