@@ -1,15 +1,15 @@
 <?php
 namespace yeesoft\behaviors;
 
+use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\base\Behavior;
-use yii\base\UnknownPropertyException;
 use yii\base\InvalidConfigException;
+use yii\base\UnknownPropertyException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\Inflector;
 use yii\validators\Validator;
-use yeesoft\helpers\LanguageHelper;
 
 class MultilingualSettingsBehavior extends Behavior
 {
@@ -203,21 +203,18 @@ class MultilingualSettingsBehavior extends Behavior
             }
         }
 
-        
-
 
         foreach ($this->languages as $lang) {
             foreach ($this->attributes as $attribute) {
                 $attrinuteName = $this->getAttributeName($attribute, $lang);
 
                 $owner->{$attrinuteName} = '1';
-                
+
             }
         }
 
-        
-    }
 
+    }
 
 
     /**
@@ -275,7 +272,7 @@ class MultilingualSettingsBehavior extends Behavior
         }
     }
 
-   
+
     /**
      * Whether an attribute exists
      * @param string $name the name of the attribute

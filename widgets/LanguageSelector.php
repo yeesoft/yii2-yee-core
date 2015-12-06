@@ -3,8 +3,8 @@
 namespace yeesoft\widgets;
 
 use yeesoft\helpers\LanguageHelper;
-use yii\helpers\ArrayHelper;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 class LanguageSelector extends \yii\base\Widget
 {

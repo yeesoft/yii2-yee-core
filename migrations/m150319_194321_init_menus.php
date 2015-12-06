@@ -15,6 +15,12 @@ class m150319_194321_init_menus extends Migration
 
         $this->createTable('menu', [
             'id' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
+            'created_by' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
+            'updated_by' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
+            'CONSTRAINT `fk_menu_created_by` FOREIGN KEY (created_by) REFERENCES user (id) ON DELETE SET NULL ON UPDATE CASCADE',
+            'CONSTRAINT `fk_menu_updated_by` FOREIGN KEY (updated_by) REFERENCES user (id) ON DELETE SET NULL ON UPDATE CASCADE',
         ], $tableOptions);
 
         $this->addPrimaryKey('pk', 'menu', 'id');
@@ -38,6 +44,12 @@ class m150319_194321_init_menus extends Migration
             'image' => Schema::TYPE_STRING . '(24) COLLATE utf8_unicode_ci DEFAULT NULL',
             'alwaysVisible' => Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0'",
             'order' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
+            'created_at' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'updated_at' => Schema::TYPE_INTEGER . ' DEFAULT NULL',
+            'created_by' => Schema::TYPE_INTEGER . '(11) DEFAULT NULL',
+            'updated_by' => Schema::TYPE_INTEGER . '(11) DEFAULT NULL',
+            'CONSTRAINT `fk_menu_link_created_by` FOREIGN KEY (created_by) REFERENCES user (id) ON DELETE SET NULL ON UPDATE CASCADE',
+            'CONSTRAINT `fk_menu_link_updated_by` FOREIGN KEY (updated_by) REFERENCES user (id) ON DELETE SET NULL ON UPDATE CASCADE',
         ], $tableOptions);
 
         $this->addPrimaryKey('pk', 'menu_link', 'id');
@@ -57,18 +69,24 @@ class m150319_194321_init_menus extends Migration
 
         $this->addForeignKey('fk_menu_link', 'menu_link', 'menu_id', 'menu', 'id', 'CASCADE');
 
-        $this->insert('menu', ['id' => 'admin-main-menu']);
-        $this->insert('menu_lang', ['menu_id' => 'admin-main-menu','language' => 'en', 'title' => 'Main Admin Panel Menu']);
+        $this->insert('menu', ['id' => 'admin-menu', 'created_by' => 1]);
+        $this->insert('menu_lang', ['menu_id' => 'admin-menu', 'language' => 'en', 'title' => 'Control Panel Menu']);
 
-        $this->insert('menu_link', ['id' => 'dashboard', 'menu_id' => 'admin-main-menu', 'link' => '/', 'image' => 'th-large', 'order' => 1]);
-        $this->insert('menu_link_lang', ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en' ]);
+        $this->insert('menu_link', ['id' => 'dashboard', 'menu_id' => 'admin-menu', 'link' => '/', 'image' => 'th-large', 'created_by' => 1, 'order' => 1]);
+        $this->insert('menu_link_lang', ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en']);
     }
 
     public function down()
     {
+        $this->dropForeignKey('fk_menu_created_by', 'menu');
+        $this->dropForeignKey('fk_menu_updated_by', 'menu');
+        $this->dropForeignKey('fk_menu_link_created_by', 'menu_link');
+        $this->dropForeignKey('fk_menu_link_updated_by', 'menu_link');
+
         $this->dropForeignKey('fk_menu_link_lang', 'menu_link_lang');
         $this->dropForeignKey('fk_menu_link', 'menu_link');
         $this->dropForeignKey('fk_menu_lang', 'menu_link');
+
         $this->dropTable('menu_link_lang');
         $this->dropTable('menu_link');
         $this->dropTable('menu_lang');

@@ -2,9 +2,9 @@
 
 namespace yeesoft\widgets;
 
+use yeesoft\assets\LanguagePillsAsset;
 use yeesoft\helpers\LanguageHelper;
 use Yii;
-use yeesoft\assets\LanguagePillsAsset;
 
 
 /**

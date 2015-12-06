@@ -5,18 +5,25 @@ namespace yeesoft\models;
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\MenuHelper;
-use yii\helpers\ArrayHelper;
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "menu".
  *
  * @property string $id
  * @property string $title
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property integer $created_by
+ * @property integer $updated_by
  *
  * @property MenuLink[] $menuLinks
  */
-class Menu extends \yii\db\ActiveRecord
+class Menu extends ActiveRecord implements OwnerAccess
 {
 
     /**
@@ -33,6 +40,8 @@ class Menu extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
+            BlameableBehavior::className(),
+            TimestampBehavior::className(),
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
                 'langForeignKey' => 'menu_id',
@@ -51,9 +60,10 @@ class Menu extends \yii\db\ActiveRecord
     {
         return [
             [['id', 'title'], 'required'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['id'], 'string', 'max' => 64],
             [['title'], 'string', 'max' => 255],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' =>  Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -65,6 +75,10 @@ class Menu extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('yee', 'ID'),
             'title' => Yii::t('yee', 'Title'),
+            'created_by' => Yii::t('yee', 'Created By'),
+            'updated_by' => Yii::t('yee', 'Updated By'),
+            'created_at' => Yii::t('yee', 'Created'), '',
+            'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
 
@@ -80,9 +94,9 @@ class Menu extends \yii\db\ActiveRecord
      * get list of menus
      * @return array
      */
-    public static function getList()
+    public static function getMenus()
     {
-        return ArrayHelper::map(self::find()->asArray()->all(), 'id', 'title');
+        return ArrayHelper::map(self::find()->joinWith('translations')->all(), 'id', 'title');
     }
 
     /**
@@ -162,5 +176,23 @@ class Menu extends \yii\db\ActiveRecord
     public static function find()
     {
         return new MultilingualQuery(get_called_class());
+    }
+
+    /**
+     *
+     * @inheritdoc
+     */
+    public static function getFullAccessPermission()
+    {
+        return 'fullMenuAccess';
+    }
+
+    /**
+     *
+     * @inheritdoc
+     */
+    public static function getOwnerField()
+    {
+        return 'created_by';
     }
 }

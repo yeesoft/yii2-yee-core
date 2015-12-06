@@ -2,8 +2,8 @@
 
 namespace yeesoft\i18n;
 
-use yii\db\Migration;
 use yii\base\NotSupportedException;
+use yii\db\Migration;
 
 class TranslatedMessagesMigration extends Migration
 {
@@ -13,9 +13,9 @@ class TranslatedMessagesMigration extends Migration
         $language = $this->getLanguage();
         $messages = $this->getTranslations();
         $sources = $this->getSourceMessages();
-        
+
         foreach ($messages as $message => $translation) {
-            if(isset($sources[$message])){
+            if (isset($sources[$message])) {
                 $this->delete('message', ['source_id' => $sources[$message]->id, 'language' => $language]); //Delete if exists
                 $this->insert('message', ['source_id' => $sources[$message]->id, 'translation' => $translation, 'language' => $language]);
             }
@@ -27,12 +27,12 @@ class TranslatedMessagesMigration extends Migration
         $language = $this->getLanguage();
         $messages = $this->getTranslations();
         $sources = $this->getSourceMessages();
-        
+
         foreach ($messages as $message => $translation) {
-            if(isset($sources[$message])){
+            if (isset($sources[$message])) {
                 $this->delete('message', ['source_id' => $sources[$message]->id, 'language' => $language]);
             }
-        }        
+        }
     }
 
     public function getSourceMessages()
@@ -42,7 +42,7 @@ class TranslatedMessagesMigration extends Migration
             ->queryAll(\PDO::FETCH_OBJ);
 
         $messages = [];
-        
+
         foreach ($rows as $row) {
             $messages[$row->message] = $row;
         }

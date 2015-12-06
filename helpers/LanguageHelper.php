@@ -48,7 +48,7 @@ class LanguageHelper
     public static function getLanguages()
     {
         if (!isset(Yii::$app->params['languages'])) {
-            return ['en' => 'English'];
+            return [Yii::$app->language => Yii::t('yee', 'Default Language')];
         }
 
         return Yii::$app->params['languages'];

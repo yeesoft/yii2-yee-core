@@ -45,7 +45,7 @@ class Setting extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'key' => Yii::t('yee', 'Key') ,
+            'key' => Yii::t('yee', 'Key'),
             'group' => Yii::t('yee', 'Group'),
             'value' => Yii::t('yee', 'Value'),
             'language' => Yii::t('yee', 'Language'),

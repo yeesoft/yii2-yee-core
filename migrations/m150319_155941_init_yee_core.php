@@ -11,6 +11,7 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
     const auth_item_group_table = 'auth_item_group';
     const auth_assignment_table = 'auth_assignment';
     const user_visit_log_table = 'user_visit_log';
+    const user_setting_table = 'user_setting';
 
     public function up()
     {
@@ -18,7 +19,6 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
-
 
         $this->createTable(self::auth_rule_table, [
             'name' => Schema::TYPE_STRING . '(64) NOT NULL',
@@ -71,25 +71,44 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
             'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE CASCADE ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->createTable(self::user_visit_log_table,
-            array(
-                'id' => Schema::TYPE_PK,
-                'token' => Schema::TYPE_STRING . '(255) NOT NULL',
-                'ip' => Schema::TYPE_STRING . '(15) NOT NULL',
-                'language' => Schema::TYPE_STRING . '(2) NOT NULL',
-                'user_agent' => Schema::TYPE_STRING . '(255) NOT NULL',
-                'browser' => Schema::TYPE_STRING . '(30) NOT NULL',
-                'os' => Schema::TYPE_STRING . '(20) NOT NULL',
-                'user_id' => Schema::TYPE_INTEGER,
-                'visit_time' => Schema::TYPE_INTEGER . ' NOT NULL',
-                'KEY (user_id)',
-                'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE SET NULL ON UPDATE CASCADE',
-            ), $tableOptions);
+        $this->createTable(self::user_visit_log_table, [
+            'id' => Schema::TYPE_PK,
+            'token' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'ip' => Schema::TYPE_STRING . '(15) NOT NULL',
+            'language' => Schema::TYPE_STRING . '(2) NOT NULL',
+            'user_agent' => Schema::TYPE_STRING . '(255) NOT NULL',
+            'browser' => Schema::TYPE_STRING . '(30) NOT NULL',
+            'os' => Schema::TYPE_STRING . '(20) NOT NULL',
+            'user_id' => Schema::TYPE_INTEGER,
+            'visit_time' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'KEY (user_id)',
+            'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE SET NULL ON UPDATE CASCADE',
+        ], $tableOptions);
 
+        $this->createTable(self::user_setting_table, [
+            'id' => Schema::TYPE_PK,
+            'user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
+            'key' => Schema::TYPE_STRING . '(64) NOT NULL',
+            'value' => Schema::TYPE_TEXT . ' DEFAULT NULL',
+            'KEY (`user_id`, `key`)',
+            'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE CASCADE ON UPDATE CASCADE',
+        ], $tableOptions);
+
+        $this->insert(self::user_table, [
+            'id' => 1,
+            'username' => 'admin',
+            'auth_key' => '',
+            'password_hash' => '',
+            'email' => '',
+            'superadmin' => 1,
+            'created_at' => 0,
+            'updated_at' => 0,
+        ]);
     }
 
     public function down()
     {
+        $this->dropTable(self::user_setting_table);
         $this->dropTable(self::user_visit_log_table);
         $this->dropTable(self::auth_assignment_table);
         $this->dropTable(self::auth_item_child_table);

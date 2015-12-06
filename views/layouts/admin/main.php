@@ -5,11 +5,11 @@ use yeesoft\assets\FormStylerAsset;
 use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
 use yeesoft\models\Menu;
+use yeesoft\widgets\LanguageSelector;
 use yeesoft\widgets\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
-use yeesoft\widgets\LanguageSelector;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -83,7 +83,7 @@ MetisMenuAsset::register($this);
                     ['class' => 'nav nav-second-level'],
                     ['class' => 'nav nav-third-level']
                 ],
-                'items' => Menu::getMenuItems('admin-main-menu'),
+                'items' => Menu::getMenuItems('admin-menu'),
             ]) ?>
         </div>
         <!-- !SIDEBAR NAV -->
@@ -96,7 +96,7 @@ MetisMenuAsset::register($this);
                     <?= Breadcrumbs::widget(['links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : []]) ?>
 
                     <?php if (Yii::$app->session->hasFlash('crudMessage')): ?>
-                        <div class="alert alert-info alert-dismissible" role="alert">
+                        <div class="alert alert-info alert-dismissible alert-crud" role="alert">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>

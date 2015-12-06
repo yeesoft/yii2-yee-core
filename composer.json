@@ -1,6 +1,13 @@
 {
   "name": "yeesoft/yii2-yee-core",
-  "description": "Yee (Yii2 based CMS) Core Module",
+  "description": "Core Module For Yee CMS",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Taras Makitra",
+      "email": "makitrataras@gmail.com"
+    }
+  ],
   "require": {
     "ikimea/browser": "*",
     "yiisoft/yii2-jui": "*",

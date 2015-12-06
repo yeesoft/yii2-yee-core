@@ -124,7 +124,7 @@ class GridQuickLinks extends Widget
     {
         parent::init();
 
-        if(!$this->defaultOptions){
+        if (!$this->defaultOptions) {
             $this->defaultOptions = [
                 'all' => ['label' => Yii::t('yee', 'All'), 'filterWhere' => []],
                 'active' => ['label' => Yii::t('yee', 'Active'), 'filterWhere' => ['status' => 1]],
@@ -134,7 +134,7 @@ class GridQuickLinks extends Widget
 
     }
 
-        /**
+    /**
      * @throws \yii\base\InvalidConfigException
      * @return string
      */

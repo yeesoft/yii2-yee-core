@@ -72,7 +72,7 @@ class AccessFilter extends ActionFilter
             $modelClass = (isset($this->owner->modelClass)) ? $this->owner->modelClass : null;
 
             //Check access for owners
-            if ($modelClass && YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getOwnerAccessPermission()) && $modelId) {
+            if ($modelClass && YeeHelper::isImplemented($modelClass, OwnerAccess::class) && !User::hasPermission($modelClass::getFullAccessPermission()) && $modelId) {
                 $model = $modelClass::findOne(['id' => $modelId]);
                 if ($model && Yii::$app->user->identity->id == $model->{$modelClass::getOwnerField()}) {
                     return true;

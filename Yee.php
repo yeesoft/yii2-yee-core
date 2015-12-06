@@ -1,17 +1,26 @@
 <?php
+/**
+ * @link http://www.yee-soft.com/
+ * @copyright Copyright (c) 2015 Taras Makitra
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 namespace yeesoft;
 
 use Yii;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Yee CMS
+ *
+ * @author Taras Makitra <makitrataras@gmail.com>
+ */
 class Yee extends \yii\base\Module
 {
     /**
      * Version number of the module.
      */
     const VERSION = '0.1-a';
-
     const SESSION_LAST_ATTEMPT = '_um_last_attempt';
     const SESSION_ATTEMPT_COUNT = '_um_attempt_count';
 
@@ -43,7 +52,6 @@ class Yee extends \yii\base\Module
         'signup-confirmation' => '/mail/signup-email-confirmation-html',
         'password-reset-mail' => '/mail/password-reset-html',
         'confirm-email' => '/mail/email-confirmation-html',
-
     ];
 
     /**
@@ -131,26 +139,40 @@ class Yee extends \yii\base\Module
     public $auth_item_group_table = '{{%auth_item_group}}';
     public $auth_assignment_table = '{{%auth_assignment}}';
     public $auth_rule_table = '{{%auth_rule}}';
+
     //public $controllerNamespace   = 'yeesoft\usermanagement\controllers';
 
     /**
-     * @p
+     * @inheritdoc
      */
     public function init()
     {
         parent::init();
 
-        $this->registerTranslations();
-        $this->prepareMailerOptions();
+        if (Yii::$app->id != 'console') {
+            $this->registerTranslations();
+            $this->prepareMailerOptions();
+            $this->initFormatter();
+        }
     }
 
-    public function registerTranslations()
+    protected function registerTranslations()
     {
         Yii::$app->i18n->translations['yee*'] = [
             'class' => 'yeesoft\i18n\DbMessageSource',
             'sourceLanguage' => 'en-US',
             'enableCaching' => true,
         ];
+    }
+
+    protected function initFormatter()
+    {
+        date_default_timezone_set(Yii::$app->settings->get('general.timezone', 'UTC'));
+        Yii::$app->formatter->timeZone = Yii::$app->settings->get('general.timezone', 'UTC');
+        Yii::$app->formatter->dateFormat = Yii::$app->settings->get('general.dateformat', "yyyy-MM-dd");
+        Yii::$app->formatter->timeFormat = Yii::$app->settings->get('general.timeformat', "HH:mm");
+        Yii::$app->formatter->datetimeFormat = Yii::$app->formatter->dateFormat . " " . Yii::$app->formatter->timeFormat;
+
     }
 
     /**
@@ -163,11 +185,9 @@ class Yee extends \yii\base\Module
         $lastAttempt = Yii::$app->session->get(static::SESSION_LAST_ATTEMPT);
 
         if ($lastAttempt) {
-            $attemptsCount = Yii::$app->session->get(static::SESSION_ATTEMPT_COUNT,
-                0);
+            $attemptsCount = Yii::$app->session->get(static::SESSION_ATTEMPT_COUNT, 0);
 
-            Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT,
-                ++$attemptsCount);
+            Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, ++$attemptsCount);
 
             // If last attempt was made more than X seconds ago then reset counters
             if (($lastAttempt + $this->attemptsTimeout) < time()) {
@@ -207,5 +227,14 @@ class Yee extends \yii\base\Module
     public static function powered()
     {
         return '<a href="http://www.yee-soft.com/" rel="external">Yee CMS</a>';
+    }
+
+    /**
+     * Returns a string representing the current version of the Yee CMS Core.
+     * @return string the version of Yee CMS Core
+     */
+    public static function getVersion()
+    {
+        return self::VERSION;
     }
 }

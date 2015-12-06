@@ -1,15 +1,15 @@
 //language pills for switching multilingual fields
-(function($) {
-    $(function() {
+(function ($) {
+    $(function () {
         hideLanguageFields();
 
-        $(document).on('click', '.language-pills a', function(e) {
+        $(document).on('click', '.language-pills a', function (e) {
             var lang = $(this).attr('data-lang');
             $('div[data-toggle="multilang"]').hide();
             $('div[data-lang="' + lang + '"]').show();
         });
 
-        $(document).on("mediaDetailsLoaded", function(e){
+        $(document).on("mediaDetailsLoaded", function (e) {
             hideLanguageFields();
         });
 

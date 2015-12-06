@@ -19,7 +19,7 @@ class MultilingualField extends \yii\widgets\ActiveField
     {
         parent::init();
 
-        $languages = Yii::$app->params['languages'];
+        $languages = LanguageHelper::getLanguages();
         $isCurrentLanguage = (Yii::$app->language == $this->language);
 
         if ($this->language !== NULL && (LanguageHelper::isMultilingual($this->model) || $this->multilingual)) {

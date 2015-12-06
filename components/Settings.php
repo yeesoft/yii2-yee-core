@@ -14,7 +14,7 @@ use yii\caching\Cache;
  *
  * Set setting:
  * ~~~
- * Yii::$app->settings->set(['general','title'],'Lviv4u - Your Territories');
+ * Yii::$app->settings->set(['general','title'],'Yee Site');
  * ~~~
  *
  * Get setting:
@@ -119,10 +119,10 @@ class Settings extends Component
         $model = $this->modelClass;
         $key = self::explodeKey($key);
 
-        $language = isset($key[2]) ? $key[2] : NULL ;
+        $language = isset($key[2]) ? $key[2] : NULL;
         $group = $key[0];
         $key = $key[1];
-        
+
         $setting = $model::getSetting($group, $key, $language);
 
         if ($setting) {
@@ -152,7 +152,7 @@ class Settings extends Component
      * @param type $default Default value
      * @return mixed
      */
-    protected function getFromDB($group, $key, $language = NULL, $default = NULL)
+    public function getFromDB($group, $key, $language = NULL, $default = NULL)
     {
         $model = $this->modelClass;
         $setting = $model::getSetting($group, $key, $language);

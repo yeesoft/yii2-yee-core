@@ -25,26 +25,6 @@ class m150319_184824_init_settings extends Migration
 
         $this->createIndex('setting_group_lang', 'setting', ['group', 'key', 'language']);
 
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'title', 'language' => 'en', 'value' => 'Yee Site']);
-
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'description', 'value' => '']);
-
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'email', 'value' => '', 'description' => 'This address is used for admin purposes, like new user notification.']);
-
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'dateformat', 'value' => 'F j, Y']);
-
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'timeformat', 'value' => 'g:i a']);
-
-        $this->insert('setting',
-            ['group' => 'general', 'key' => 'timezone', 'value' => 'Europe/London']);
-
-        $this->insert('setting',
-            ['group' => 'reading', 'key' => 'page_size', 'value' => '10', 'description' => 'The number of items per page.']);
     }
 
     public function down()

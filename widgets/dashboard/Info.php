@@ -2,24 +2,10 @@
 
 namespace yeesoft\widgets\dashboard;
 
-class Info extends \yii\base\Widget
+use yeesoft\widgets\DashboardWidget;
+
+class Info extends DashboardWidget
 {
-    /**
-     * Widget Height
-     */
-    public $height = '1-5';
-
-    /**
-     * Widget Width
-     */
-    public $width = '4';
-
-    /**
-     *
-     * @var type
-     */
-    public $position = 'left';
-
     public function run()
     {
         return $this->render('info',

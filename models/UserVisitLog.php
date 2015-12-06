@@ -86,7 +86,8 @@ class UserVisitLog extends ActiveRecord
     {
         return [
             [['token', 'ip', 'language', 'visit_time'], 'required'],
-            [['user_id', 'visit_time'], 'integer'],
+            [['user_id'], 'integer'],
+
             [['token', 'user_agent'], 'string', 'max' => 255],
             [['ip'], 'string', 'max' => 15],
             [['os'], 'string', 'max' => 20],
@@ -128,7 +129,7 @@ class UserVisitLog extends ActiveRecord
      */
     public function getVisitDate()
     {
-        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->visit_time);
+        return Yii::$app->formatter->asDate($this->visit_time);
     }
 
     /**
@@ -138,7 +139,18 @@ class UserVisitLog extends ActiveRecord
      */
     public function getVisitTime()
     {
-        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->visit_time);
+        return Yii::$app->formatter->asTime($this->visit_time);
     }
+
+    /**
+     * Get visit datetime
+     *
+     * @return string
+     */
+    public function getVisitDatetime()
+    {
+        return "{$this->visitDate} {$this->visitTime}";
+    }
+
 
 }

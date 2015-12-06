@@ -2,8 +2,8 @@
 
 namespace yeesoft\i18n;
 
-use yii\db\Migration;
 use yii\base\NotSupportedException;
+use yii\db\Migration;
 
 class SourceMessagesMigration extends Migration
 {
@@ -12,7 +12,7 @@ class SourceMessagesMigration extends Migration
     {
         $category = $this->getCategory();
         $messages = $this->getMessages();
-        
+
         foreach ($messages as $message => $immutable) {
             $this->insert('message_source', ['category' => $category, 'message' => $message, 'immutable' => $immutable]);
         }

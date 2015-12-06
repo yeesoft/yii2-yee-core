@@ -13,6 +13,7 @@ class m150319_150657_alter_user_table extends Migration
         $this->addColumn('user', 'bind_to_ip', Schema::TYPE_STRING . "(255) DEFAULT NULL AFTER `updated_at`");
         $this->addColumn('user', 'email_confirmed', Schema::TYPE_SMALLINT . "(1) NOT NULL DEFAULT '0' AFTER `updated_at`");
         $this->addColumn('user', 'confirmation_token', Schema::TYPE_STRING . "(255) DEFAULT NULL AFTER `updated_at`");
+        $this->addColumn('user', 'avatar', Schema::TYPE_TEXT . " DEFAULT NULL AFTER `superadmin`");
     }
 
     public function safeDown()

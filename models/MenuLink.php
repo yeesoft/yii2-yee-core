@@ -4,8 +4,11 @@ namespace yeesoft\models;
 
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
-use yii\helpers\ArrayHelper;
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "menu_link".
@@ -18,10 +21,14 @@ use Yii;
  * @property integer $alwaysVisible
  * @property string $image
  * @property integer $order
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property integer $created_by
+ * @property integer $updated_by
  *
  * @property Menu $menu
  */
-class MenuLink extends \yii\db\ActiveRecord
+class MenuLink extends ActiveRecord implements OwnerAccess
 {
 
     /**
@@ -38,6 +45,8 @@ class MenuLink extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
+            BlameableBehavior::className(),
+            TimestampBehavior::className(),
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
                 'langForeignKey' => 'link_id',
@@ -56,11 +65,11 @@ class MenuLink extends \yii\db\ActiveRecord
     {
         return [
             [['id', 'menu_id', 'label'], 'required'],
-            [['order', 'alwaysVisible'], 'integer'],
+            [['order', 'alwaysVisible', 'created_by', 'updated_by', 'created_at', 'updated_at',], 'integer'],
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.') ],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -71,13 +80,17 @@ class MenuLink extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('yee', 'ID'),
-            'menu_id' => Yii::t('yee','Menu'),
+            'menu_id' => Yii::t('yee', 'Menu'),
             'link' => Yii::t('yee', 'Link'),
             'label' => Yii::t('yee', 'Label'),
-            'parent_id' => Yii::t('yee','Parent Link'),
-            'alwaysVisible' => Yii::t('yee','Always Visible'),
+            'parent_id' => Yii::t('yee', 'Parent Link'),
+            'alwaysVisible' => Yii::t('yee', 'Always Visible'),
             'image' => Yii::t('yee', 'Icon'),
             'order' => Yii::t('yee', 'Order'),
+            'created_by' => Yii::t('yee', 'Created By'),
+            'updated_by' => Yii::t('yee', 'Updated By'),
+            'created_at' => Yii::t('yee', 'Created'), '',
+            'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
 
@@ -106,7 +119,7 @@ class MenuLink extends \yii\db\ActiveRecord
                 return $array->label . ' [' . $array->id . ']';
             });
 
-        return ArrayHelper::merge([NULL => Yii::t('yee','No Parent')], $list);
+        return ArrayHelper::merge([NULL => Yii::t('yee', 'No Parent')], $list);
     }
 
     /**
@@ -116,5 +129,23 @@ class MenuLink extends \yii\db\ActiveRecord
     public static function find()
     {
         return new MultilingualQuery(get_called_class());
+    }
+
+    /**
+     *
+     * @inheritdoc
+     */
+    public static function getFullAccessPermission()
+    {
+        return 'fullMenuLinkAccess';
+    }
+
+    /**
+     *
+     * @inheritdoc
+     */
+    public static function getOwnerField()
+    {
+        return 'created_by';
     }
 }

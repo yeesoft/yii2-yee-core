@@ -86,7 +86,7 @@ class User extends UserIdentity
             ['repeat_password', 'compare', 'compareAttribute' => 'password'],
         ];
     }
-    
+
     /**
      * Store result in session to prevent multiple db requests with multiple calls
      *
@@ -437,7 +437,7 @@ class User extends UserIdentity
      */
     public function getCreatedDate()
     {
-        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->created_at);
+        return Yii::$app->formatter->asDate(($this->isNewRecord) ? time() : $this->created_at);
     }
 
     /**
@@ -447,7 +447,7 @@ class User extends UserIdentity
      */
     public function getUpdatedDate()
     {
-        return date(Yii::$app->settings->get('general.dateformat'), ($this->isNewRecord) ? time() : $this->updated_at);
+        return Yii::$app->formatter->asDate(($this->isNewRecord) ? time() : $this->updated_at);
     }
 
     /**
@@ -457,7 +457,7 @@ class User extends UserIdentity
      */
     public function getCreatedTime()
     {
-        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->created_at);
+        return Yii::$app->formatter->asTime(($this->isNewRecord) ? time() : $this->updated_at);
     }
 
     /**
@@ -467,6 +467,26 @@ class User extends UserIdentity
      */
     public function getUpdatedTime()
     {
-        return date(Yii::$app->settings->get('general.timeformat'), ($this->isNewRecord) ? time() : $this->updated_at);
+        return Yii::$app->formatter->asTime(($this->isNewRecord) ? time() : $this->updated_at);
+    }
+
+    /**
+     * Get created datetime
+     *
+     * @return string
+     */
+    public function getCreatedDatetime()
+    {
+        return "{$this->createdDate} {$this->createdTime}";
+    }
+
+    /**
+     * Get created datetime
+     *
+     * @return string
+     */
+    public function getUpdatedDatetime()
+    {
+        return "{$this->updatedDate} {$this->updatedTime}";
     }
 }

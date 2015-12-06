@@ -34,6 +34,10 @@ body {
     padding-top: 20px;
 }
 
+.dashboard {
+    margin-top: 30px;
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
@@ -274,4 +278,18 @@ div.jq-selectbox.form-control {
     .navbar-top-links .dropdown-alerts {
         margin-left: auto;
     }
+}
+
+.dot-left:before, .dot-right:after {
+    content: "\2022";
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.avatar img {
+    border: 1px solid #d2d2d2;
+    background: #f6f8f9;
+    border-radius: 4px;
+    width: 48px;
+    height: 48px;
 }

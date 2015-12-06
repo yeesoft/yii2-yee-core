@@ -2,6 +2,7 @@
 
 namespace yeesoft\components;
 
+use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\web\UrlManager;
 
@@ -10,8 +11,9 @@ class MultilingualUrlManager extends UrlManager
 
     public function createUrl($params)
     {
+        $languages = LanguageHelper::getLanguages();
         //remove incorrect language param
-        if (isset($params['language']) && !isset(Yii::$app->params['languages'][$params['language']])) {
+        if (isset($params['language']) && !isset($languages[$params['language']])) {
             unset($params['language']);
         }
 
@@ -19,11 +21,13 @@ class MultilingualUrlManager extends UrlManager
         if (!isset($params['language'])) {
             if (Yii::$app->session->has('language')) {
                 $language = Yii::$app->session->get('language');
-            } else if (isset(Yii::$app->request->cookies['language'])) {
+            } elseif (isset(Yii::$app->request->cookies['language'])) {
                 $language = Yii::$app->request->cookies['language']->value;
+            } else {
+                $language = Yii::$app->language;
             }
 
-            if (isset(Yii::$app->params['languages'][$language])) {
+            if (isset($languages[$language])) {
                 Yii::$app->language = $language;
             }
 
