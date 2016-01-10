@@ -70,10 +70,10 @@ class m150319_194321_init_menus extends Migration
         $this->addForeignKey('fk_menu_link', 'menu_link', 'menu_id', 'menu', 'id', 'CASCADE');
 
         $this->insert('menu', ['id' => 'admin-menu', 'created_by' => 1]);
-        $this->insert('menu_lang', ['menu_id' => 'admin-menu', 'language' => 'en', 'title' => 'Control Panel Menu']);
+        $this->insert('menu_lang', ['menu_id' => 'admin-menu', 'language' => 'en-US', 'title' => 'Control Panel Menu']);
 
-        $this->insert('menu_link', ['id' => 'dashboard', 'menu_id' => 'admin-menu', 'link' => '/', 'image' => 'th-large', 'created_by' => 1, 'order' => 1]);
-        $this->insert('menu_link_lang', ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en']);
+        $this->insert('menu_link', ['id' => 'dashboard', 'menu_id' => 'admin-menu', 'link' => '/', 'image' => 'th', 'created_by' => 1, 'order' => 1]);
+        $this->insert('menu_link_lang', ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en-US']);
     }
 
     public function down()

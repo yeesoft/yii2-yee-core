@@ -9,6 +9,7 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "menu_link".
@@ -47,6 +48,11 @@ class MenuLink extends ActiveRecord implements OwnerAccess
         return [
             BlameableBehavior::className(),
             TimestampBehavior::className(),
+            'sluggable' => [
+                'class' => SluggableBehavior::className(),
+                'slugAttribute' => 'id',
+                'attribute' => 'label',
+            ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
                 'langForeignKey' => 'link_id',
@@ -64,12 +70,14 @@ class MenuLink extends ActiveRecord implements OwnerAccess
     public function rules()
     {
         return [
-            [['id', 'menu_id', 'label'], 'required'],
+            [['menu_id', 'label'], 'required'],
+            ['id', 'unique'],
             [['order', 'alwaysVisible', 'created_by', 'updated_by', 'created_at', 'updated_at',], 'integer'],
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
             [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Link ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
+            ['order', 'default', 'value' => 999],
         ];
     }
 

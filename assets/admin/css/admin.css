@@ -293,3 +293,7 @@ div.jq-selectbox.form-control {
     width: 48px;
     height: 48px;
 }
+
+.fa-font-family {
+    font-family: 'FontAwesome';
+}

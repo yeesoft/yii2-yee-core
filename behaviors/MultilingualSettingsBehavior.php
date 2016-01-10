@@ -76,12 +76,10 @@ class MultilingualSettingsBehavior extends Behavior
      * @var boolean whether to abridge the language ID.
      * Default to true.
      */
-    public $abridge = true;
+    public $abridge = false;
 
     private $currentLanguage;
-    private $ownerClassName;
 
-    private $ownerClassShortName;
     private $langAttributes = [];
 
     /**
@@ -154,23 +152,6 @@ class MultilingualSettingsBehavior extends Behavior
         }
 
         $rules = $owner->rules();
-
-        /*
-        
-        $old_rules = $rules;
-
-        array_walk_recursive($rules, function (&$item, $key) {
-            if ($item == 'title') $item = 'title_en';
-        });
-
-        //print_r($old_rules);
-        //print_r($rules);
-
-        $new_rules = array_merge($old_rules, $rules);
-
-         print_r($new_rules);
-
-        die;*/
 
         $validators = $owner->getValidators();
 

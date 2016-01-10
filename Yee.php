@@ -9,6 +9,8 @@ namespace yeesoft;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yeesoft\helpers\LanguageHelper;
+use yii\base\InvalidConfigException;
 
 /**
  * Yee CMS
@@ -150,6 +152,15 @@ class Yee extends \yii\base\Module
         parent::init();
 
         if (Yii::$app->id != 'console') {
+
+            //Check language settings
+            if(!LanguageHelper::isSiteMultilingual() &&
+                !in_array(Yii::$app->language, array_keys(LanguageHelper::getLanguages()) ) ){
+                throw new InvalidConfigException('Invalid language settings! Field "languages" in \common\config\params.php should contain the same language as "language" param in config\main.php');
+            }
+
+            //Check here: redirLangs not contains in langs param
+
             $this->registerTranslations();
             $this->prepareMailerOptions();
             $this->initFormatter();

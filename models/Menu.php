@@ -4,12 +4,13 @@ namespace yeesoft\models;
 
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
-use yeesoft\helpers\MenuHelper;
+use yeesoft\helpers\FA;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "menu".
@@ -42,6 +43,11 @@ class Menu extends ActiveRecord implements OwnerAccess
         return [
             BlameableBehavior::className(),
             TimestampBehavior::className(),
+            'sluggable' => [
+                'class' => SluggableBehavior::className(),
+                'slugAttribute' => 'id',
+                'attribute' => 'title',
+            ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
                 'langForeignKey' => 'menu_id',
@@ -59,7 +65,8 @@ class Menu extends ActiveRecord implements OwnerAccess
     public function rules()
     {
         return [
-            [['id', 'title'], 'required'],
+            [['title'], 'required'],
+            ['id', 'unique'],
             [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
             [['id'], 'string', 'max' => 64],
             [['title'], 'string', 'max' => 255],
@@ -132,7 +139,7 @@ class Menu extends ActiveRecord implements OwnerAccess
     private static function generateItem($link, $menuLinks)
     {
         $item = [];
-        $icon = (!empty($link->image)) ? MenuHelper::generateIcon($link->image) . ' ' : '';
+        $icon = (!empty($link->image)) ? FA::icon($link->image) . ' ' : '';
 
         $subItems = self::generateSubItems($link->id, $menuLinks);
 

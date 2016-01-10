@@ -3,6 +3,7 @@
 namespace yeesoft\helpers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Language helper
@@ -20,6 +21,17 @@ class LanguageHelper
     public static function isMultilingual($model)
     {
         return ($model->getBehavior('multilingual') !== NULL);
+    }
+
+    /**
+     * Return true if site is multilingual.
+     *
+     * @return boolean
+     */
+    public static function isSiteMultilingual()
+    {
+        $languages = static::getLanguages();
+        return count($languages) > 1;
     }
 
     /**
@@ -61,5 +73,73 @@ class LanguageHelper
     public static function getLanguageBaseName($language)
     {
         return substr($language, 0, 2);
+    }
+
+    /**
+     * @param $language
+     * @return string
+     */
+    public static function getLangRedirect($language)
+    {
+        if (!isset(Yii::$app->params['languageRedirects'])) {
+            return $language;
+        }
+
+        return (isset(Yii::$app->params['languageRedirects'][$language])) ?
+            Yii::$app->params['languageRedirects'][$language] : $language;
+    }
+
+    /**
+     * @param $language
+     * @return string
+     */
+    public static function getLangRedirectSource($language)
+    {
+        if (!isset(Yii::$app->params['languageRedirects'])) {
+            return $language;
+        }
+
+        $languageRedirects = array_flip(Yii::$app->params['languageRedirects']);
+
+        return (isset($languageRedirects[$language])) ? $languageRedirects[$language] : $language;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRedirectedLanguages()
+    {
+        if (!isset(Yii::$app->params['languageRedirects'])) {
+            self::getLanguages();
+        }
+
+        $redirects = [];
+        $languages = self::getLanguages();
+
+        foreach ($languages as $key => $value) {
+            $key             = (isset(Yii::$app->params['languageRedirects'][$key])) ? Yii::$app->params['languageRedirects'][$key] : $key;
+            $redirects[$key] = $value;
+        }
+
+        return $redirects;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getValidLanguages($skipReplacedLangs = true)
+    {
+        $keys = array_keys(self::getLanguages());
+
+        if (isset(Yii::$app->params['languageRedirects'])) {
+            $languageRedirects = Yii::$app->params['languageRedirects'];
+            if ($skipReplacedLangs) {
+                return array_replace($keys, array_keys($languageRedirects), array_values($languageRedirects));
+            } else {
+                return ArrayHelper::merge($keys, array_values($languageRedirects));
+            }
+        }
+
+        return $keys;
     }
 }

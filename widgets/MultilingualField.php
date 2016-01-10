@@ -36,7 +36,8 @@ class MultilingualField extends \yii\widgets\ActiveField
                 'class' => ($isCurrentLanguage ? 'in' : ''),
             ]);
 
-            $this->attribute .= ($isCurrentLanguage ? '' : '_' . $this->language);
+            $langPart = strtolower(str_replace('-', '_', $this->language));
+            $this->attribute .= ($isCurrentLanguage) ? '' : '_' . $langPart;
         }
     }
 

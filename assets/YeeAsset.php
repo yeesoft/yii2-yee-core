@@ -31,6 +31,7 @@ class YeeAsset extends AssetBundle
             JqueryAsset::className(),
             'yii\web\YiiAsset',
             'yii\bootstrap\BootstrapAsset',
+            'rmrevin\yii\fontawesome\AssetBundle',
         ];
 
         parent::init();

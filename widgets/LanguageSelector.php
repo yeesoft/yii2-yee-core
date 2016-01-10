@@ -22,11 +22,15 @@ class LanguageSelector extends \yii\base\Widget
 
     public function run()
     {
+        if(!LanguageHelper::isSiteMultilingual()){
+            return;
+        }
+
         $language = Yii::$app->language;
-        $languages = LanguageHelper::getLanguages();
+        $languages = LanguageHelper::getRedirectedLanguages();
 
         list($route, $params) = Yii::$app->getUrlManager()->parseRequest(Yii::$app->getRequest());
-        $params = ArrayHelper::merge($_GET, $params);
+        $params = ArrayHelper::merge(Yii::$app->getRequest()->get(), $params);
         $url = isset($params['route']) ? $params['route'] : $route;
 
         return $this->render("language-selector/{$this->view}", [

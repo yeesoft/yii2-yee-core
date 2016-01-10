@@ -40,14 +40,14 @@ abstract class BaseController extends Controller
     {
         parent::init();
 
-        if (!Yii::$app->errorHandler->exception) {
+        if (!Yii::$app->errorHandler->exception && LanguageHelper::isSiteMultilingual()) {
 
             $languages = LanguageHelper::getLanguages();
 
             // If there is a post-request, redirect the application 
             // to the provided url of the selected language
             if (Yii::$app->getRequest()->post('language', NULL)) {
-                $language = Yii::$app->getRequest()->post('language');
+                $language = LanguageHelper::getLangRedirectSource(Yii::$app->getRequest()->post('language'));
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -59,6 +59,8 @@ abstract class BaseController extends Controller
 
             // Set the application lang if provided by GET, session or cookie
             if ($language = Yii::$app->getRequest()->get('language', NULL)) {
+
+                $language = LanguageHelper::getLangRedirectSource($language);
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -74,17 +76,25 @@ abstract class BaseController extends Controller
             } else if (Yii::$app->session->has('language')) {
 
                 $language = Yii::$app->session->get('language');
+                $language = LanguageHelper::getLangRedirectSource($language);
+                
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
                 }
+
                 Yii::$app->language = $language;
+                
             } else if (isset(Yii::$app->request->cookies['language'])) {
 
                 $language = Yii::$app->request->cookies['language']->value;
+                $language = LanguageHelper::getLangRedirectSource($language);
+
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
                 }
+                
                 Yii::$app->language = $language;
+
             }
 
             //Try to set formatter locale

@@ -72,13 +72,13 @@ $(function () {
 /********* FORM-STYLE SCRIPTS START ************/
 (function ($) {
     function initStyler() {
-        $('input:checkbox').styler();
-        $('input:radio').styler();
-        $('input:file').not(".fileinput-button input:file").styler({
+        $('input:checkbox').not('.non-styler').styler();
+        $('input:radio').not('.non-styler').styler();
+        $('input:file').not('.non-styler').not(".fileinput-button input:file").styler({
             filePlaceholder: "no file selected",
             fileBrowse: "Choose File",
         });
-        $('select').styler({
+        $('select').not('.non-styler').styler({
             selectPlaceholder: "Select...",
             selectSearchNotFound: "Nothing found",
             selectSearchPlaceholder: "Search..."
