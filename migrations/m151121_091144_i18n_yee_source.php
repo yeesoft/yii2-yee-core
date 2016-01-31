@@ -19,6 +19,7 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Add New' => 1,
             'All' => 1,
             'Always Visible' => 1,
+            'An unknown error occurred.' => 1,
             'Approved' => 1,
             'Author' => 1,
             'Banned' => 1,
@@ -31,6 +32,7 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Code' => 1,
             'Comment Status' => 1,
             'Comments Activity' => 1,
+            'Confirm' => 1,
             'Confirmation Token' => 1,
             'Content' => 1,
             'Control Panel' => 1,
@@ -121,6 +123,7 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Yee CMS Version' => 1,
             'Yee Core Version' => 1,
             'Yii Framework Version' => 1,
+            'Your item has been updated.' => 1,
         ];
     }
 }

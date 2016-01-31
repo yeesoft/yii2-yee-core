@@ -22,6 +22,7 @@ use yii\helpers\ArrayHelper;
  * @property string $registration_ip
  * @property integer $status
  * @property integer $superadmin
+ * @property string $avatar
  * @property integer $created_at
  * @property integer $updated_at
  */
@@ -30,6 +31,7 @@ class User extends UserIdentity
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 0;
     const STATUS_BANNED = -1;
+    const SCENARIO_NEW_USER = 'newUser';
 
     /**
      * @var string
@@ -70,19 +72,19 @@ class User extends UserIdentity
     public function rules()
     {
         return [
-            ['username', 'required'],
+            [['username', 'email'], 'required'],
             ['username', 'unique'],
-            ['username', 'trim'],
+            [['username', 'email', 'bind_to_ip'], 'trim'],
             [['status', 'email_confirmed'], 'integer'],
             ['email', 'email'],
-            ['email', 'validateEmailConfirmedUnique'],
+            ['email', 'validateEmailUnique'],
             ['bind_to_ip', 'validateBindToIp'],
-            ['bind_to_ip', 'trim'],
             ['bind_to_ip', 'string', 'max' => 255],
-            ['password', 'required', 'on' => ['newUser', 'changePassword']],
-            ['password', 'string', 'max' => 255, 'on' => ['newUser', 'changePassword']],
-            ['password', 'trim', 'on' => ['newUser', 'changePassword']],
-            ['repeat_password', 'required', 'on' => ['newUser', 'changePassword']],
+            ['password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+            ['password', 'string', 'max' => 255, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+            ['password', 'string', 'min' => 6, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+            ['password', 'trim', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+            ['repeat_password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
             ['repeat_password', 'compare', 'compareAttribute' => 'password'],
         ];
     }
@@ -293,12 +295,11 @@ class User extends UserIdentity
     /**
      * Check that there is no such confirmed E-mail in the system
      */
-    public function validateEmailConfirmedUnique()
+    public function validateEmailUnique()
     {
         if ($this->email) {
             $exists = User::findOne([
                 'email' => $this->email,
-                'email_confirmed' => 1,
             ]);
 
             if ($exists AND $exists->id != $this->id) {
@@ -488,5 +489,42 @@ class User extends UserIdentity
     public function getUpdatedDatetime()
     {
         return "{$this->updatedDate} {$this->updatedTime}";
+    }
+
+    /**
+     *
+     * @param string $size
+     * @return boolean|string
+     */
+    public function getAvatar($size = 'small')
+    {
+        if(!empty($this->avatar)){
+            $avatars = json_decode($this->avatar);
+            
+            if(isset($avatars->$size)){
+                return $avatars->$size;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param array $avatars
+     */
+    public function setAvatars($avatars)
+    {
+        $this->avatar = json_encode($avatars);
+        return $this->save();
+    }
+
+    /**
+     *
+     */
+    public function removeAvatar()
+    {
+        $this->avatar = '';
+        return $this->save();
     }
 }
