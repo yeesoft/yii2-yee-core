@@ -12,7 +12,7 @@ class MultilingualUrlManager extends UrlManager
 
     public $nonMultilingualUrls = [];
 
-    public $languagePattern   = '<language:([a-zA-Z-]{2,5})?>';
+    public $languagePattern = '<language:([a-zA-Z-]{2,5})?>';
 
     /**
      * Initializes UrlManager.
@@ -28,9 +28,10 @@ class MultilingualUrlManager extends UrlManager
         }
         if ($this->cache instanceof Cache) {
             $cacheKey = __CLASS__;
-            $hash     = md5(json_encode($this->rules));
-            if (($data     = $this->cache->get($cacheKey)) !== false && isset($data[1])
-                && $data[1] === $hash) {
+            $hash = md5(json_encode($this->rules));
+            if (($data = $this->cache->get($cacheKey)) !== false && isset($data[1])
+                && $data[1] === $hash
+            ) {
                 $this->rules = $data[0];
             } else {
                 $this->rules = (LanguageHelper::isSiteMultilingual() && !empty($this->multilingualRules)) ? $this->getMergedRules() : $this->rules;
@@ -46,13 +47,15 @@ class MultilingualUrlManager extends UrlManager
     public function createUrl($params)
     {
         if ((isset($params['language']) && $params['language'] === false)
-            || (isset($params[0]) && in_array($params[0], $this->nonMultilingualUrls))) {
+            || (isset($params[0]) && in_array($params[0], $this->nonMultilingualUrls))
+        ) {
             unset($params['language']);
             return parent::createUrl($params);
         }
 
         if (isset($params[0]) && $params[0] === 'auth/default/oauth' && !empty($params['language'])) {
-           print_r($params);die;
+            print_r($params);
+            die;
 
         }
 
@@ -82,7 +85,7 @@ class MultilingualUrlManager extends UrlManager
                 $params['language'] = LanguageHelper::getLangRedirect(Yii::$app->language);
             }
         }
-        
+
         return parent::createUrl($params);
     }
 
@@ -91,7 +94,7 @@ class MultilingualUrlManager extends UrlManager
         $rules = $this->rules;
 
         foreach ($this->multilingualRules as $pattern => $route) {
-            $multilingualPattern         = $this->languagePattern.'/'.ltrim($pattern, '/');
+            $multilingualPattern = $this->languagePattern . '/' . ltrim($pattern, '/');
             $rules[$multilingualPattern] = $route;
         }
 

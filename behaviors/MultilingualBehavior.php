@@ -25,7 +25,7 @@ class MultilingualBehavior extends OriginalMultilingualBehavior
     public function init()
     {
         parent::init();
-        
+
         $this->languages = LanguageHelper::getLanguages();
         $this->defaultLanguage = Yii::$app->language;
     }

@@ -498,10 +498,10 @@ class User extends UserIdentity
      */
     public function getAvatar($size = 'small')
     {
-        if(!empty($this->avatar)){
+        if (!empty($this->avatar)) {
             $avatars = json_decode($this->avatar);
-            
-            if(isset($avatars->$size)){
+
+            if (isset($avatars->$size)) {
                 return $avatars->$size;
             }
         }

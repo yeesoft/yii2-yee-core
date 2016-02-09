@@ -22,7 +22,7 @@ class LanguageSelector extends \yii\base\Widget
 
     public function run()
     {
-        if(!LanguageHelper::isSiteMultilingual()){
+        if (!LanguageHelper::isSiteMultilingual()) {
             return;
         }
 

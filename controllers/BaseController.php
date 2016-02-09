@@ -77,13 +77,13 @@ abstract class BaseController extends Controller
 
                 $language = Yii::$app->session->get('language');
                 $language = LanguageHelper::getLangRedirectSource($language);
-                
+
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
                 }
 
                 Yii::$app->language = $language;
-                
+
             } else if (isset(Yii::$app->request->cookies['language'])) {
 
                 $language = Yii::$app->request->cookies['language']->value;
@@ -92,7 +92,7 @@ abstract class BaseController extends Controller
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
                 }
-                
+
                 Yii::$app->language = $language;
 
             }

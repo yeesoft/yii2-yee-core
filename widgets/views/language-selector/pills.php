@@ -1,8 +1,8 @@
 <?php
 
+use yeesoft\helpers\LanguageHelper;
 use yeesoft\widgets\assets\LanguageSelectorAsset;
 use yii\helpers\ArrayHelper;
-use yeesoft\helpers\LanguageHelper;
 
 LanguageSelectorAsset::register($this);
 ?>

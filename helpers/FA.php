@@ -14,7 +14,7 @@ class FA extends ParentFA
     public static function getIconsList()
     {
         $icons = FA::getIcons();
-        $icons = array_map(function($item){
+        $icons = array_map(function ($item) {
             return "{$item['unicode']} {$item['label']}";
         }, $icons);
 

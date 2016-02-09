@@ -117,7 +117,7 @@ class LanguageHelper
         $languages = self::getLanguages();
 
         foreach ($languages as $key => $value) {
-            $key             = (isset(Yii::$app->params['languageRedirects'][$key])) ? Yii::$app->params['languageRedirects'][$key] : $key;
+            $key = (isset(Yii::$app->params['languageRedirects'][$key])) ? Yii::$app->params['languageRedirects'][$key] : $key;
             $redirects[$key] = $value;
         }
 

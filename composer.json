@@ -13,7 +13,7 @@
     "yiisoft/yii2-jui": "*",
     "bower-asset/metisMenu": "*",
     "omgdef/yii2-multilingual-behavior": "~2.0",
-    "rmrevin/yii2-fontawesome" : "~2.12"
+    "rmrevin/yii2-fontawesome": "~2.12"
   },
   "autoload": {
     "psr-4": {

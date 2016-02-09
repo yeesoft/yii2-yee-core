@@ -82,6 +82,7 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Processing' => 1,
             'Publish' => 1,
             'Published' => 1,
+            'Read more' => 1,
             'Records per page' => 1,
             'Registration IP' => 1,
             'Repeat password' => 1,

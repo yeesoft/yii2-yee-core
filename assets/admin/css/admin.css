@@ -189,6 +189,10 @@ a:focus {
     width: 48%;
 }
 
+.record-info .form-group .btn-file-input {
+    width: 100% !important;
+}
+
 .ui-datepicker {
     z-index: 999 !important;
 }

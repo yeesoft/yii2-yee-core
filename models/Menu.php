@@ -7,10 +7,10 @@ use yeesoft\behaviors\MultilingualBehavior;
 use yeesoft\helpers\FA;
 use Yii;
 use yii\behaviors\BlameableBehavior;
+use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
-use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "menu".
