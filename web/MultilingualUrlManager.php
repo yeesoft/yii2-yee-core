@@ -34,12 +34,12 @@ class MultilingualUrlManager extends UrlManager
             ) {
                 $this->rules = $data[0];
             } else {
-                $this->rules = (LanguageHelper::isSiteMultilingual() && !empty($this->multilingualRules)) ? $this->getMergedRules() : $this->rules;
+                $this->rules = (!empty($this->multilingualRules)) ? $this->getMergedRules() : $this->rules;
                 $this->rules = $this->buildRules($this->rules);
                 $this->cache->set($cacheKey, [$this->rules, $hash]);
             }
         } else {
-            $this->rules = (LanguageHelper::isSiteMultilingual() && !empty($this->multilingualRules)) ? $this->getMergedRules() : $this->rules;
+            $this->rules = (!empty($this->multilingualRules)) ? $this->getMergedRules() : $this->rules;
             $this->rules = $this->buildRules($this->rules);
         }
     }
@@ -92,9 +92,10 @@ class MultilingualUrlManager extends UrlManager
     public function getMergedRules()
     {
         $rules = $this->rules;
+        $prefix = LanguageHelper::isSiteMultilingual() ? $this->languagePattern . '/' : '';
 
         foreach ($this->multilingualRules as $pattern => $route) {
-            $multilingualPattern = $this->languagePattern . '/' . ltrim($pattern, '/');
+            $multilingualPattern = $prefix . ltrim($pattern, '/');
             $rules[$multilingualPattern] = $route;
         }
 
