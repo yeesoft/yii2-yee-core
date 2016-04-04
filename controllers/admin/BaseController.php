@@ -84,7 +84,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
-        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
             && !User::hasPermission($modelClass::getFullAccessPermission()));
 
         if ($searchModel) {
@@ -125,6 +125,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionCreate()
     {
+        /* @var $model \yii\db\ActiveRecord */
         $model = new $this->modelClass;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -145,6 +146,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionUpdate($id)
     {
+        /* @var $model \yii\db\ActiveRecord */
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) AND $model->save()) {
@@ -165,6 +167,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionDelete($id)
     {
+        /* @var $model \yii\db\ActiveRecord */
         $model = $this->findModel($id);
         $model->delete();
 
@@ -179,6 +182,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     public function actionToggleAttribute($attribute, $id)
     {
         //TODO: Restrict owner access
+        /* @var $model \yii\db\ActiveRecord */
         $model = $this->findModel($id);
         $model->{$attribute} = ($model->{$attribute} == 1) ? 0 : 1;
         $model->save(false);
@@ -191,7 +195,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
                 && !User::hasPermission($modelClass::getFullAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
@@ -210,7 +214,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
                 && !User::hasPermission($modelClass::getFullAccessPermission()));
             $where = ['id' => Yii::$app->request->post('selection', [])];
 
@@ -229,7 +233,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::class)
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
                 && !User::hasPermission($modelClass::getFullAccessPermission()));
 
             foreach (Yii::$app->request->post('selection', []) as $id) {

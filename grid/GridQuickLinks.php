@@ -172,7 +172,7 @@ class GridQuickLinks extends Widget
             foreach ($this->options as $option) {
                 if (($this->showCount)) {
 
-                    if ((YeeHelper::isImplemented($model, OwnerAccess::class)
+                    if ((YeeHelper::isImplemented($model, OwnerAccess::CLASSNAME)
                         && !User::hasPermission($model::getFullAccessPermission()))
                     ) {
                         $option['filterWhere'][$model::getOwnerField()] = Yii::$app->user->identity->id;

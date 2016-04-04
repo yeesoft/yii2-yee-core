@@ -8,6 +8,8 @@ namespace yeesoft\models;
 interface OwnerAccess
 {
 
+    const CLASSNAME = 'yeesoft\models\OwnerAccess';
+
     /**
      * Get permission to check whether the access is denied to users who are not authors of item.
      */
