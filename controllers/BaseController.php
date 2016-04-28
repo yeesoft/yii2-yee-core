@@ -97,10 +97,7 @@ abstract class BaseController extends Controller
 
             }
 
-            //Try to set formatter locale
-//            $language = Yii::$app->language;
-//            $locale = (strlen($language) == 2)? $language.'-'.strtoupper($language) :$language; //temp workaround
-//            Yii::$app->formatter->locale = $locale;
+            Yii::$app->formatter->locale = Yii::$app->language;
 
         }
     }
