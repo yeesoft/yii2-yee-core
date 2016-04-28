@@ -85,7 +85,7 @@ class m150319_194321_init_menus extends Migration
 
         $this->dropForeignKey('fk_menu_link_lang', 'menu_link_lang');
         $this->dropForeignKey('fk_menu_link', 'menu_link');
-        $this->dropForeignKey('fk_menu_lang', 'menu_link');
+        $this->dropForeignKey('fk_menu_lang', 'menu_lang');
 
         $this->dropTable('menu_link_lang');
         $this->dropTable('menu_link');
