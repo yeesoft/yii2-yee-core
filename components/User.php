@@ -69,7 +69,7 @@ class User extends \yii\web\User
     /**
      * @inheritdoc
      */
-    public function loginRequired($checkAjax = true)
+    public function loginRequired($checkAjax = true, $checkAcceptHeader = true)
     {
         $request = Yii::$app->getRequest();
         if ($this->enableSession && (!$checkAjax || !$request->getIsAjax())) {
