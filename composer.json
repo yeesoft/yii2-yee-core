@@ -1,23 +1,25 @@
 {
-  "name": "yeesoft/yii2-yee-core",
-  "description": "Core Module For Yee CMS",
-  "license": "Apache-2.0",
-  "authors": [
-    {
-      "name": "Taras Makitra",
-      "email": "makitrataras@gmail.com"
+    "name": "yeesoft/yii2-yee-core",
+    "description": "Core Module For Yee CMS",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Taras Makitra",
+            "email": "makitrataras@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "ikimea/browser": "*",
+        "yiisoft/yii2-jui": "*",
+        "bower-asset/metisMenu": "*",
+        "omgdef/yii2-multilingual-behavior": "~2.0",
+        "rmrevin/yii2-fontawesome": "~2.12",
+        "bower-asset/jquery-form-styler": "~1.7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "yeesoft\\": ""
+        }
     }
-  ],
-  "require": {
-    "ikimea/browser": "*",
-    "yiisoft/yii2-jui": "*",
-    "bower-asset/metisMenu": "*",
-    "omgdef/yii2-multilingual-behavior": "~2.0",
-    "rmrevin/yii2-fontawesome": "~2.12"
-  },
-  "autoload": {
-    "psr-4": {
-      "yeesoft\\": ""
-    }
-  }
-}
+} 
