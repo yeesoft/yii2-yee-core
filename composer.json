@@ -14,12 +14,7 @@
         "yiisoft/yii2-jui": "*",
         "bower-asset/metisMenu": "*",
         "omgdef/yii2-multilingual-behavior": "~2.0",
-        "rmrevin/yii2-fontawesome": "~2.12",
-        "bower-asset/jquery-form-styler": "~1.7.4"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Dimox/jQueryFormStyler.git"
+        "rmrevin/yii2-fontawesome": "~2.12"
     },
     "autoload": {
         "psr-4": {
