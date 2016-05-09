@@ -17,9 +17,13 @@
         "rmrevin/yii2-fontawesome": "~2.12",
         "bower-asset/jquery-form-styler": "~1.7.4"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Dimox/jQueryFormStyler.git"
+    },
     "autoload": {
         "psr-4": {
             "yeesoft\\": ""
         }
     }
-} 
+}
