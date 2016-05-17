@@ -14,14 +14,15 @@ use Yii;
  *
  * @author Taras Makitra <makitrataras@gmail.com>
  */
-class UserSetting extends \yii\db\ActiveRecord
+class UserSetting extends \yeesoft\db\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'user_setting';
+        return '{{%user_setting}}';
     }
 
     /**
@@ -73,4 +74,5 @@ class UserSetting extends \yii\db\ActiveRecord
 
         return FALSE;
     }
+
 }

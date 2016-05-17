@@ -1,6 +1,6 @@
 <?php
 
-use yeesoft\i18n\SourceMessagesMigration;
+use yeesoft\db\SourceMessagesMigration;
 
 class m151121_091144_i18n_yee_source extends SourceMessagesMigration
 {
@@ -132,4 +132,5 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Your item has been updated.' => 1,
         ];
     }
+
 }

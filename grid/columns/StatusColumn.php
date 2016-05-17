@@ -58,11 +58,6 @@ class StatusColumn extends DataColumn
     /**
      * @var array
      */
-    public $filterInputOptions = ['id' => null];
-
-    /**
-     * @var array
-     */
     public $contentOptions = ['style' => 'text-align:center; vertical-align: middle;'];
 
     /**

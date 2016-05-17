@@ -45,8 +45,10 @@ class DateFilterColumn extends DataColumn
             Html::addCssClass($this->filterInputOptions, 'date-filter-input');
 
             $dropDown = Html::activeDropDownList($model,
-                $this->attribute . '_operand', $filterOptions,
-                ['class' => 'no-trigger']);
+                $this->attribute . '_operand', $filterOptions, [
+                    'class' => 'form-control pull-left',
+                    'style' => 'width: 32px; appearance: none; -moz-appearance: none; -webkit-appearance: none;',
+                    ]);
             $field = DatePicker::widget(['model' => $model, 'attribute' => $this->attribute,
                 'options' => $this->filterInputOptions, 'dateFormat' => 'yyyy-MM-dd',]);
 

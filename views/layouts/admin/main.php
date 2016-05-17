@@ -1,7 +1,6 @@
 <?php
 
 use backend\assets\AppAsset;
-use yeesoft\assets\FormStylerAsset;
 use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
 use yeesoft\models\Menu;
@@ -15,8 +14,7 @@ use yii\widgets\Breadcrumbs;
 /* @var $content string */
 
 AppAsset::register($this);
-FormStylerAsset::register($this);
-YeeAsset::register($this);
+$assetBundle = YeeAsset::register($this);
 MetisMenuAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -36,8 +34,9 @@ MetisMenuAsset::register($this);
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
 
         <?php
+        $logo = $assetBundle->baseUrl . '/images/yee-logo.png';
         NavBar::begin([
-            'brandLabel' => '<b style="font-size:1.1em;">Yee</b> ' . Yii::t('yee', 'Control Panel'),
+            'brandLabel' => Html::img($logo, ['class' => 'yee-logo', 'alt' => 'YeeCMS']) . '<b>Yee</b> ' . Yii::t('yee', 'Control Panel'),
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-static-top',
@@ -111,17 +110,6 @@ MetisMenuAsset::register($this);
     </div>
 
 </div>
-
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">
-            <a href="http://www.yee-soft.com/" rel="external">Yee</a>
-            <?= Yii::t('yee', 'Control Panel') ?> &copy; <?= date('Y') ?>
-        </p>
-
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>

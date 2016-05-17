@@ -3,9 +3,7 @@
 namespace yeesoft\widgets;
 
 use yeesoft\assets\LanguagePillsAsset;
-use yeesoft\helpers\LanguageHelper;
 use Yii;
-
 
 /**
  * Widget to display buttons to switch languages in update pages
@@ -18,7 +16,7 @@ class LanguagePills extends \yii\base\Widget
         LanguagePillsAsset::register($this->view);
 
         $content = '';
-        $languages = LanguageHelper::getLanguages();
+        $languages = Yii::$app->yee->languages;
         $defaultLanguage = Yii::$app->language;
 
         if (count($languages) > 1) {

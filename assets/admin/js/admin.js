@@ -72,33 +72,33 @@ $(function () {
 /********* FORM-STYLE SCRIPTS START ************/
 (function ($) {
     function initStyler() {
-        $('input:checkbox').not('.non-styler').styler();
-        $('input:radio').not('.non-styler').styler();
-        $('input:file').not('.non-styler').not(".fileinput-button input:file").styler({
-            filePlaceholder: "no file selected",
-            fileBrowse: "Choose File",
-        });
-        $('select').not('.non-styler').styler({
-            selectPlaceholder: "Select...",
-            selectSearchNotFound: "Nothing found",
-            selectSearchPlaceholder: "Search..."
-        });
+       // $('input:checkbox').not('.non-styler').styler();
+       // $('input:radio').not('.non-styler').styler();
+//        $('input:file').not('.non-styler').not(".fileinput-button input:file").styler({
+//            filePlaceholder: "no file selected",
+//            fileBrowse: "Choose File",
+//        });
+//        $('select').not('.non-styler').styler({
+//            selectPlaceholder: "Select...",
+//            selectSearchNotFound: "Nothing found",
+//            selectSearchPlaceholder: "Search..."
+//        });
 
-        $('.select-on-check-all').on('click', function () {
-            var checkAllCheckbox = $(this).find('input:checkbox.select-on-check-all');
-            $('.grid-view input:checkbox').not($(checkAllCheckbox)).each(function () {
-                this.checked = $(checkAllCheckbox).prop("checked");
-                $(this).trigger('refresh');
-            });
-        });
+//        $('.select-on-check-all').on('click', function () {
+//            var checkAllCheckbox = $(this).find('input:checkbox.select-on-check-all');
+//            $('.grid-view input:checkbox').not($(checkAllCheckbox)).each(function () {
+//                this.checked = $(checkAllCheckbox).prop("checked");
+//                $(this).trigger('refresh');
+//            });
+//        });
     }
 
     $(function () {
-        initStyler();
+        //initStyler();
     });
 
     $(document).on('pjax:complete', function () {
-        initStyler();
+       // initStyler();
     });
 
 })(jQuery);

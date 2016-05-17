@@ -1,13 +1,10 @@
 <?php
 namespace yeesoft\behaviors;
 
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
-use yii\base\UnknownPropertyException;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\helpers\Inflector;
 use yii\validators\Validator;
 
@@ -108,7 +105,7 @@ class MultilingualSettingsBehavior extends Behavior
     {
         parent::init();
 
-        $this->languages = LanguageHelper::getLanguages();
+        $this->languages = Yii::$app->yee->languages;
         $this->defaultLanguage = Yii::$app->language;
     }
 
@@ -132,7 +129,7 @@ class MultilingualSettingsBehavior extends Behavior
         }
 
         $this->languages = array_unique(array_map(function ($language) {
-            return $this->getLanguageBaseName($language);
+            return $this->getLanguageSubtag($language);
         }, $this->languages));
 
         if (!$this->defaultLanguage) {
@@ -140,10 +137,10 @@ class MultilingualSettingsBehavior extends Behavior
                 Yii::$app->params['defaultLanguage'] : Yii::$app->language;
         }
 
-        $this->defaultLanguage = $this->getLanguageBaseName($this->defaultLanguage);
+        $this->defaultLanguage = $this->getLanguageSubtag($this->defaultLanguage);
 
         if (!$this->currentLanguage) {
-            $this->currentLanguage = $this->getLanguageBaseName(Yii::$app->language);
+            $this->currentLanguage = $this->getLanguageSubtag(Yii::$app->language);
         }
 
         if (empty($this->attributes) || !is_array($this->attributes)) {
@@ -221,7 +218,7 @@ class MultilingualSettingsBehavior extends Behavior
             foreach ($this->languages as $lang) {
                 foreach ($this->attributes as $attribute) {
                     foreach ($translations as $translation) {
-                        if ($this->getLanguageBaseName($translation->{$this->languageField}) == $lang) {
+                        if ($this->getLanguageSubtag($translation->{$this->languageField}) == $lang) {
                             $attributeName = $this->localizedPrefix . $attribute;
                             $this->setLangAttribute($this->getAttributeName($attribute, $lang), $translation->{$attributeName});
 
@@ -297,10 +294,12 @@ class MultilingualSettingsBehavior extends Behavior
     }
 
     /**
+     * Extract language two-letter abbreviation (ISO 639-1) from language key.
+     * 
      * @param $language
      * @return string
      */
-    protected function getLanguageBaseName($language)
+    protected function getLanguageSubtag($language)
     {
         return $this->abridge ? substr($language, 0, 2) : $language;
     }

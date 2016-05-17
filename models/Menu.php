@@ -9,7 +9,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -32,7 +32,7 @@ class Menu extends ActiveRecord implements OwnerAccess
      */
     public static function tableName()
     {
-        return 'menu';
+        return '{{%menu}}';
     }
 
     /**
@@ -84,7 +84,7 @@ class Menu extends ActiveRecord implements OwnerAccess
             'title' => Yii::t('yee', 'Title'),
             'created_by' => Yii::t('yee', 'Created By'),
             'updated_by' => Yii::t('yee', 'Updated By'),
-            'created_at' => Yii::t('yee', 'Created'), '',
+            'created_at' => Yii::t('yee', 'Created'),
             'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
@@ -113,9 +113,9 @@ class Menu extends ActiveRecord implements OwnerAccess
     public static function getMenuItems($menu_id)
     {
         $links = self::findOne($menu_id)
-            ->getLinks()
-            ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
-            ->all();
+                ->getLinks()
+                ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
+                ->all();
 
         return self::generateNavigationItems($links);
     }
@@ -202,4 +202,5 @@ class Menu extends ActiveRecord implements OwnerAccess
     {
         return 'created_by';
     }
+
 }

@@ -9,6 +9,7 @@ use yii\rbac\DbManager;
 
 class Permission extends AbstractItem
 {
+
     const ITEM_TYPE = self::TYPE_PERMISSION;
 
     /**
@@ -33,16 +34,13 @@ class Permission extends AbstractItem
      * @throws \InvalidArgumentException
      * @return true|static|string
      */
-    public static function assignRoutes($permissionName, $routes,
-                                        $permissionDescription = null,
-                                        $groupCode = null)
+    public static function assignRoutes($permissionName, $routes, $permissionDescription = null, $groupCode = null)
     {
         $permission = static::findOne(['name' => $permissionName]);
-        $routes = (array)$routes;
+        $routes = (array) $routes;
 
         if (!$permission) {
-            $permission = static::create($permissionName,
-                $permissionDescription, $groupCode);
+            $permission = static::create($permissionName, $permissionDescription, $groupCode);
 
             if ($permission->hasErrors()) {
                 return $permission;
@@ -53,8 +51,7 @@ class Permission extends AbstractItem
             $route = '/' . ltrim($route, '/');
             try {
                 Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->getModule('yee')->auth_item_child_table,
-                        [
+                        ->insert(Yii::$app->yee->auth_item_child_table, [
                             'parent' => $permission->name,
                             'child' => $route,
                         ])->execute();
@@ -68,4 +65,5 @@ class Permission extends AbstractItem
 
         return true;
     }
+
 }

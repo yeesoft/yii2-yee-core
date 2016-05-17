@@ -28,6 +28,7 @@ use yii\helpers\ArrayHelper;
  */
 class User extends UserIdentity
 {
+
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 0;
     const STATUS_BANNED = -1;
@@ -53,7 +54,7 @@ class User extends UserIdentity
      */
     public static function tableName()
     {
-        return Yii::$app->getModule('yee')->user_table;
+        return Yii::$app->yee->user_table;
     }
 
     /**
@@ -125,11 +126,11 @@ class User extends UserIdentity
     {
         try {
             Yii::$app->db->createCommand()
-                ->insert(Yii::$app->getModule('yee')->auth_assignment_table, [
-                    'user_id' => $userId,
-                    'item_name' => $roleName,
-                    'created_at' => time(),
-                ])->execute();
+                    ->insert(Yii::$app->yee->auth_assignment_table, [
+                        'user_id' => $userId,
+                        'item_name' => $roleName,
+                        'created_at' => time(),
+                    ])->execute();
 
             AuthHelper::invalidatePermissions();
 
@@ -165,8 +166,8 @@ class User extends UserIdentity
     public static function revokeRole($userId, $roleName)
     {
         $result = Yii::$app->db->createCommand()
-                ->delete(Yii::$app->getModule('yee')->auth_assignment_table, ['user_id' => $userId, 'item_name' => $roleName])
-                ->execute() > 0;
+                        ->delete(Yii::$app->yee->auth_assignment_table, ['user_id' => $userId, 'item_name' => $roleName])
+                        ->execute() > 0;
 
         if ($result) {
             AuthHelper::invalidatePermissions();
@@ -186,12 +187,11 @@ class User extends UserIdentity
         if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
             return true;
         }
-        $roles = (array)$roles;
+        $roles = (array) $roles;
 
         AuthHelper::ensurePermissionsUpToDate();
 
-        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, []))
-        !== [];
+        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
     }
 
     /**
@@ -298,9 +298,7 @@ class User extends UserIdentity
     public function validateEmailUnique()
     {
         if ($this->email) {
-            $exists = User::findOne([
-                'email' => $this->email,
-            ]);
+            $exists = User::findOne(['email' => $this->email]);
 
             if ($exists AND $exists->id != $this->id) {
                 $this->addError('email', Yii::t('yee', 'This e-mail already exists'));
@@ -353,7 +351,7 @@ class User extends UserIdentity
     public function getRoles()
     {
         return $this->hasMany(Role::className(), ['name' => 'item_name'])
-            ->viaTable(Yii::$app->getModule('yee')->auth_assignment_table, ['user_id' => 'id']);
+                        ->viaTable(Yii::$app->yee->auth_assignment_table, ['user_id' => 'id']);
     }
 
     /**
@@ -383,8 +381,7 @@ class User extends UserIdentity
                 }
 
                 // Don't let non-superadmin edit superadmin
-                if (!Yii::$app->user->isSuperadmin AND $this->oldAttributes['superadmin']
-                    == 1
+                if (!Yii::$app->user->isSuperadmin AND $this->oldAttributes['superadmin'] == 1
                 ) {
                     return false;
                 }
@@ -527,4 +524,5 @@ class User extends UserIdentity
         $this->avatar = '';
         return $this->save();
     }
+
 }

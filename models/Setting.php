@@ -16,7 +16,7 @@ use Yii;
  *
  * @author Taras Makitra <makitrataras@gmail.com>
  */
-class Setting extends \yii\db\ActiveRecord
+class Setting extends \yeesoft\db\ActiveRecord
 {
 
     /**
@@ -24,7 +24,7 @@ class Setting extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'setting';
+        return '{{%setting}}';
     }
 
     /**
@@ -63,4 +63,5 @@ class Setting extends \yii\db\ActiveRecord
     {
         return self::findOne(['group' => $group, 'key' => $key, 'language' => $language]);
     }
+
 }

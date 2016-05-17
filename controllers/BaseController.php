@@ -3,7 +3,6 @@
 namespace yeesoft\controllers;
 
 use yeesoft\behaviors\AccessFilter;
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\web\Controller;
 use yii\web\Cookie;
@@ -40,14 +39,14 @@ abstract class BaseController extends Controller
     {
         parent::init();
 
-        if (!Yii::$app->errorHandler->exception && LanguageHelper::isSiteMultilingual()) {
+        if (!Yii::$app->errorHandler->exception && Yii::$app->yee->isMultilingual) {
 
-            $languages = LanguageHelper::getLanguages();
+            $languages = Yii::$app->yee->languages;
 
             // If there is a post-request, redirect the application 
             // to the provided url of the selected language
             if (Yii::$app->getRequest()->post('language', NULL)) {
-                $language = LanguageHelper::getLangRedirectSource(Yii::$app->getRequest()->post('language'));
+                $language = Yii::$app->yee->getSourceLanguageShortcode(Yii::$app->getRequest()->post('language'));
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -60,7 +59,7 @@ abstract class BaseController extends Controller
             // Set the application lang if provided by GET, session or cookie
             if ($language = Yii::$app->getRequest()->get('language', NULL)) {
 
-                $language = LanguageHelper::getLangRedirectSource($language);
+                $language = Yii::$app->yee->getSourceLanguageShortcode($language);
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -76,7 +75,7 @@ abstract class BaseController extends Controller
             } else if (Yii::$app->session->has('language')) {
 
                 $language = Yii::$app->session->get('language');
-                $language = LanguageHelper::getLangRedirectSource($language);
+                $language = Yii::$app->yee->getSourceLanguageShortcode($language);
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -87,7 +86,7 @@ abstract class BaseController extends Controller
             } else if (isset(Yii::$app->request->cookies['language'])) {
 
                 $language = Yii::$app->request->cookies['language']->value;
-                $language = LanguageHelper::getLangRedirectSource($language);
+                $language = Yii::$app->yee->getSourceLanguageShortcode($language);
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();

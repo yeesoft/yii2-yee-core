@@ -2,7 +2,6 @@
 
 namespace yeesoft\web;
 
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\web\UrlManager;
 
@@ -60,8 +59,8 @@ class MultilingualUrlManager extends UrlManager
         }
 
 
-        if (LanguageHelper::isSiteMultilingual() && !empty($this->multilingualRules)) {
-            $languages = LanguageHelper::getValidLanguages();
+        if (Yii::$app->yee->isMultilingual && !empty($this->multilingualRules)) {
+            $languages = array_keys(Yii::$app->yee->displayLanguages);
 
             //remove incorrect language param
             if (isset($params['language']) && !in_array($params['language'], $languages)) {
@@ -82,7 +81,7 @@ class MultilingualUrlManager extends UrlManager
                     Yii::$app->language = $language;
                 }
 
-                $params['language'] = LanguageHelper::getLangRedirect(Yii::$app->language);
+                $params['language'] = Yii::$app->yee->getDisplayLanguageShortcode(Yii::$app->language);
             }
         }
 
@@ -92,7 +91,7 @@ class MultilingualUrlManager extends UrlManager
     public function getMergedRules()
     {
         $rules = $this->rules;
-        $prefix = LanguageHelper::isSiteMultilingual() ? $this->languagePattern . '/' : '';
+        $prefix = Yii::$app->yee->isMultilingual ? $this->languagePattern . '/' : '';
 
         foreach ($this->multilingualRules as $pattern => $route) {
             $multilingualPattern = $prefix . ltrim($pattern, '/');

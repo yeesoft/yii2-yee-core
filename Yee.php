@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link http://www.yee-soft.com/
  * @copyright Copyright (c) 2015 Taras Makitra
@@ -7,60 +8,60 @@
 
 namespace yeesoft;
 
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
+use yii\base\Component;
 
 /**
- * Yee CMS
- *
- * @author Taras Makitra <makitrataras@gmail.com>
+ * YeeCMS component. Contains basic settings and functions of YeeCMS.
  */
-class Yee extends \yii\base\Module
+class Yee extends Component
 {
-    /**
-     * Version number of the module.
-     */
-    const VERSION = '0.1-a';
-    const SESSION_LAST_ATTEMPT = '_um_last_attempt';
-    const SESSION_ATTEMPT_COUNT = '_um_attempt_count';
 
     /**
-     * If set true, then on after registration message with activation code will be sent
-     * to user email and after confirmation user status will be "active"
+     * Version number of the component.
+     */
+    const VERSION = '0.1.0';
+
+    /**
+     * Session ID of last login attempt.
+     */
+    const SESSION_LAST_ATTEMPT_TIME = '_last_attempt';
+
+    /**
+     * Session ID of login attempts count.
+     */
+    const SESSION_ATTEMPTS_COUNT = '_attempt_count';
+
+    /**
+     * Indicates whether it is required to confirm email after registration.
+     * User's account status will be set to "active" after user confirms his email.
      *
-     * @var bool
-     * @see $useEmailAsLogin
+     * @var boolean
      */
     public $emailConfirmationRequired = true;
 
     /**
-     * Params for mailer
-     * They will be merged with $_defaultMailerOptions
+     * Default email FROM sender. If empty it will be set to
+     * `[Yii::$app->params['adminEmail'] => Yii::$app->name]`
      *
-     * @var array
-     * @see $_defaultMailerOptions
+     * @var string
      */
-    public $mailerOptions = [];
+    public $emailSender;
 
     /**
-     * Default options for mailer
+     * Email templates. These settings will be merged with `$_defaultEmailTemplates`.
      *
      * @var array
+     * @see $_defaultEmailTemplates
      */
-    protected $_defaultMailerOptions = [
-        'from' => '', // If empty it will be - [Yii::$app->params['adminEmail'] => Yii::$app->name . ' robot']
-        'signup-confirmation' => '/mail/signup-email-confirmation-html',
-        'password-reset-mail' => '/mail/password-reset-html',
-        'confirm-email' => '/mail/email-confirmation-html',
-    ];
+    public $emailTemplates = [];
 
     /**
-     * Permission that will be assigned automatically for everyone, so you can assign
-     * routes like "site/index" to this permission and those routes will be available for everyone
-     *
-     * Basically it's permission for guests (and of course for everyone else)
+     * Permission that will be assigned automatically for everyone. You can assign
+     * routes like "site/index" to this permission and those routes will be 
+     * available for everyone.
      *
      * @var string
      */
@@ -74,75 +75,140 @@ class Yee extends \yii\base\Module
     public $confirmationTokenExpire = 3600; // 1 hour
 
     /**
-     * Roles that will be assigned to user registered via /auth/signup
+     * Roles that will be assigned to user after registration.
      *
      * @var array
      */
-    public $rolesAfterRegistration = [];
+    public $defaultRoles = [];
 
     /**
-     * Pattern that will be applied for names on registration.
-     * Default pattern allows user enter only numbers and letters.
-     *
-     * This will not be used if $useEmailAsLogin set as true !
+     * Pattern that will be used to validate usernames on registration. Default 
+     * pattern allows only numbers and letters.
      *
      * @var string
      */
     public $usernameRegexp = '/^(\w|\d)+$/';
 
     /**
-     * Pattern that will be applied for names on registration. It contain regexp that should NOT be in username
-     * Default pattern doesn't allow anything having "admin"
-     *
-     * This will not be used if $useEmailAsLogin set as true !
+     * Pattern that describe what names should not be allowed for username on 
+     * registration. Default pattern does not allow anything having "admin".
      *
      * @var string
      */
     public $usernameBlackRegexp = '/^(.)*admin(.)*$/i';
 
     /**
-     * How much attempts user can made to login or recover password in $attemptsTimeout seconds interval
+     * List of languages used in application.
+     *
+     * @var array
+     */
+    public $languages = ['en-US' => 'English'];
+
+    /**
+     * List of language slug redirects. You can use this parameter to redirect
+     * language slug to another slug. For example `en-US` to `en`.
+     *
+     * @var array
+     */
+    public $languageRedirects = ['en-US' => 'en'];
+
+    /**
+     * How much attempts user can made to login, update or recover password
+     * in `$attemptsTimeout` seconds interval.
      *
      * @var int
      */
     public $maxAttempts = 5;
 
     /**
-     * Number of seconds after attempt counter to login or recover password will reset
+     * Number of seconds after attempt counter to login, update or recover 
+     * password will reset.
      *
      * @var int
      */
     public $attemptsTimeout = 60;
 
     /**
-     * Options for registration and password recovery captcha
+     * Captcha action options. Used for registration and password recovery.
      *
      * @var array
      */
-    public $captchaOptions = [
+    public $captchaAction = [
         'class' => 'yii\captcha\CaptchaAction',
         'minLength' => 5,
         'maxLength' => 5,
         'height' => 45,
         'width' => 100,
-        'fontFile' => '@vendor/yeesoft/yii2-yee-auth/fonts/lightweight.ttf',
         'padding' => 0
     ];
 
     /**
-     * Table aliases
-     *
-     * @var string
+     * User table alias.
+     * 
+     * @var string 
      */
     public $user_table = '{{%user}}';
+
+    /**
+     * User visit log table alias.
+     * 
+     * @var string 
+     */
     public $user_visit_log_table = '{{%user_visit_log}}';
+
+    /**
+     * Auth item table alias.
+     * 
+     * @var string 
+     */
     public $auth_item_table = '{{%auth_item}}';
+
+    /**
+     * Auth item child table alias.
+     * 
+     * @var string 
+     */
     public $auth_item_child_table = '{{%auth_item_child}}';
+
+    /**
+     * Auth item group table alias.
+     * 
+     * @var string 
+     */
     public $auth_item_group_table = '{{%auth_item_group}}';
+
+    /**
+     * Auth assignment table alias.
+     * 
+     * @var string 
+     */
     public $auth_assignment_table = '{{%auth_assignment}}';
+
+    /**
+     * Auth rule table alias.
+     * 
+     * @var string 
+     */
     public $auth_rule_table = '{{%auth_rule}}';
 
-    //public $controllerNamespace   = 'yeesoft\usermanagement\controllers';
+    /**
+     * List of languages used in frontend rules. Contains the same values as
+     * `$languages` but keys is replaced with `$languageRedirects`.
+     * 
+     * @var array 
+     */
+    protected $_displayLanguages;
+
+    /**
+     * Default email templates.
+     *
+     * @var array
+     */
+    protected $_defaultEmailTemplates = [
+        'signup-confirmation' => '/mail/signup-email-confirmation-html',
+        'password-reset' => '/mail/password-reset-html',
+        'confirm-email' => '/mail/email-confirmation-html',
+    ];
 
     /**
      * @inheritdoc
@@ -153,30 +219,57 @@ class Yee extends \yii\base\Module
 
         if (Yii::$app->id != 'console') {
 
-            //Check language settings
-            if (!LanguageHelper::isSiteMultilingual() &&
-                !in_array(Yii::$app->language, array_keys(LanguageHelper::getLanguages()))
-            ) {
-                throw new InvalidConfigException('Invalid language settings! Field "languages" in \common\config\params.php should contain the same language as "language" param in config\main.php');
-            }
+            $this->registerTranslations();
+            $this->initLanguageOptions();
 
             //Check here: redirLangs not contains in langs param
 
-            $this->registerTranslations();
-            $this->prepareMailerOptions();
+            $this->initEmailOptions();
             $this->initFormatter();
         }
     }
 
+    /**
+     * Register YeeCMS DB message translations.
+     */
     protected function registerTranslations()
     {
         Yii::$app->i18n->translations['yee*'] = [
-            'class' => 'yeesoft\i18n\DbMessageSource',
+            'class' => 'yeesoft\db\DbMessageSource',
             'sourceLanguage' => 'en-US',
             'enableCaching' => true,
         ];
     }
 
+    /**
+     * Prepare mailer options. Merge given email templates options with default.
+     */
+    protected function initLanguageOptions()
+    {
+        if (empty($this->languages) || !is_array($this->languages)) {
+            $this->languages[Yii::$app->language] = Yii::t('yee', 'Default Language');
+        }
+
+        if (!in_array(Yii::$app->language, array_keys($this->languages))) {
+            throw new InvalidConfigException('Invalid language settings! Default application language should be included into `yeesoft\Yee::$languages` setting.');
+        }
+    }
+
+    /**
+     * Prepare mailer options. Merge given email templates options with default.
+     */
+    protected function initEmailOptions()
+    {
+        if (empty($this->emailSender)) {
+            $this->emailSender = [Yii::$app->params['adminEmail'] => Yii::$app->name];
+        }
+
+        $this->emailTemplates = ArrayHelper::merge($this->_defaultEmailTemplates, $this->emailTemplates);
+    }
+
+    /**
+     * Updates formatter to display date and time correcty.
+     */
     protected function initFormatter()
     {
         date_default_timezone_set(Yii::$app->settings->get('general.timezone', 'UTC'));
@@ -184,27 +277,85 @@ class Yee extends \yii\base\Module
         Yii::$app->formatter->dateFormat = Yii::$app->settings->get('general.dateformat', "yyyy-MM-dd");
         Yii::$app->formatter->timeFormat = Yii::$app->settings->get('general.timeformat', "HH:mm");
         Yii::$app->formatter->datetimeFormat = Yii::$app->formatter->dateFormat . " " . Yii::$app->formatter->timeFormat;
-
     }
 
     /**
-     * Check how much attempts user has been made in X seconds
+     * Return true if site is multilingual.
      *
-     * @return bool
+     * @return boolean
+     */
+    public function getIsMultilingual()
+    {
+        $languages = Yii::$app->yee->languages;
+        return count($languages) > 1;
+    }
+
+    /**
+     * Returns language shortcode that will be displayed on frontend.
+     * 
+     * @param string $language
+     * @return string
+     */
+    public function getDisplayLanguageShortcode($language)
+    {
+        return (isset($this->languageRedirects[$language])) ? $this->languageRedirects[$language] : $language;
+    }
+
+    /**
+     * Returns original language shortcode from its redirect.
+     * 
+     * @param string $language
+     * @return string
+     */
+    public function getSourceLanguageShortcode($language)
+    {
+        if (!isset($this->languageRedirects)) {
+            return $language;
+        }
+
+        $languageRedirects = array_flip(Yii::$app->yee->languageRedirects);
+
+        return (isset($languageRedirects[$language])) ? $languageRedirects[$language] : $language;
+    }
+
+    /**
+     * Returns list of languages used in frontend rules. Contains the same values 
+     * as `$languages` but keys is replaced with `$languageRedirects`.
+     * 
+     * @return array
+     */
+    public function getDisplayLanguages()
+    {
+        if (!isset($this->_displayLanguages)) {
+            foreach ($this->languages as $key => $value) {
+                $key = (isset($this->languageRedirects[$key])) ? $this->languageRedirects[$key] : $key;
+                $redirects[$key] = $value;
+            }
+
+            $this->_displayLanguages = $redirects;
+        }
+        return $this->_displayLanguages;
+    }
+
+    /**
+     * Check how much attempts to login, reset or update password user has been
+     * made in `$attemptsTimeout` seconds.
+     *
+     * @return boolean
      */
     public function checkAttempts()
     {
-        $lastAttempt = Yii::$app->session->get(static::SESSION_LAST_ATTEMPT);
+        $lastAttemptTime = Yii::$app->session->get(static::SESSION_LAST_ATTEMPT_TIME);
 
-        if ($lastAttempt) {
-            $attemptsCount = Yii::$app->session->get(static::SESSION_ATTEMPT_COUNT, 0);
+        if ($lastAttemptTime) {
+            $attemptsCount = Yii::$app->session->get(static::SESSION_ATTEMPTS_COUNT, 0);
 
-            Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, ++$attemptsCount);
+            Yii::$app->session->set(static::SESSION_ATTEMPTS_COUNT, ++$attemptsCount);
 
             // If last attempt was made more than X seconds ago then reset counters
-            if (($lastAttempt + $this->attemptsTimeout) < time()) {
-                Yii::$app->session->set(static::SESSION_LAST_ATTEMPT, time());
-                Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, 1);
+            if (($lastAttemptTime + $this->attemptsTimeout) < time()) {
+                Yii::$app->session->set(static::SESSION_LAST_ATTEMPT_TIME, time());
+                Yii::$app->session->set(static::SESSION_ATTEMPTS_COUNT, 1);
 
                 return true;
             } elseif ($attemptsCount > $this->maxAttempts) {
@@ -214,26 +365,15 @@ class Yee extends \yii\base\Module
             return true;
         }
 
-        Yii::$app->session->set(static::SESSION_LAST_ATTEMPT, time());
-        Yii::$app->session->set(static::SESSION_ATTEMPT_COUNT, 1);
+        Yii::$app->session->set(static::SESSION_LAST_ATTEMPT_TIME, time());
+        Yii::$app->session->set(static::SESSION_ATTEMPTS_COUNT, 1);
 
         return true;
     }
 
     /**
-     * Merge given mailer options with default
-     */
-    protected function prepareMailerOptions()
-    {
-        if (!isset($this->mailerOptions['from'])) {
-            $this->mailerOptions['from'] = [Yii::$app->params['adminEmail'] => Yii::$app->name];
-        }
-
-        $this->mailerOptions = ArrayHelper::merge($this->_defaultMailerOptions, $this->mailerOptions);
-    }
-
-    /**
      * Returns an HTML hyperlink that can be displayed on your Web page.
+     * 
      * @return string
      */
     public static function powered()
@@ -243,10 +383,12 @@ class Yee extends \yii\base\Module
 
     /**
      * Returns a string representing the current version of the Yee CMS Core.
+     * 
      * @return string the version of Yee CMS Core
      */
     public static function getVersion()
     {
         return self::VERSION;
     }
+
 }

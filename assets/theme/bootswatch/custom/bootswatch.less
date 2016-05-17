@@ -1,0 +1,181 @@
+// Custom 3.3.5
+// Bootswatch
+// -----------------------------------------------------
+
+
+// Navbar =====================================================================
+
+// Buttons ====================================================================
+
+// Typography =================================================================
+
+// Tables =====================================================================
+
+// Forms ======================================================================
+
+// Navs =======================================================================
+
+// Indicators =================================================================
+
+// Progress bars ==============================================================
+
+// Containers =================================================================
+
+// Checkboxes & Radios ========================================================
+
+@checkbox-size: 16px;
+@checkbox-padding: 3px;
+@checkbox-inner-size: (@checkbox-size - (2 * @checkbox-padding));
+@checkbox-border-radius: 3px;
+@checkbox-inner-border-radius: 1px;
+@radio-border-radius: 50%;
+
+.gradient (@startColor: #eee, @endColor: white) {
+    background-color: @startColor;
+    background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+    background: -webkit-linear-gradient(top, @startColor, @endColor);
+    background: -moz-linear-gradient(top, @startColor, @endColor);
+    background: -ms-linear-gradient(top, @startColor, @endColor);
+    background: -o-linear-gradient(top, @startColor, @endColor);
+}
+
+.checkbox-variant(@parent, @color) {
+    .@{parent} input[type="checkbox"]:checked + label,
+        .@{parent} input[type="radio"]:checked + label {
+        &::before {
+            border-color: @color;
+        }
+        &::after {
+            color: #fff;
+            .gradient(@color, lighten(@color, 20%));
+        }
+    }
+}
+
+.radio-variant(@parent, @color) {
+    .@{parent} input[type="radio"]{
+        & + label{
+            &::after{
+                background-color: @color;
+            }
+        }
+        &:checked + label{
+            &::before {
+                border-color: @color;
+            }
+            &::after{
+                .gradient(@color, lighten(@color, 20%));
+            }
+        }
+    }
+}
+
+.checkbox, .radio{
+    padding-left: 20px;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+
+    label{
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        padding-left: 5px;
+
+        &::after, &::before{
+            content: " ";
+            display: inline-block;
+            position: absolute;
+            margin-left: -20px;
+        }
+
+        &::before{
+            width: @checkbox-size;
+            height: @checkbox-size;
+            left: 0;
+            border: 1px solid darken(@input-border, 20%);
+            background-color: #fff;
+        }
+
+        &::after{
+            width: @checkbox-inner-size;
+            height: @checkbox-inner-size;
+            left: @checkbox-padding;
+            top: @checkbox-padding;
+        }
+    }
+
+    input[type="checkbox"],
+    input[type="radio"]{
+        opacity: 0;
+        z-index: 1;
+        &:disabled + label{
+            opacity: 0.65;
+            &::before{
+                background-color: @input-bg-disabled;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+.checkbox{
+    label{
+        &::before{
+            border-radius: @checkbox-border-radius;
+        }
+        &::after{
+            border-radius: @checkbox-inner-border-radius;
+        }
+    }
+
+    input[type="checkbox"], input[type="radio"]{
+        &:checked + label::after{
+            .gradient(@input-color, lighten(@input-color, 15%));
+        }
+    }
+
+    &.checkbox-circle label{
+        &::before, &::after{
+            border-radius: @radio-border-radius;
+        }
+    }
+
+    &.checkbox-inline{
+        margin-top: 0;
+    }
+}
+
+.radio{
+    label{
+        &::before{
+            border-radius: @radio-border-radius;
+        }
+        &::after{
+            border-radius: @radio-border-radius;
+            .gradient(@input-color, lighten(@input-color, 20%));
+            .scale(0, 0);
+        }
+    }
+
+    input[type="radio"]{
+        &:checked + label::after{
+            .scale(1, 1);
+        }
+    }
+
+    &.radio-inline{
+        margin-top: 0;
+    }
+}
+
+.checkbox-variant(checkbox-primary, @brand-primary);
+.checkbox-variant(checkbox-danger, @brand-danger);
+.checkbox-variant(checkbox-info, @brand-info);
+.checkbox-variant(checkbox-warning, @brand-warning);
+.checkbox-variant(checkbox-success, @brand-success);
+
+.radio-variant(radio-primary, @brand-primary);
+.radio-variant(radio-danger, @brand-danger);
+.radio-variant(radio-info, @brand-info);
+.radio-variant(radio-warning, @brand-warning);
+.radio-variant(radio-success, @brand-success);

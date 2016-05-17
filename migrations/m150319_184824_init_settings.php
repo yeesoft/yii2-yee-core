@@ -1,10 +1,9 @@
 <?php
 
-use yii\db\Migration;
-use yii\db\Schema;
-
-class m150319_184824_init_settings extends Migration
+class m150319_184824_init_settings extends yii\db\Migration
 {
+
+    const TABLE_NAME = '{{%setting}}';
 
     public function up()
     {
@@ -13,22 +12,21 @@ class m150319_184824_init_settings extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable('setting',
-            [
-                'id' => Schema::TYPE_PK,
-                'group' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci DEFAULT "general"',
-                'key' => Schema::TYPE_STRING . '(64) COLLATE utf8_unicode_ci NOT NULL',
-                'language' => Schema::TYPE_STRING . '(6) COLLATE utf8_unicode_ci DEFAULT NULL',
-                'value' => Schema::TYPE_TEXT . ' COLLATE utf8_unicode_ci NOT NULL',
-                'description' => Schema::TYPE_TEXT . ' COLLATE utf8_unicode_ci DEFAULT NULL',
-            ], $tableOptions);
+        $this->createTable(self::TABLE_NAME, [
+            'id' => $this->primaryKey(),
+            'group' => $this->string(64)->defaultValue('general'),
+            'key' => $this->string(64)->notNull(),
+            'language' => $this->string(6),
+            'value' => $this->text(),
+            'description' => $this->text(),
+        ], $tableOptions);
 
-        $this->createIndex('setting_group_lang', 'setting', ['group', 'key', 'language']);
-
+        $this->createIndex('setting_group_lang', self::TABLE_NAME, ['group', 'key', 'language']);
     }
 
     public function down()
     {
-        $this->dropTable('setting');
+        $this->dropTable(self::TABLE_NAME);
     }
+
 }

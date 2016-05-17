@@ -5,7 +5,7 @@ namespace yeesoft\models;
 use yeesoft\helpers\AuthHelper;
 use Yii;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\helpers\Inflector;
 use yii\rbac\DbManager;
 
@@ -23,6 +23,7 @@ use yii\rbac\DbManager;
  */
 abstract class AbstractItem extends ActiveRecord
 {
+
     const TYPE_ROLE = 1;
     const TYPE_PERMISSION = 2;
     const TYPE_ROUTE = 3;
@@ -44,15 +45,13 @@ abstract class AbstractItem extends ActiveRecord
      *
      * @return static
      */
-    public static function create($name, $description = null, $groupCode = null,
-                                  $ruleName = null, $data = null)
+    public static function create($name, $description = null, $groupCode = null, $ruleName = null, $data = null)
     {
         $item = new static;
 
         $item->type = static::ITEM_TYPE;
         $item->name = $name;
-        $item->description = ($description === null AND static::ITEM_TYPE != static::TYPE_ROUTE)
-            ? Inflector::titleize($name) : $description;
+        $item->description = ($description === null AND static::ITEM_TYPE != static::TYPE_ROUTE) ? Inflector::titleize($name) : $description;
         $item->rule_name = $ruleName;
         $item->group_code = $groupCode;
         $item->data = $data;
@@ -71,17 +70,16 @@ abstract class AbstractItem extends ActiveRecord
      *
      * @throws \Exception
      */
-    public static function addChildren($parentName, $childrenNames,
-                                       $throwException = false)
+    public static function addChildren($parentName, $childrenNames, $throwException = false)
     {
-        $parent = (object)['name' => $parentName];
+        $parent = (object) ['name' => $parentName];
 
-        $childrenNames = (array)$childrenNames;
+        $childrenNames = (array) $childrenNames;
 
         $dbManager = new DbManager();
 
         foreach ($childrenNames as $childName) {
-            $child = (object)['name' => $childName];
+            $child = (object) ['name' => $childName];
 
             try {
                 $dbManager->addChild($parent, $child);
@@ -101,13 +99,12 @@ abstract class AbstractItem extends ActiveRecord
      */
     public static function removeChildren($parentName, $childrenNames)
     {
-        $childrenNames = (array)$childrenNames;
+        $childrenNames = (array) $childrenNames;
 
         foreach ($childrenNames as $childName) {
             Yii::$app->db->createCommand()
-                ->delete(Yii::$app->getModule('yee')->auth_item_child_table,
-                    ['parent' => $parentName, 'child' => $childName])
-                ->execute();
+                    ->delete(Yii::$app->yee->auth_item_child_table, ['parent' => $parentName, 'child' => $childName])
+                    ->execute();
         }
 
         AuthHelper::invalidatePermissions();
@@ -146,7 +143,7 @@ abstract class AbstractItem extends ActiveRecord
      */
     public static function tableName()
     {
-        return Yii::$app->getModule('yee')->auth_item_table;
+        return Yii::$app->yee->auth_item_table;
     }
 
     /**
@@ -163,8 +160,7 @@ abstract class AbstractItem extends ActiveRecord
             [['name', 'rule_name', 'group_code'], 'string', 'max' => 64],
             [['rule_name', 'description', 'group_code', 'data'], 'default', 'value' => null],
             ['type', 'integer'],
-            ['type', 'in', 'range' => [static::TYPE_ROLE, static::TYPE_PERMISSION,
-                static::TYPE_ROUTE]],
+            ['type', 'in', 'range' => [static::TYPE_ROLE, static::TYPE_PERMISSION, static::TYPE_ROUTE]],
         ];
     }
 
@@ -174,12 +170,10 @@ abstract class AbstractItem extends ActiveRecord
     public function validateUniqueName($attribute)
     {
         if (Role::find()->where(['name' => $this->name])->exists()) {
-            $this->addError('name',
-                Yii::t('yii', '{attribute} "{value}" has already been taken.',
-                    [
+            $this->addError('name', Yii::t('yii', '{attribute} "{value}" has already been taken.', [
                         'attribute' => $this->getAttributeLabel($attribute),
                         'value' => $this->$attribute,
-                    ]));
+            ]));
         }
     }
 
@@ -189,7 +183,7 @@ abstract class AbstractItem extends ActiveRecord
      */
     public static function find()
     {
-        return parent::find()->andWhere([Yii::$app->getModule('yee')->auth_item_table . '.type' => static::ITEM_TYPE]);
+        return parent::find()->andWhere([Yii::$app->yee->auth_item_table . '.type' => static::ITEM_TYPE]);
     }
 
     /**
@@ -214,8 +208,7 @@ abstract class AbstractItem extends ActiveRecord
      */
     public function getGroup()
     {
-        return $this->hasOne(AuthItemGroup::className(),
-            ['code' => 'group_code']);
+        return $this->hasOne(AuthItemGroup::className(), ['code' => 'group_code']);
     }
 
     /**
@@ -239,4 +232,5 @@ abstract class AbstractItem extends ActiveRecord
 
         AuthHelper::invalidatePermissions();
     }
+
 }

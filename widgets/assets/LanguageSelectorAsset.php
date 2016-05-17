@@ -6,8 +6,9 @@ use yii\web\AssetBundle;
 use yii\web\JqueryAsset;
 
 /**
- * Class YeeAsset
- * @package yeesoft\core
+ * Class LanguageSelectorAsset
+ * 
+ * @package yeesoft\widgets\assets
  */
 class LanguageSelectorAsset extends AssetBundle
 {

@@ -4,7 +4,7 @@ namespace yeesoft\models;
 
 use Yii;
 use yii\base\Security;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
@@ -58,10 +58,10 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
      */
     public static function findByConfirmationToken($token)
     {
-        $expire = Yii::$app->getModule('yee')->confirmationTokenExpire;
+        $expire = Yii::$app->yee->confirmationTokenExpire;
 
         $parts = explode('_', $token);
-        $timestamp = (int)end($parts);
+        $timestamp = (int) end($parts);
 
         if ($timestamp + $expire < time()) {
             // token expired
@@ -69,8 +69,8 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
         }
 
         return static::findOne([
-            'confirmation_token' => $token,
-            'status' => User::STATUS_ACTIVE,
+                    'confirmation_token' => $token,
+                    'status' => User::STATUS_ACTIVE,
         ]);
     }
 
@@ -82,10 +82,10 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
      */
     public static function findInactiveByConfirmationToken($token)
     {
-        $expire = Yii::$app->getModule('yee')->confirmationTokenExpire;
+        $expire = Yii::$app->yee->confirmationTokenExpire;
 
         $parts = explode('_', $token);
-        $timestamp = (int)end($parts);
+        $timestamp = (int) end($parts);
 
         if ($timestamp + $expire < time()) {
             // token expired
@@ -93,8 +93,8 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
         }
 
         return static::findOne([
-            'confirmation_token' => $token,
-            'status' => User::STATUS_INACTIVE,
+                    'confirmation_token' => $token,
+                    'status' => User::STATUS_INACTIVE,
         ]);
     }
 
@@ -130,8 +130,7 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password,
-            $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
     /**
@@ -177,4 +176,5 @@ abstract class UserIdentity extends ActiveRecord implements IdentityInterface
     {
         $this->confirmation_token = null;
     }
+
 }

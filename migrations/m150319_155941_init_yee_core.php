@@ -1,17 +1,16 @@
 <?php
 
-use yii\db\Schema;
-
 class m150319_155941_init_yee_core extends \yii\db\Migration
 {
-    const user_table = 'user';
-    const auth_rule_table = 'auth_rule';
-    const auth_item_table = 'auth_item';
-    const auth_item_child_table = 'auth_item_child';
-    const auth_item_group_table = 'auth_item_group';
-    const auth_assignment_table = 'auth_assignment';
-    const user_visit_log_table = 'user_visit_log';
-    const user_setting_table = 'user_setting';
+
+    const USER_TABLE = '{{%user}}';
+    const AUTH_RULE_TABLE = '{{%auth_rule}}';
+    const AUTH_ITEM_TABLE = '{{%auth_item}}';
+    const AUTH_ITEM_CHILD_TABLE = '{{%auth_item_child}}';
+    const AUTH_ITEM_GROUP_TABLE = '{{%auth_item_group}}';
+    const AUTH_ASSIGNMENT_TABLE = '{{%auth_assignment}}';
+    const USER_VISIT_LOG_TABLE = '{{%user_visit_log}}';
+    const USER_SETTING_TABLE = '{{%user_setting}}';
 
     public function up()
     {
@@ -20,100 +19,94 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=InnoDB';
         }
 
-        $this->createTable(self::auth_rule_table, [
-            'name' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'data' => Schema::TYPE_TEXT,
-            'created_at' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
+        $this->createTable(self::AUTH_RULE_TABLE, [
+            'name' => $this->string(64)->notNull(),
+            'data' => $this->text(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
             'PRIMARY KEY (name)',
         ], $tableOptions);
 
-        $this->createTable(self::auth_item_group_table, [
-            'code' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'name' => Schema::TYPE_STRING . '(255) NOT NULL',
-            'created_at' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
+        $this->createTable(self::AUTH_ITEM_GROUP_TABLE, [
+            'code' => $this->string(64)->notNull(),
+            'name' => $this->string(255)->notNull(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
             'PRIMARY KEY (code)',
         ], $tableOptions);
 
-        $this->createTable(self::auth_item_table, [
-            'name' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'type' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'description' => Schema::TYPE_TEXT,
-            'rule_name' => Schema::TYPE_STRING . '(64)',
-            'group_code' => Schema::TYPE_STRING . '(64)',
-            'data' => Schema::TYPE_TEXT,
-            'created_at' => Schema::TYPE_INTEGER,
-            'updated_at' => Schema::TYPE_INTEGER,
+        $this->createTable(self::AUTH_ITEM_TABLE, [
+            'name' => $this->string(64)->notNull(),
+            'type' => $this->integer()->notNull(),
+            'description' => $this->text(),
+            'rule_name' => $this->string(64),
+            'group_code' => $this->string(64),
+            'data' => $this->text(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
             'PRIMARY KEY (name)',
-            'KEY (type)',
-            'KEY (group_code)',
-            'FOREIGN KEY (rule_name) REFERENCES ' . self::auth_rule_table . ' (name) ON DELETE SET NULL ON UPDATE CASCADE',
-            'FOREIGN KEY (group_code) REFERENCES ' . self::auth_item_group_table . ' (code) ON DELETE SET NULL ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->createTable(self::auth_item_child_table, [
-            'parent' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'child' => Schema::TYPE_STRING . '(64) NOT NULL',
+        $this->createIndex('auth_item_type', self::AUTH_ITEM_TABLE, ['type']);
+        $this->addForeignKey('fk_auth_item_table_rule_name', self::AUTH_ITEM_TABLE, ['rule_name'], self::AUTH_RULE_TABLE, ['name'], 'SET NULL', 'CASCADE');
+        $this->addForeignKey('fk_auth_item_table_group_code', self::AUTH_ITEM_TABLE, ['group_code'], self::AUTH_ITEM_GROUP_TABLE, ['code'], 'SET NULL', 'CASCADE');
+
+        $this->createTable(self::AUTH_ITEM_CHILD_TABLE, [
+            'parent' => $this->string(64)->notNull(),
+            'child' => $this->string(64)->notNull(),
             'PRIMARY KEY (parent, child)',
-            'KEY (child)',
-            'FOREIGN KEY (parent) REFERENCES ' . self::auth_item_table . ' (name) ON DELETE CASCADE ON UPDATE CASCADE',
-            'FOREIGN KEY (child) REFERENCES ' . self::auth_item_table . ' (name) ON DELETE CASCADE ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->createTable(self::auth_assignment_table, [
-            'item_name' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'created_at' => Schema::TYPE_INTEGER,
+        $this->addForeignKey('fk_parent_auth_item_child_table', self::AUTH_ITEM_CHILD_TABLE, ['parent'], self::AUTH_ITEM_TABLE, ['name'], 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_child_auth_item_child_table', self::AUTH_ITEM_CHILD_TABLE, ['child'], self::AUTH_ITEM_TABLE, ['name'], 'CASCADE', 'CASCADE');
+
+        $this->createTable(self::AUTH_ASSIGNMENT_TABLE, [
+            'item_name' => $this->string(64)->notNull(),
+            'user_id' => $this->integer()->notNull(),
+            'created_at' => $this->integer(),
             'PRIMARY KEY (item_name, user_id)',
-            'KEY (user_id)',
-            'FOREIGN KEY (item_name) REFERENCES ' . self::auth_item_table . ' (name) ON DELETE CASCADE ON UPDATE CASCADE',
-            'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE CASCADE ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->createTable(self::user_visit_log_table, [
-            'id' => Schema::TYPE_PK,
-            'token' => Schema::TYPE_STRING . '(255) NOT NULL',
-            'ip' => Schema::TYPE_STRING . '(15) NOT NULL',
-            'language' => Schema::TYPE_STRING . '(2) NOT NULL',
-            'user_agent' => Schema::TYPE_STRING . '(255) NOT NULL',
-            'browser' => Schema::TYPE_STRING . '(30) NOT NULL',
-            'os' => Schema::TYPE_STRING . '(20) NOT NULL',
-            'user_id' => Schema::TYPE_INTEGER,
-            'visit_time' => Schema::TYPE_INTEGER . ' NOT NULL',
+        $this->addForeignKey('fk_item_name_auth_assignment_table', self::AUTH_ASSIGNMENT_TABLE, ['item_name'], self::AUTH_ITEM_TABLE, ['name'], 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_user_id_auth_assignment_table', self::AUTH_ASSIGNMENT_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'CASCADE', 'CASCADE');
+
+        $this->createTable(self::USER_VISIT_LOG_TABLE, [
+            'id' => $this->primaryKey(),
+            'token' => $this->string(255)->notNull(),
+            'ip' => $this->string(15)->notNull(),
+            'language' => $this->string(5)->notNull(),
+            'user_agent' => $this->string(255)->notNull(),
+            'browser' => $this->string(30)->notNull(),
+            'os' => $this->string(20)->notNull(),
+            'user_id' => $this->integer(),
+            'visit_time' => $this->integer()->notNull(),
             'KEY (user_id)',
-            'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE SET NULL ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->createTable(self::user_setting_table, [
-            'id' => Schema::TYPE_PK,
-            'user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'key' => Schema::TYPE_STRING . '(64) NOT NULL',
-            'value' => Schema::TYPE_TEXT . ' DEFAULT NULL',
+        $this->addForeignKey('fk_user_id_user_visit_log_table', self::USER_VISIT_LOG_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'SET NULL', 'CASCADE');
+
+        $this->createTable(self::USER_SETTING_TABLE, [
+            'id' => $this->primaryKey(),
+            'user_id' => $this->integer()->notNull(),
+            'key' => $this->string(64)->notNull(),
+            'value' => $this->text(),
             'KEY (`user_id`, `key`)',
-            'FOREIGN KEY (user_id) REFERENCES ' . self::user_table . ' (id) ON DELETE CASCADE ON UPDATE CASCADE',
         ], $tableOptions);
 
-        $this->insert(self::user_table, [
-            'id' => 1,
-            'username' => 'admin',
-            'auth_key' => '',
-            'password_hash' => '',
-            'email' => '',
-            'superadmin' => 1,
-            'created_at' => 0,
-            'updated_at' => 0,
-        ]);
+        $this->addForeignKey('fk_user_id_user_setting_table', self::USER_SETTING_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'CASCADE', 'CASCADE');
+
+        $this->insert(self::USER_TABLE, ['id' => 1, 'username' => 'admin', 'auth_key' => '', 'password_hash' => '', 'email' => '', 'superadmin' => 1, 'created_at' => 0, 'updated_at' => 0]);
     }
 
     public function down()
     {
-        $this->dropTable(self::user_setting_table);
-        $this->dropTable(self::user_visit_log_table);
-        $this->dropTable(self::auth_assignment_table);
-        $this->dropTable(self::auth_item_child_table);
-        $this->dropTable(self::auth_item_table);
-        $this->dropTable(self::auth_item_group_table);
-        $this->dropTable(self::auth_rule_table);
+        $this->dropTable(self::USER_SETTING_TABLE);
+        $this->dropTable(self::USER_VISIT_LOG_TABLE);
+        $this->dropTable(self::AUTH_ASSIGNMENT_TABLE);
+        $this->dropTable(self::AUTH_ITEM_CHILD_TABLE);
+        $this->dropTable(self::AUTH_ITEM_TABLE);
+        $this->dropTable(self::AUTH_ITEM_GROUP_TABLE);
+        $this->dropTable(self::AUTH_RULE_TABLE);
     }
+
 }

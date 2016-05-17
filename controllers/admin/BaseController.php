@@ -2,13 +2,12 @@
 
 namespace yeesoft\controllers\admin;
 
-use yeesoft\helpers\LanguageHelper;
 use yeesoft\helpers\YeeHelper;
 use yeesoft\models\OwnerAccess;
 use yeesoft\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
@@ -125,7 +124,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionCreate()
     {
-        /* @var $model \yii\db\ActiveRecord */
+        /* @var $model \yeesoft\db\ActiveRecord */
         $model = new $this->modelClass;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -146,7 +145,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionUpdate($id)
     {
-        /* @var $model \yii\db\ActiveRecord */
+        /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) AND $model->save()) {
@@ -167,7 +166,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionDelete($id)
     {
-        /* @var $model \yii\db\ActiveRecord */
+        /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
         $model->delete();
 
@@ -182,7 +181,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     public function actionToggleAttribute($attribute, $id)
     {
         //TODO: Restrict owner access
-        /* @var $model \yii\db\ActiveRecord */
+        /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
         $model->{$attribute} = ($model->{$attribute} == 1) ? 0 : 1;
         $model->save(false);
@@ -297,8 +296,9 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     protected function findModel($id)
     {
         $modelClass = $this->modelClass;
-
-        if (LanguageHelper::isMultilingual(new $modelClass)) {
+        $model = new $modelClass;
+        
+        if (method_exists($model, 'isMultilingual') && $model->isMultilingual()) {
             $condition = [];
             $primaryKey = $modelClass::primaryKey();
             $query = $modelClass::find();

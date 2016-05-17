@@ -9,14 +9,14 @@ body {
 
 #page-wrapper {
     min-height: 568px;
-    background-color: #fff;
+    background-color: #F5F5F5;
 }
 
 .wrap {
     min-height: 100%;
     height: auto;
-    margin: 0 auto -60px;
-    padding: 0 0 60px;
+    margin: 0 auto;
+    padding: 0;
 }
 
 .wrap > .container {
@@ -25,13 +25,8 @@ body {
 
 .breadcrumb {
     margin-top: 15px;
-}
-
-.footer {
-    height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
+    margin-bottom: 10px;
+    border: 1px solid #DDDDDD;
 }
 
 .dashboard {
@@ -78,20 +73,6 @@ a.desc:after {
     white-space: nowrap;
 }
 
-.hint-block {
-    display: block;
-    margin-top: 5px;
-    color: #999;
-}
-
-.error-summary {
-    color: #a94442;
-    background: #fdf7f7;
-    border-left: 3px solid #eed3d7;
-    padding: 10px 20px;
-    margin: 0 0 15px 0;
-}
-
 .page-title {
     margin-top: 0 !important;
     /*padding-top: 5px;*/
@@ -104,12 +85,7 @@ a:focus {
     outline: none !important;
 }
 
-.panel-body {
-    /* padding: 0 !important;*/
-}
-
 .panel-default {
-    /* border: 0 !important;*/
     box-shadow: none !important;
 }
 
@@ -118,24 +94,11 @@ a:focus {
 }
 
 .grid-view tbody tr td {
-    /*padding: 14px 10px !important;*/
     height: 50px;
 }
 
 .m-tb-20 {
     margin: 20px 0;
-}
-
-.jq-selectbox.no-trigger {
-    float: left;
-}
-
-.jq-selectbox.no-trigger .jq-selectbox__trigger {
-    display: none;
-}
-
-.jq-selectbox.no-trigger .jq-selectbox__select {
-    padding: 0px 10px !important;
 }
 
 .date-filter-input {
@@ -145,7 +108,7 @@ a:focus {
 
 .grid-view tbody tr .quick-actions {
     display: none;
-    margin-top: -18px;
+    margin-top: -15px;
 }
 
 .grid-view .action-title {
@@ -168,7 +131,6 @@ a:focus {
 
 .quick-actions a {
     padding-right: 5px;
-
 }
 
 .quick-actions a:before {
@@ -197,31 +159,12 @@ a:focus {
     z-index: 999 !important;
 }
 
-.record-info .jq-selectbox {
-    display: block !important;
-}
-
-#page-wrapper {
-    background-color: #F5F5F5 !important;
-}
-
-.footer {
-    background-color: #edecec !important;
-}
-
-.breadcrumb {
-    background-color: #fff !important;
-    border: 1px solid #DDDDDD;
-    margin-bottom: 15px !important;
-}
-
 .table-striped > tbody > tr:nth-of-type(2n+1) {
     background-color: #F9F9F9 !important;
 }
 
-div.jq-selectbox.form-control {
-    border: none !important;
-    padding: 0 !important;
+.sidebar {
+    font-size: 14px;
 }
 
 .sidebar .active > a > .arrow::before {
@@ -300,4 +243,16 @@ div.jq-selectbox.form-control {
 
 .fa-font-family {
     font-family: 'FontAwesome';
+}
+
+.navbar-brand b {
+    font-size: 1.1em
+}
+.navbar-brand .yee-logo {
+    margin: -5px 5px 0 0; 
+    float:left;
+    opacity: 0.9;
+}
+.navbar-brand:hover .yee-logo {
+    opacity: 1;
 }

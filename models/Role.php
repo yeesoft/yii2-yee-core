@@ -10,6 +10,7 @@ use yii\rbac\DbManager;
 
 class Role extends AbstractItem
 {
+
     const ITEM_TYPE = self::TYPE_ROLE;
 
     /**
@@ -34,8 +35,7 @@ class Role extends AbstractItem
     {
         $rbacPermissions = (new DbManager())->getPermissionsByRole($roleName);
 
-        $permissionNames = ArrayHelper::map($rbacPermissions, 'name',
-            'description');
+        $permissionNames = ArrayHelper::map($rbacPermissions, 'name', 'description');
 
         return $asArray ? $permissionNames : Permission::find()->andWhere(['name' => array_keys($permissionNames)])->all();
     }
@@ -72,30 +72,27 @@ class Role extends AbstractItem
      * @throws \InvalidArgumentException
      * @return true|static|string
      */
-    public static function assignRoutesViaPermission($roleName, $permissionName,
-                                                     $routes,
-                                                     $permissionDescription = null,
-                                                     $groupCode = null)
+    public static function assignRoutesViaPermission($roleName, $permissionName, $routes, $permissionDescription = null, $groupCode = null)
     {
         $role = static::findOne(['name' => $roleName]);
 
-        if (!$role)
+        if (!$role) {
             throw new \InvalidArgumentException("Role with name = {$roleName} not found");
-
+        }
 
         $permission = Permission::findOne(['name' => $permissionName]);
 
         if (!$permission) {
-            $permission = Permission::create($permissionName,
-                $permissionDescription, $groupCode);
+            $permission = Permission::create($permissionName, $permissionDescription, $groupCode);
 
-            if ($permission->hasErrors()) return $permission;
+            if ($permission->hasErrors()) {
+                return $permission;
+            }
         }
 
         try {
             Yii::$app->db->createCommand()
-                ->insert(Yii::$app->getModule('yee')->auth_item_child_table,
-                    [
+                    ->insert(Yii::$app->yee->auth_item_child_table, [
                         'parent' => $role->name,
                         'child' => $permission->name,
                     ])->execute();
@@ -104,7 +101,7 @@ class Role extends AbstractItem
             // but need to add new routes to it
         }
 
-        $routes = (array)$routes;
+        $routes = (array) $routes;
 
         foreach ($routes as $route) {
             $route = '/' . ltrim($route, '/');
@@ -113,8 +110,7 @@ class Role extends AbstractItem
 
             try {
                 Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->getModule('yee')->auth_item_child_table,
-                        [
+                        ->insert(Yii::$app->yee->auth_item_child_table, [
                             'parent' => $permission->name,
                             'child' => $route,
                         ])->execute();
@@ -128,4 +124,5 @@ class Role extends AbstractItem
 
         return true;
     }
+
 }

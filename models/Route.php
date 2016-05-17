@@ -10,6 +10,7 @@ use yii\helpers\ArrayHelper;
 
 class Route extends AbstractItem
 {
+
     const ITEM_TYPE = self::TYPE_ROUTE;
 
     /**
@@ -28,25 +29,18 @@ class Route extends AbstractItem
             return [];
         }
 
-        $auth_item = Yii::$app->getModule('yee')->auth_item_table;
-        $auth_item_child = Yii::$app->getModule('yee')->auth_item_child_table;
+        $auth_item = Yii::$app->yee->auth_item_table;
+        $auth_item_child = Yii::$app->yee->auth_item_child_table;
 
         $routes = (new Query)
-            ->select(['name'])
-            ->from($auth_item)
-            ->innerJoin($auth_item_child,
-                '(' . $auth_item_child . '.child = ' . $auth_item . '.name AND ' . $auth_item . '.type = :type)')
-            ->params([
-                ':type' => self::TYPE_ROUTE,
-            ])
-            ->where([
-                $auth_item_child . '.parent' => $permissions,
-            ])
-            ->column();
+                ->select(['name'])
+                ->from($auth_item)
+                ->innerJoin($auth_item_child, '(' . $auth_item_child . '.child = ' . $auth_item . '.name AND ' . $auth_item . '.type = :type)')
+                ->params([':type' => self::TYPE_ROUTE])
+                ->where([ $auth_item_child . '.parent' => $permissions])
+                ->column();
 
-        return $withSubRoutes ? static::withSubRoutes($routes,
-            ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name'))
-            : $routes;
+        return $withSubRoutes ? static::withSubRoutes($routes, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name')) : $routes;
     }
 
     /**
@@ -107,14 +101,10 @@ class Route extends AbstractItem
     {
         $allRoutes = AuthHelper::getRoutes();
 
-        $currentRoutes = ArrayHelper::map(Route::find()->asArray()->all(),
-            'name', 'name');
+        $currentRoutes = ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name');
 
-        $toAdd = array_diff(array_keys($allRoutes),
-            array_keys($currentRoutes));
-        $toRemove = array_diff(array_keys($currentRoutes),
-            array_keys($allRoutes));
-
+        $toAdd = array_diff(array_keys($allRoutes), array_keys($currentRoutes));
+        $toRemove = array_diff(array_keys($currentRoutes), array_keys($allRoutes));
 
         foreach ($toAdd as $addItem) {
             Route::create($addItem);
@@ -177,15 +167,11 @@ class Route extends AbstractItem
         if ($action) {
             $controller = $action->controller;
 
-            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess
-                === true
-            ) {
+            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess === true) {
                 return true;
             }
 
-            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id,
-                    $controller->freeAccessActions)
-            ) {
+            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions)) {
                 return true;
             }
         }
@@ -220,18 +206,17 @@ class Route extends AbstractItem
 
         if ($commonRoutes === false) {
             $commonRoutesDB = (new Query())
-                ->select('child')
-                ->from(Yii::$app->getModule('yee')->auth_item_child_table)
-                ->where(['parent' => Yii::$app->getModule('yee')->commonPermissionName])
-                ->column();
+                    ->select('child')
+                    ->from(Yii::$app->yee->auth_item_child_table)
+                    ->where(['parent' => Yii::$app->yee->commonPermissionName])
+                    ->column();
 
-            $commonRoutes = Route::withSubRoutes($commonRoutesDB,
-                ArrayHelper::map(Route::find()->asArray()->all(), 'name',
-                    'name'));
+            $commonRoutes = Route::withSubRoutes($commonRoutesDB, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name'));
 
             Yii::$app->cache->set('__commonRoutes', $commonRoutes, 3600);
         }
 
         return in_array($currentFullRoute, $commonRoutes);
     }
+
 }

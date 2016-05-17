@@ -1,6 +1,5 @@
 <?php
 
-use yeesoft\helpers\LanguageHelper;
 use yeesoft\widgets\assets\LanguageSelectorAsset;
 use yii\helpers\ArrayHelper;
 
@@ -10,7 +9,7 @@ LanguageSelectorAsset::register($this);
 <div class="multilingual">
     <ul class="nav nav-pills">
         <?php foreach ($languages as $key => $lang) : ?>
-            <?php if (LanguageHelper::getLangRedirect($language) == $key) : ?>
+            <?php if (Yii::$app->yee->getDisplayLanguageShortcode($language) == $key) : ?>
                 <li role="language" class="active">
                     <a><?= ($display == 'code') ? $key : $lang ?></a>
                 </li>

@@ -2,11 +2,9 @@
 
 namespace yeesoft\behaviors;
 
-use omgdef\multilingual\MultilingualBehavior as OriginalMultilingualBehavior;
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 
-class MultilingualBehavior extends OriginalMultilingualBehavior
+class MultilingualBehavior extends \omgdef\multilingual\MultilingualBehavior
 {
 
     /**
@@ -26,7 +24,7 @@ class MultilingualBehavior extends OriginalMultilingualBehavior
     {
         parent::init();
 
-        $this->languages = LanguageHelper::getLanguages();
+        $this->languages = Yii::$app->yee->languages;
         $this->defaultLanguage = Yii::$app->language;
     }
 

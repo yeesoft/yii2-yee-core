@@ -13,7 +13,7 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $created_at
  * @property integer $updated_at
  */
-class AuthItemGroup extends \yii\db\ActiveRecord
+class AuthItemGroup extends \yeesoft\db\ActiveRecord
 {
 
     /**
@@ -21,7 +21,7 @@ class AuthItemGroup extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return Yii::$app->getModule('yee')->auth_item_group_table;
+        return Yii::$app->yee->auth_item_group_table;
     }
 
     /**
@@ -60,4 +60,5 @@ class AuthItemGroup extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
+
 }

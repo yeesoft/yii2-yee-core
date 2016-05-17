@@ -2,7 +2,6 @@
 
 namespace yeesoft\widgets;
 
-use yeesoft\helpers\LanguageHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -22,12 +21,12 @@ class LanguageSelector extends \yii\base\Widget
 
     public function run()
     {
-        if (!LanguageHelper::isSiteMultilingual()) {
+        if (!Yii::$app->yee->isMultilingual) {
             return;
         }
 
         $language = Yii::$app->language;
-        $languages = LanguageHelper::getRedirectedLanguages();
+        $languages = Yii::$app->yee->displayLanguages;
 
         list($route, $params) = Yii::$app->getUrlManager()->parseRequest(Yii::$app->getRequest());
         $params = ArrayHelper::merge(Yii::$app->getRequest()->get(), $params);

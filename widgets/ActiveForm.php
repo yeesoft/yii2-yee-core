@@ -2,25 +2,24 @@
 
 namespace yeesoft\widgets;
 
-use yeesoft\helpers\LanguageHelper;
-use yii\widgets\ActiveForm as DefaultActiveForm;
+use Yii;
 
 /**
  * Multilingual ActiveForm
  */
-class ActiveForm extends DefaultActiveForm
+class ActiveForm extends \yii\bootstrap\ActiveForm
 {
-    public $fieldClass = 'yeesoft\widgets\MultilingualField';
+    public $fieldClass = 'yeesoft\widgets\ActiveField';
 
     public function field($model, $attribute, $options = [])
     {
         $fields = [];
 
         $isMultilingualOption = (isset($options['multilingual']) && $options['multilingual']);
-        $isMultilingualAttribute = (LanguageHelper::isMultilingual($model) && $model->hasLangAttribute($attribute));
+        $isMultilingualAttribute = (method_exists($model, 'isMultilingual') && $model->isMultilingual() && $model->hasLangAttribute($attribute));
 
         if ($isMultilingualOption || $isMultilingualAttribute) {
-            $languages = array_keys(LanguageHelper::getLanguages());
+            $languages = array_keys(Yii::$app->yee->languages);
 
             foreach ($languages as $language) {
                 $fields[] = parent::field($model, $attribute, array_merge($options, ['language' => $language]));

@@ -1,14 +1,14 @@
 <?php
 
-namespace yeesoft\i18n;
+namespace yeesoft\db;
 
 use yii\base\NotSupportedException;
 use yii\db\Migration;
 
-class TranslatedMessagesMigration extends Migration
+abstract class TranslatedMessagesMigration extends Migration
 {
 
-    public function up()
+    public function safeUp()
     {
         $language = $this->getLanguage();
         $messages = $this->getTranslations();
@@ -16,13 +16,13 @@ class TranslatedMessagesMigration extends Migration
 
         foreach ($messages as $message => $translation) {
             if (isset($sources[$message])) {
-                $this->delete('message', ['source_id' => $sources[$message]->id, 'language' => $language]); //Delete if exists
-                $this->insert('message', ['source_id' => $sources[$message]->id, 'translation' => $translation, 'language' => $language]);
+                $this->delete('{{%message}}', ['source_id' => $sources[$message]->id, 'language' => $language]); //Delete if exists
+                $this->insert('{{%message}}', ['source_id' => $sources[$message]->id, 'translation' => $translation, 'language' => $language]);
             }
         }
     }
 
-    public function down()
+    public function safeDown()
     {
         $language = $this->getLanguage();
         $messages = $this->getTranslations();
@@ -30,14 +30,14 @@ class TranslatedMessagesMigration extends Migration
 
         foreach ($messages as $message => $translation) {
             if (isset($sources[$message])) {
-                $this->delete('message', ['source_id' => $sources[$message]->id, 'language' => $language]);
+                $this->delete('{{%message}}', ['source_id' => $sources[$message]->id, 'language' => $language]);
             }
         }
     }
 
     public function getSourceMessages()
     {
-        $rows = $this->db->createCommand('SELECT * FROM message_source WHERE category = :category')
+        $rows = $this->db->createCommand('SELECT * FROM {{%message_source}} WHERE category = :category')
             ->bindValue(':category', $this->getCategory())
             ->queryAll(\PDO::FETCH_OBJ);
 
@@ -57,10 +57,7 @@ class TranslatedMessagesMigration extends Migration
      * @throws NotSupportedException if method is not overriden
      * @return string
      */
-    public function getCategory()
-    {
-        throw new NotSupportedException('Method getCategory should be overriden.');
-    }
+    abstract public function getCategory();
 
     /**
      * Return array of translated messages:
@@ -72,10 +69,7 @@ class TranslatedMessagesMigration extends Migration
      * @throws NotSupportedException if method is not overriden
      * @return array
      */
-    public function getTranslations()
-    {
-        throw new NotSupportedException('Method getCategory should be overriden.');
-    }
+    abstract public function getTranslations();
 
     /**
      * Return language code

@@ -1,6 +1,5 @@
 <?php
 
-use yeesoft\helpers\LanguageHelper;
 use yeesoft\widgets\assets\LanguageSelectorAsset;
 use yii\helpers\ArrayHelper;
 
@@ -11,7 +10,7 @@ LanguageSelectorAsset::register($this);
     <ul style="display: inline-flex; list-style: none;">
         <?php foreach ($languages as $key => $lang) : ?>
             <li style="margin-right: 10px;">
-                <?php if (LanguageHelper::getLangRedirect($language) == $key) : ?>
+                <?php if (Yii::$app->yee->getDisplayLanguageShortcode($language) == $key) : ?>
                     <span><?= ($display == 'code') ? $key : $lang ?></span>
                 <?php else: ?>
                     <?php $link = Yii::$app->urlManager->createUrl(ArrayHelper::merge($params, [$url, 'language' => $key])); ?>

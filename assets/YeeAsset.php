@@ -7,6 +7,7 @@ use yii\web\JqueryAsset;
 
 /**
  * Class YeeAsset
+ * 
  * @package yeesoft\core
  */
 class YeeAsset extends AssetBundle
@@ -21,7 +22,6 @@ class YeeAsset extends AssetBundle
         ];
 
         $this->css = [
-            'css/theme.css',
             'css/admin.css',
             'css/widget.css',
             'css/styler.css',

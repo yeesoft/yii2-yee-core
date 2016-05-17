@@ -8,7 +8,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -37,7 +37,7 @@ class MenuLink extends ActiveRecord implements OwnerAccess
      */
     public static function tableName()
     {
-        return 'menu_link';
+        return '{{%menu_link}}';
     }
 
     /**
@@ -97,7 +97,7 @@ class MenuLink extends ActiveRecord implements OwnerAccess
             'order' => Yii::t('yee', 'Order'),
             'created_by' => Yii::t('yee', 'Created By'),
             'updated_by' => Yii::t('yee', 'Updated By'),
-            'created_at' => Yii::t('yee', 'Created'), '',
+            'created_at' => Yii::t('yee', 'Created'),
             'updated_at' => Yii::t('yee', 'Updated'),
         ];
     }
@@ -117,15 +117,14 @@ class MenuLink extends ActiveRecord implements OwnerAccess
     public function getSiblings()
     {
         $siblings = MenuLink::find()->joinWith('translations')
-            ->andFilterWhere(['like', 'menu_id', $this->menu_id])
-            ->andFilterWhere(['!=', 'menu_link.id', $this->id])
-            ->all();
+                ->andFilterWhere(['like', 'menu_id', $this->menu_id])
+                ->andFilterWhere(['!=', 'menu_link.id', $this->id])
+                ->all();
 
         $list = ArrayHelper::map(
-            $siblings, 'id',
-            function ($array, $default) {
-                return $array->label . ' [' . $array->id . ']';
-            });
+                        $siblings, 'id', function ($array, $default) {
+                    return $array->label . ' [' . $array->id . ']';
+                });
 
         return ArrayHelper::merge([NULL => Yii::t('yee', 'No Parent')], $list);
     }
@@ -156,4 +155,5 @@ class MenuLink extends ActiveRecord implements OwnerAccess
     {
         return 'created_by';
     }
+
 }

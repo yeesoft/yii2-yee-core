@@ -5,7 +5,7 @@ namespace yeesoft\models;
 use Ikimea\Browser\Browser;
 use yeesoft\helpers\YeeHelper;
 use Yii;
-use yii\db\ActiveRecord;
+use yeesoft\db\ActiveRecord;
 
 /**
  * This is the model class for table "user_visit_log".
@@ -24,6 +24,7 @@ use yii\db\ActiveRecord;
  */
 class UserVisitLog extends ActiveRecord
 {
+
     CONST SESSION_TOKEN = '__visitorToken';
 
     /**
@@ -55,15 +56,16 @@ class UserVisitLog extends ActiveRecord
      */
     public static function checkToken()
     {
-        if (Yii::$app->user->isGuest) return;
+        if (Yii::$app->user->isGuest)
+            return;
 
         $model = static::find()
-            ->andWhere(['user_id' => Yii::$app->user->id])
-            ->orderBy('id DESC')
-            ->asArray()
-            ->one();
+                ->andWhere(['user_id' => Yii::$app->user->id])
+                ->orderBy('id DESC')
+                ->asArray()
+                ->one();
 
-        if (!$model OR ($model['token'] !== Yii::$app->session->get(self::SESSION_TOKEN))) {
+        if (!$model OR ( $model['token'] !== Yii::$app->session->get(self::SESSION_TOKEN))) {
             Yii::$app->user->logout();
 
             echo "<script> location.reload();</script>";
@@ -76,7 +78,7 @@ class UserVisitLog extends ActiveRecord
      */
     public static function tableName()
     {
-        return Yii::$app->getModule('yee')->user_visit_log_table;
+        return Yii::$app->yee->user_visit_log_table;
     }
 
     /**
@@ -87,7 +89,6 @@ class UserVisitLog extends ActiveRecord
         return [
             [['token', 'ip', 'language', 'visit_time'], 'required'],
             [['user_id'], 'integer'],
-
             [['token', 'user_agent'], 'string', 'max' => 255],
             [['ip'], 'string', 'max' => 15],
             [['os'], 'string', 'max' => 20],
@@ -151,6 +152,5 @@ class UserVisitLog extends ActiveRecord
     {
         return "{$this->visitDate} {$this->visitTime}";
     }
-
 
 }
