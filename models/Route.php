@@ -95,31 +95,6 @@ class Route extends AbstractItem
     }
 
     /**
-     * Refresh list of all routes from controllers, modules, etc
-     */
-    public static function refreshRoutes()
-    {
-        $allRoutes = AuthHelper::getRoutes();
-
-        $currentRoutes = ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name');
-
-        $toAdd = array_diff(array_keys($allRoutes), array_keys($currentRoutes));
-        $toRemove = array_diff(array_keys($currentRoutes), array_keys($allRoutes));
-
-        foreach ($toAdd as $addItem) {
-            Route::create($addItem);
-        }
-
-        if ($toRemove) {
-            Route::deleteAll(['in', 'name', $toRemove]);
-        }
-
-        if ($toAdd OR $toRemove) {
-            Yii::$app->cache->delete('__commonRoutes');
-        }
-    }
-
-    /**
      * Checks if route is in array of allowed routes
      *
      * @param string $route

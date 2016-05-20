@@ -199,50 +199,6 @@ class AuthHelper
         return $result;
     }
 
-    // ================= Credits to mdm/admin module =================
-    /**
-     * @return array
-     */
-    public static function getRoutes()
-    {
-        $result = [];
-        self::getRouteRecursive(Yii::$app, $result);
-
-        return array_reverse(array_combine($result, $result));
-    }
-
-    /**
-     * @param \yii\base\Module $module
-     * @param array $result
-     */
-    private static function getRouteRecursive($module, &$result)
-    {
-        foreach ($module->getModules() as $id => $child) {
-            if (($child = $module->getModule($id)) !== null) {
-                self::getRouteRecursive($child, $result);
-            }
-        }
-        /* @var $controller \yii\base\Controller */
-        foreach ($module->controllerMap as $id => $value) {
-            $controller = Yii::createObject($value,
-                [
-                    $id,
-                    $module
-                ]);
-            self::getActionRoutes($controller, $result);
-            $result[] = '/' . $controller->uniqueId . '/*';
-        }
-
-        $namespace = trim($module->controllerNamespace, '\\') . '\\';
-        self::getControllerRoutes($module, $namespace, '', $result);
-
-        if ($module->uniqueId) {
-            $result[] = '/' . $module->uniqueId . '/*';
-        } else {
-            $result[] = $module->uniqueId . '/*';
-        }
-    }
-
     /**
      * @param \yii\base\Controller $controller
      * @param Array $result all controller action.
@@ -262,47 +218,5 @@ class AuthHelper
                 $result[] = $prefix . Inflector::camel2id(substr($name, 6));
             }
         }
-    }
-
-    /**
-     * @param \yii\base\Module $module
-     * @param $namespace
-     * @param $prefix
-     * @param $result
-     */
-    private static function getControllerRoutes($module, $namespace, $prefix,
-                                                &$result)
-    {
-        try {
-            $path = Yii::getAlias('@' . str_replace('\\', '/', $namespace));
-        } catch (InvalidParamException $e) {
-            $path = $module->getBasePath() . '/controllers';
-        }
-
-        $files = @scandir($path);
-		
-		if ($files) {
-			
-			foreach ($files as $file) {
-				if (strpos($file, '.') === 0) {
-					continue;
-				}
-
-				if (is_dir($path . '/' . $file)) {
-					self::getControllerRoutes($module, $namespace . $file . '\\',
-						$prefix . $file . '/', $result);
-				} elseif (strcmp(substr($file, -14), 'Controller.php') === 0) {
-					$id = Inflector::camel2id(substr(basename($file), 0, -14));
-					$className = $namespace . Inflector::id2camel($id) . 'Controller';
-					if (strpos($className, '-') === false && class_exists($className)
-						&& is_subclass_of($className, 'yii\base\Controller')
-					) {
-						$controller = new $className($prefix . $id, $module);
-						self::getActionRoutes($controller, $result);
-						$result[] = '/' . $controller->uniqueId . '/*';
-					}
-				}
-			}
-		}
     }
 }
