@@ -16,7 +16,7 @@ class m150319_194321_init_menus extends yii\db\Migration
         }
 
         $this->createTable(self::TABLE_NAME, [
-            'id' => $this->string(64)->notNull(),
+            'id' => $this->string(64)->notNull()->unique(),
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
             'created_by' => $this->integer(),
@@ -41,7 +41,7 @@ class m150319_194321_init_menus extends yii\db\Migration
         $this->addForeignKey('fk_menu_lang', self::TABLE_LANG_NAME, 'menu_id', self::TABLE_NAME, 'id', 'CASCADE', 'CASCADE');
 
         $this->createTable(self::TABLE_LINK_NAME, [
-            'id' => $this->string(64)->notNull(),
+            'id' => $this->string(64)->notNull()->unique(),
             'menu_id' => $this->string(64)->notNull(),
             'link' => $this->string(255),
             'parent_id' => $this->string(64)->defaultValue(''),
