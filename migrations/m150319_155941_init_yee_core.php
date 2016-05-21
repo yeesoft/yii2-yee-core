@@ -80,9 +80,9 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
             'os' => $this->string(20)->notNull(),
             'user_id' => $this->integer(),
             'visit_time' => $this->integer()->notNull(),
-            'KEY (user_id)',
         ], $tableOptions);
 
+        $this->createIndex('visit_log_user_id', self::USER_VISIT_LOG_TABLE, 'user_id');
         $this->addForeignKey('fk_user_id_user_visit_log_table', self::USER_VISIT_LOG_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'SET NULL', 'CASCADE');
 
         $this->createTable(self::USER_SETTING_TABLE, [
@@ -90,9 +90,9 @@ class m150319_155941_init_yee_core extends \yii\db\Migration
             'user_id' => $this->integer()->notNull(),
             'key' => $this->string(64)->notNull(),
             'value' => $this->text(),
-            'KEY (`user_id`, `key`)',
         ], $tableOptions);
-
+        
+        $this->createIndex('user_setting_user_key', self::USER_SETTING_TABLE, ['user_id','key']);
         $this->addForeignKey('fk_user_id_user_setting_table', self::USER_SETTING_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'CASCADE', 'CASCADE');
 
         $this->insert(self::USER_TABLE, ['id' => 1, 'username' => 'admin', 'auth_key' => '', 'password_hash' => '', 'email' => '', 'superadmin' => 1, 'created_at' => 0, 'updated_at' => 0]);
