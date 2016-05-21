@@ -23,7 +23,9 @@ class m150319_194321_init_menus extends yii\db\Migration
             'updated_by' => $this->integer(),
         ], $tableOptions);
 
-        $this->addPrimaryKey('pk', self::TABLE_NAME, 'id');
+        if ($this->db->driverName !== 'pgsql') {
+           $this->addPrimaryKey('pk', self::TABLE_NAME, 'id'); 
+        }
         $this->addForeignKey('fk_menu_created_by', self::TABLE_NAME, 'created_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
         $this->addForeignKey('fk_menu_updated_by', self::TABLE_NAME, 'updated_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
 
@@ -51,8 +53,9 @@ class m150319_194321_init_menus extends yii\db\Migration
             'created_by' => $this->integer(),
             'updated_by' => $this->integer(),
         ], $tableOptions);
-
-        $this->addPrimaryKey('pk', self::TABLE_LINK_NAME, 'id');
+        if ($this->db->driverName !== 'pgsql') {
+            $this->addPrimaryKey('pk', self::TABLE_LINK_NAME, 'id');
+        }
         $this->createIndex('link_menu_id', self::TABLE_LINK_NAME, 'menu_id');
         $this->createIndex('link_parent_id', self::TABLE_LINK_NAME, 'parent_id');
         $this->addForeignKey('fk_menu_link_created_by', self::TABLE_LINK_NAME, 'created_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
