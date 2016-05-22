@@ -1,5 +1,7 @@
 <?php
 
+use yii\db\Schema;
+
 class m150319_194321_init_menus extends yii\db\Migration
 {
 
@@ -16,16 +18,13 @@ class m150319_194321_init_menus extends yii\db\Migration
         }
 
         $this->createTable(self::TABLE_NAME, [
-            'id' => $this->string(64)->notNull()->unique(),
+            'id' => Schema::TYPE_STRING.'(64) NOT NULL PRIMARY KEY',
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
             'created_by' => $this->integer(),
             'updated_by' => $this->integer(),
         ], $tableOptions);
 
-        if ($this->db->driverName !== 'pgsql') {
-           $this->addPrimaryKey('pk', self::TABLE_NAME, 'id'); 
-        }
         $this->addForeignKey('fk_menu_created_by', self::TABLE_NAME, 'created_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
         $this->addForeignKey('fk_menu_updated_by', self::TABLE_NAME, 'updated_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
 
@@ -41,7 +40,7 @@ class m150319_194321_init_menus extends yii\db\Migration
         $this->addForeignKey('fk_menu_lang', self::TABLE_LANG_NAME, 'menu_id', self::TABLE_NAME, 'id', 'CASCADE', 'CASCADE');
 
         $this->createTable(self::TABLE_LINK_NAME, [
-            'id' => $this->string(64)->notNull()->unique(),
+            'id' => Schema::TYPE_STRING.'(64) NOT NULL PRIMARY KEY',
             'menu_id' => $this->string(64)->notNull(),
             'link' => $this->string(255),
             'parent_id' => $this->string(64)->defaultValue(''),
@@ -53,9 +52,7 @@ class m150319_194321_init_menus extends yii\db\Migration
             'created_by' => $this->integer(),
             'updated_by' => $this->integer(),
         ], $tableOptions);
-        if ($this->db->driverName !== 'pgsql') {
-            $this->addPrimaryKey('pk', self::TABLE_LINK_NAME, 'id');
-        }
+
         $this->createIndex('link_menu_id', self::TABLE_LINK_NAME, 'menu_id');
         $this->createIndex('link_parent_id', self::TABLE_LINK_NAME, 'parent_id');
         $this->addForeignKey('fk_menu_link_created_by', self::TABLE_LINK_NAME, 'created_by', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
