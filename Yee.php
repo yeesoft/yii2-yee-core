@@ -218,12 +218,8 @@ class Yee extends Component
         parent::init();
 
         if (Yii::$app->id != 'console') {
-
             $this->registerTranslations();
             $this->initLanguageOptions();
-
-            //Check here: redirLangs not contains in langs param
-
             $this->initEmailOptions();
             $this->initFormatter();
         }
@@ -252,6 +248,10 @@ class Yee extends Component
 
         if (!in_array(Yii::$app->language, array_keys($this->languages))) {
             throw new InvalidConfigException('Invalid language settings! Default application language should be included into `yeesoft\Yee::$languages` setting.');
+        }
+        
+        if(!empty(array_diff(array_keys($this->languageRedirects), array_keys($this->languages)))){
+            throw new InvalidConfigException('Invalid language redirects settings!');
         }
     }
 
