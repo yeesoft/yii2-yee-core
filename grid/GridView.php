@@ -10,10 +10,10 @@ class GridView extends \yii\grid\GridView
     public $pager = [
         'options' => ['class' => 'pagination pagination-sm'],
         'hideOnSinglePage' => true,
-        'firstPageLabel' => 'First',
+        'firstPageLabel' => '<<',
         'prevPageLabel' => '<',
         'nextPageLabel' => '>',
-        'lastPageLabel' => 'Last',
+        'lastPageLabel' => '>>',
     ];
     public $tableOptions = ['class' => 'table table-striped'];
     public $layout = '{items}<div class="row"><div class="col-sm-4 m-tb-20">{bulkActions}</div><div class="col-sm-5 text-center">{pager}</div><div class="col-sm-3 text-right m-tb-20">{summary}</div></div>';
