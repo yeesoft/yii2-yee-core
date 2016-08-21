@@ -32,7 +32,7 @@ class LanguageSelector extends \yii\base\Widget
         $params = ArrayHelper::merge(Yii::$app->getRequest()->get(), $params);
         $url = isset($params['route']) ? $params['route'] : $route;
 
-        return $this->render("language-selector/{$this->view}", [
+        return $this->render($this->view, [
             'language' => $language,
             'languages' => $languages,
             'url' => $url,
