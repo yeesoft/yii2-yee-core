@@ -180,4 +180,14 @@ class YeeHelper
             return @rmdir($path);
         }
     }
+    
+    public static function getMonthsList($format = 'MMMM')
+    {
+        for ($i = 1; $i <= 12; $i++) {
+            $months[$i] = \Yii::$app->formatter->asDate(mktime(0, 0, 0, $i), $format);
+        }
+        
+        return $months;
+    }
+
 }

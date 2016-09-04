@@ -130,6 +130,19 @@ class m151121_091144_i18n_yee_source extends SourceMessagesMigration
             'Yee Core Version' => 1,
             'Yii Framework Version' => 1,
             'Your item has been updated.' => 1,
+            'Your item has been created.' => 1,
+            'Your item has been deleted.' => 1,
+            'Male' => 1,
+            'Female' => 1,
+            'First Name' => 1,
+            'Last Name' => 1,
+            'Skype' => 1,
+            'Phone' => 1,
+            'Gender' => 1,
+            'Birthday' => 1,
+            'Birth month' => 1,
+            'Birth year' => 1,
+            'Short Info' => 1,
         ];
     }
 

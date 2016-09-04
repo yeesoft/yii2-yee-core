@@ -33,6 +33,9 @@ class User extends UserIdentity
     const STATUS_INACTIVE = 0;
     const STATUS_BANNED = -1;
     const SCENARIO_NEW_USER = 'newUser';
+    const GENDER_NOT_SET = 0;
+    const GENDER_MALE = 1;
+    const GENDER_FEMALE = 2;
 
     /**
      * @var string
@@ -75,12 +78,24 @@ class User extends UserIdentity
         return [
             [['username', 'email'], 'required'],
             ['username', 'unique'],
+            ['username', 'match', 'pattern' => Yii::$app->yee->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
+            ['username', 'match', 'not' => true, 'pattern' => Yii::$app->yee->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
             [['username', 'email', 'bind_to_ip'], 'trim'],
             [['status', 'email_confirmed'], 'integer'],
             ['email', 'email'],
             ['email', 'validateEmailUnique'],
             ['bind_to_ip', 'validateBindToIp'],
             ['bind_to_ip', 'string', 'max' => 255],
+            [['first_name', 'last_name'], 'string', 'max' => 124],
+            [['skype'], 'string', 'max' => 64],
+            [['phone'], 'string', 'max' => 24],
+            [['bind_to_ip', 'info'], 'string', 'max' => 255],
+            ['gender', 'integer'],
+            ['birth_day', 'integer', 'max' => 31],
+            ['birth_month', 'integer', 'max' => 12],
+            ['birth_year', 'integer', 'max' => 2099],
+            [['birth_month', 'birth_day'], 'integer', 'min' => 1],
+            ['birth_year', 'integer', 'min' => 1880],
             ['password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
             ['password', 'string', 'max' => 255, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
             ['password', 'string', 'min' => 6, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
@@ -260,6 +275,19 @@ class User extends UserIdentity
     }
 
     /**
+     * Get gender list
+     * @return array
+     */
+    public static function getGenderList()
+    {
+        return array(
+            self::GENDER_NOT_SET => Yii::t('yii', '(not set)'),
+            self::GENDER_MALE => Yii::t('yee', 'Male'),
+            self::GENDER_FEMALE => Yii::t('yee', 'Female'),
+        );
+    }
+
+    /**
      * getUsersList
      *
      * @return array
@@ -342,6 +370,15 @@ class User extends UserIdentity
             'repeat_password' => Yii::t('yee', 'Repeat password'),
             'email_confirmed' => Yii::t('yee', 'E-mail confirmed'),
             'email' => Yii::t('yee', 'E-mail'),
+            'first_name' => Yii::t('yee', 'First Name'),
+            'last_name' => Yii::t('yee', 'Last Name'),
+            'skype' => Yii::t('yee', 'Skype'),
+            'phone' => Yii::t('yee', 'Phone'),
+            'gender' => Yii::t('yee', 'Gender'),
+            'birth_day' => Yii::t('yee', 'Birthday'),
+            'birth_month' => Yii::t('yee', 'Birth month'),
+            'birth_year' => Yii::t('yee', 'Birth year'),
+            'info' => Yii::t('yee', 'Short Info'),
         ];
     }
 
