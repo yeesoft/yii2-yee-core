@@ -52,13 +52,6 @@ class MultilingualUrlManager extends UrlManager
             return parent::createUrl($params);
         }
 
-        if (isset($params[0]) && $params[0] === 'auth/default/oauth' && !empty($params['language'])) {
-            print_r($params);
-            die;
-
-        }
-
-
         if (Yii::$app->yee->isMultilingual && !empty($this->multilingualRules)) {
             $languages = array_keys(Yii::$app->yee->displayLanguages);
 
