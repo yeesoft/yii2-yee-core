@@ -114,7 +114,7 @@ class Menu extends ActiveRecord implements OwnerAccess
     {
         $links = self::findOne($menu_id)
                 ->getLinks()
-                ->orderBy(['parent_id' => 'ACS', 'order' => 'ACS'])
+                ->orderBy(['parent_id' => 'ASC', 'order' => 'ASC'])
                 ->all();
 
         return self::generateNavigationItems($links);
