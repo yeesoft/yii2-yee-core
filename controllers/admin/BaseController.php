@@ -62,6 +62,34 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      * @var string
      */
     public $layout = '@vendor/yeesoft/yii2-yee-core/views/layouts/admin/main.php';
+    
+    /**
+     * Index page view
+     *
+     * @var string
+     */
+    public $indexView = 'index';
+    
+    /**
+     * View page view
+     *
+     * @var string
+     */
+    public $viewView = 'view';
+    
+    /**
+     * Create page view
+     *
+     * @var string
+     */
+    public $createView = 'create';
+    
+    /**
+     * Update page view
+     *
+     * @var string
+     */
+    public $updateView = 'update';
 
     public function behaviors()
     {
@@ -100,7 +128,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
             $dataProvider = new ActiveDataProvider(['query' => $modelClass::find()->where($restrictParams)]);
         }
 
-        return $this->renderIsAjax('index', compact('dataProvider', 'searchModel'));
+        return $this->renderIsAjax($this->indexView, compact('dataProvider', 'searchModel'));
     }
 
     /**
@@ -112,7 +140,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public function actionView($id)
     {
-        return $this->renderIsAjax('view', [
+        return $this->renderIsAjax($this->viewView, [
             'model' => $this->findModel($id),
         ]);
     }
@@ -132,7 +160,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
             return $this->redirect($this->getRedirectPage('create', $model));
         }
 
-        return $this->renderIsAjax('create', compact('model'));
+        return $this->renderIsAjax($this->createView, compact('model'));
     }
 
     /**
@@ -153,7 +181,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
             return $this->redirect($this->getRedirectPage('update', $model));
         }
 
-        return $this->renderIsAjax('update', compact('model'));
+        return $this->renderIsAjax($this->updateView, compact('model'));
     }
 
     /**
