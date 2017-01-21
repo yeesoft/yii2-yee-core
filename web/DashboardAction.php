@@ -5,6 +5,7 @@ namespace yeesoft\web;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidParamException;
+use yii\web\NotFoundHttpException;
 
 class DashboardAction extends Action
 {
