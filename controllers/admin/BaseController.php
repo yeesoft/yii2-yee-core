@@ -61,7 +61,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      *
      * @var string
      */
-    public $layout = '@vendor/yeesoft/yii2-yee-core/views/layouts/admin/main.php';
+    public $layout = '@vendor/yeesoft/yii2-yee-core/views/layouts/main';
     
     /**
      * Index page view

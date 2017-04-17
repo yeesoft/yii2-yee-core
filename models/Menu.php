@@ -4,7 +4,6 @@ namespace yeesoft\models;
 
 use omgdef\multilingual\MultilingualQuery;
 use yeesoft\behaviors\MultilingualBehavior;
-use yeesoft\helpers\FA;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
@@ -65,12 +64,12 @@ class Menu extends ActiveRecord implements OwnerAccess
     public function rules()
     {
         return [
-            [['title'], 'required'],
-            ['id', 'unique'],
-            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-            [['id'], 'string', 'max' => 64],
-            [['title'], 'string', 'max' => 255],
-            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
+                [['title'], 'required'],
+                ['id', 'unique'],
+                [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+                [['id'], 'string', 'max' => 64],
+                [['title'], 'string', 'max' => 255],
+                [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -138,12 +137,10 @@ class Menu extends ActiveRecord implements OwnerAccess
 
     private static function generateItem($link, $menuLinks)
     {
-        $item = [];
-        $icon = (!empty($link->image)) ? FA::icon($link->image) . ' ' : '';
-
-        $subItems = self::generateSubItems($link->id, $menuLinks);
-
-        $item['label'] = $icon . $link->label;
+        $item = [
+            'icon' => $link->image,
+            'label' => $link->label,
+        ];
 
         if (isset($link->alwaysVisible) && $link->alwaysVisible) {
             $item['visible'] = true;
@@ -154,6 +151,7 @@ class Menu extends ActiveRecord implements OwnerAccess
             $item['url'] = (isset($url['scheme'])) ? $link->link : [$link->link];
         }
 
+        $subItems = self::generateSubItems($link->id, $menuLinks);
         if (is_array($subItems)) {
             $item['items'] = $subItems;
         }

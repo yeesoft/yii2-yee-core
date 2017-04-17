@@ -1,8 +1,9 @@
 <?php
 
-namespace yeesoft\controllers\admin;
+namespace yeesoft\dashboard\controllers;
 
 use yii\helpers\ArrayHelper;
+use yeesoft\controllers\admin\BaseController;
 
 class DashboardController extends BaseController
 {
@@ -32,11 +33,11 @@ class DashboardController extends BaseController
             ];
         }
 
-        return ArrayHelper::merge(parent::actions(), [
-            'index' => [
-                'class' => 'yeesoft\web\DashboardAction',
-                'widgets' => $this->widgets,
-            ]
-        ]);
+//        return ArrayHelper::merge(parent::actions(), [
+//            'index' => [
+//                'class' => 'yeesoft\web\DashboardAction',
+//                'widgets' => $this->widgets,
+//            ]
+//        ]);
     }
 }

@@ -2,10 +2,12 @@
 
 namespace yeesoft\widgets;
 
+use Yii;
 use yeesoft\models\User;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yeesoft\helpers\FA;
 
 /**
  * Class Nav
@@ -13,32 +15,61 @@ use yii\helpers\Html;
  * Show only those items in navigation menu which user can see.
  * If item has no "visible" key, than "visible" => User::canRoute($item['url') will be added.
  *
- * Nav support sub-dropdown menus. Submenus has no nested level limit.
- *
- * @var array $options setting for menu and submenus
- *
- * If $options is one dimensional array then this options will be applied to all sub-menus. Example:
- * 'options' => ['class' => 'nav nav-menu']
- *
- * If $options is two dimensional array then this options will be applied according
- * to nested submenu level. If there is no options for current level, default settings
- * will be applied. Example:
- * 'options' => [
- *   [ 'class' => 'nav nav-first-level'],
- *   [ 'class' => 'nav nav-second-level'],
- *   [ 'class' => 'nav nav-third-level']
- * ]
+ * Nav support submenus. Submenus has no nested level limit.
  *
  * @package yeesoft\widgets
  */
 class Nav extends \yii\bootstrap\Nav
 {
 
+    /**
+     * @var array the HTML attributes for the widget container tag.
+     * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
+     */
+    public $options = ['class' => 'sidebar-menu'];
+
+    /**
+     * @var array the HTML attributes for the inner container tag.
+     * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
+     */
+    public $innerOptions = ['class' => 'treeview-menu'];
+
+    /**
+     * @var boolean whether the nav items labels should be HTML-encoded.
+     */
+    public $encodeLabels = false;
+
+    /**
+     * @var boolean whether to activate parent menu items when one of the corresponding child menu items is active.
+     */
+    public $activateParents = true;
+
+    /**
+     * Initializes the widget.
+     */
     public function init()
     {
-        parent::init();
+        $this->trigger(self::EVENT_INIT);
+
+        if ($this->route === null && Yii::$app->controller !== null) {
+            $this->route = Yii::$app->controller->getRoute();
+        }
+        if ($this->params === null) {
+            $this->params = Yii::$app->request->getQueryParams();
+        }
+        if ($this->dropDownCaret === null) {
+            $this->dropDownCaret = Html::tag('span', Html::tag('i', '', ['class' => 'fa fa-angle-left pull-right']), ['class' => 'pull-right-container']);
+        }
 
         $this->ensureVisibility($this->items);
+    }
+
+    /**
+     * Renders the widget.
+     */
+    public function run()
+    {
+        return $this->renderItems();
     }
 
     /**
@@ -51,22 +82,18 @@ class Nav extends \yii\bootstrap\Nav
         $allVisible = false;
 
         foreach ($items as &$item) {
-            if (isset($item['url']) AND !isset($item['visible']) AND !in_array($item['url'],
-                    ['', '#'])
-            ) {
+            if (isset($item['url']) AND ! isset($item['visible']) AND ! in_array($item['url'], ['', '#'])) {
                 $item['visible'] = User::canRoute($item['url']);
             }
 
             if (isset($item['items'])) {
                 // If not children are visible - make invisible this node
-                if (!$this->ensureVisibility($item['items']) AND !isset($item['visible'])) {
+                if (!$this->ensureVisibility($item['items']) AND ! isset($item['visible'])) {
                     $item['visible'] = false;
                 }
             }
 
-            if (isset($item['label']) AND (!isset($item['visible']) OR $item['visible']
-                    === true)
-            ) {
+            if (isset($item['label']) AND ( !isset($item['visible']) OR $item['visible'] === true)) {
                 $allVisible = true;
             }
         }
@@ -77,24 +104,24 @@ class Nav extends \yii\bootstrap\Nav
     /**
      * Renders widget items.
      *
-     * @param string|array $itemsList items to render.
+     * @param string|array $items items to render.
      * @param int $level navigation nested level.
      * @return string the rendering result.
      * @throws InvalidConfigException
      */
-    public function renderItems($itemsList = NULL, $level = 0)
+    public function renderItems($items = NULL, $level = 0)
     {
-        $renderItems = ($itemsList === NULL) ? $this->items : $itemsList;
-        $items = [];
-        foreach ($renderItems as $i => $item) {
+        $rendered = [];
+        $items = ($items === NULL) ? $this->items : $items;
+
+        foreach ($items as $item) {
             if (isset($item['visible']) && !$item['visible']) {
                 continue;
             }
-            $items[] = $this->renderItem($item, $level);
+            $rendered[] = $this->renderItem($item, $level);
         }
 
-        return Html::tag('ul', implode("\n", $items),
-            $this->getLevelOptions($level));
+        return Html::tag('ul', implode("\n", $rendered), ($level > 0) ? $this->innerOptions : $this->options);
     }
 
     /**
@@ -113,8 +140,17 @@ class Nav extends \yii\bootstrap\Nav
         if (!isset($item['label'])) {
             throw new InvalidConfigException("The 'label' option is required.");
         }
+        
+        if(!ArrayHelper::getValue($item, 'url') && !ArrayHelper::getValue($item, 'items')){
+            return Html::tag('li', $item['label'], ['class' => 'header']);
+        }
+
         $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
-        $label = $encodeLabel ? Html::encode($item['label']) : $item['label'];
+        $icon = (isset($item['icon']) && !empty($item['icon'])) ? FA::icon($item['icon']) . ' ' : '';
+        $circle = ($level > 0) ? Html::tag('i', '', ['class' => 'fa fa-circle-o']) : '';
+        $title = Html::tag('span', $item['label']);
+        $label = $icon . $circle . $title;
+        $label = $encodeLabel ? Html::encode($label) : $label;
         $options = ArrayHelper::getValue($item, 'options', []);
         $items = ArrayHelper::getValue($item, 'items');
         $url = ArrayHelper::getValue($item, 'url', '#');
@@ -126,45 +162,24 @@ class Nav extends \yii\bootstrap\Nav
             $active = $this->isItemActive($item);
         }
 
-        if ($items !== null) {
-            $linkOptions['data-toggle'] = 'dropdown';
-            Html::addCssClass($options, 'dropdown');
-            Html::addCssClass($linkOptions, 'dropdown-toggle');
+        if (is_array($items)) {
+            Html::addCssClass($options, 'treeview');
+
             if ($this->dropDownCaret !== '') {
                 $label .= ' ' . $this->dropDownCaret;
             }
-            if (is_array($items)) {
-                if ($this->activateItems) {
-                    $items = $this->isChildActive($items, $active);
-                }
-                $items = $this->renderItems($items, $level + 1);
+
+            if ($this->activateItems) {
+                $items = $this->isChildActive($items, $active);
             }
+            $items = $this->renderItems($items, $level + 1);
         }
 
         if ($this->activateItems && $active) {
             Html::addCssClass($options, 'active');
         }
 
-        return Html::tag('li', Html::a($label, $url, $linkOptions) . $items,
-            $options);
+        return Html::tag('li', Html::a($label, $url, $linkOptions) . $items, $options);
     }
 
-    /**
-     *  Return options array for current level navigation.
-     *
-     * @param type $level navigation nested level.
-     * @return array options for current level navigation.
-     */
-    private function getLevelOptions($level = 0)
-    {
-        if ($this->options === NULL) return NULL;
-
-        if (isset($this->options[$level]) && is_array($this->options[$level]))
-            return $this->options[$level];
-
-        if (!isset($this->options[$level]) && isset($this->options[0]) && is_array($this->options[0]))
-            return ['class' => 'nav'];
-
-        return $this->options;
-    }
 }
