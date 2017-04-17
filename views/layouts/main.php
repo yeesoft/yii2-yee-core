@@ -240,10 +240,10 @@ AdminThemeAsset::register($this);
 
             <footer class="main-footer">
                 <div class="pull-right hidden-xs">
-                    <b>Version</b> 2.3.8
+                    <b>Version</b> 0.2.x
                 </div>
-                <strong>Copyright &copy; 2014-2016 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights reserved.
-                <?= Html::a('[elements]', ['/site/elements']) ?>
+                <strong>Copyright &copy; 2015-<?= date("Y") ?> <a href="https://www.yee-soft.com/">YeeSoft</a>.</strong> All rights reserved.
+                <?= Html::a('[elements]', ['/dashboard/default/elements']) ?>
             </footer>
 
         </div>
