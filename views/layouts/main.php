@@ -199,6 +199,9 @@ AdminThemeAsset::register($this);
                                     </li>
                                 </ul>
                             </li>
+                            <li>
+                                <a href="#" data-toggle="control-sidebar"><i class="fa fa-ellipsis-v"></i></a>
+                            </li>
                         </ul>
                     </div>
                 </nav>
