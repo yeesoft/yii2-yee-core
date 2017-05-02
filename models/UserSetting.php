@@ -54,7 +54,7 @@ class UserSetting extends \yeesoft\db\ActiveRecord
     public function get($key, $default = NULL)
     {
         if ($setting = self::findOne(['user_id' => Yii::$app->user->id, 'key' => $key])) {
-            return $setting->value;
+            return json_decode($setting->value);
         }
 
         return $default;
@@ -62,17 +62,15 @@ class UserSetting extends \yeesoft\db\ActiveRecord
 
     public function set($key, $value)
     {
-        try {
-            if ($setting = self::findOne(['user_id' => Yii::$app->user->id, 'key' => $key])) {
-                $setting->value = $value;
-                return ($setting->save()) ? TRUE : FALSE;
-            }
-        } catch (Exception $ex) {
-            print_r($ex);
-            die;
+        $params = ['user_id' => Yii::$app->user->id, 'key' => $key];
+
+        if (!$setting = self::findOne($params)) {
+            $setting = new self($params);
         }
 
-        return FALSE;
+        $setting->value = json_encode($value);
+
+        return ($setting->save()) ? TRUE : FALSE;
     }
 
 }
