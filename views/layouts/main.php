@@ -268,7 +268,7 @@ AdminThemeAsset::register($this);
 
         -->
 
-
+        <div class="notification-container"></div>
 
         <?php $this->endBody() ?>
     </body>

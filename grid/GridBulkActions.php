@@ -61,7 +61,7 @@ class GridBulkActions extends Widget
     {
         parent::init();
 
-        $this->promptText = $this->promptText ? $this->promptText : Yii::t('yee', '--- With selected ---');
+        $this->promptText = $this->promptText ? $this->promptText : Yii::t('yee', 'Bulk Actions');
         $this->confirmationText = $this->confirmationText ? $this->confirmationText : Yii::t('yii', 'Are you sure you want to delete this item?');
     }
 

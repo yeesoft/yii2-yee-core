@@ -8,6 +8,8 @@ use Closure;
 class CheckboxColumn extends \yii\grid\CheckboxColumn
 {
 
+    public $displayFilter = true;
+
     /**
      * Renders the header cell content.
      * The default implementation simply renders [[header]].
@@ -56,6 +58,14 @@ class CheckboxColumn extends \yii\grid\CheckboxColumn
         }
 
         return Html::checkbox($this->name, !empty($options['checked']), $options);
+    }
+
+    /**
+     * Renders the filter cell.
+     */
+    public function renderFilterCell()
+    {
+        return ($this->displayFilter) ? parent::renderFilterCell() : '';
     }
 
 }
