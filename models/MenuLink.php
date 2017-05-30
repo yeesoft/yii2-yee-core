@@ -55,8 +55,7 @@ class MenuLink extends ActiveRecord implements OwnerAccess
             ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
-                'langForeignKey' => 'link_id',
-                'tableName' => "{{%menu_link_lang}}",
+                'languageForeignKey' => 'link_id',
                 'attributes' => [
                     'label'
                 ]

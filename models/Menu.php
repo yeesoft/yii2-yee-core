@@ -49,8 +49,7 @@ class Menu extends ActiveRecord implements OwnerAccess
             ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
-                'langForeignKey' => 'menu_id',
-                'tableName' => "{{%menu_lang}}",
+                'languageForeignKey' => 'menu_id',
                 'attributes' => [
                     'title'
                 ]

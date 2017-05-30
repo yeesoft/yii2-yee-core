@@ -49,6 +49,7 @@ class DateFilterColumn extends DataColumn
                     'class' => 'form-control pull-left',
                     'style' => 'width: 32px; appearance: none; -moz-appearance: none; -webkit-appearance: none;',
                     ]);
+            $dropDown = '';
             $field = DatePicker::widget(['model' => $model, 'attribute' => $this->attribute,
                 'options' => $this->filterInputOptions, 'dateFormat' => 'yyyy-MM-dd',]);
 

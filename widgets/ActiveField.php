@@ -2,52 +2,32 @@
 
 namespace yeesoft\widgets;
 
-use Yii;
+use yii\helpers\Html;
 
 /**
  * @inheritdoc
  */
-class ActiveField extends \yii\bootstrap\ActiveField
+class ActiveField extends \yeesoft\multilingual\widgets\ActiveField
 {
-    public $language = NULL;
 
-    public $multilingual = FALSE;
-    
     /**
-     * @var string the template for checkboxes in default layout
+     * Renders a text value.
+     *
+     * @return $this the field object itself.
      */
-    public $checkboxTemplate = "<div class=\"checkbox\">\n{input}\n{beginLabel}\n{labelTitle}\n{endLabel}\n{error}\n{hint}\n</div>";
-    
-    /**
-     * @var string the template for checkboxes in horizontal layout
-     */
-    public $horizontalCheckboxTemplate = "{beginWrapper}\n<div class=\"checkbox\">\n{input}\n{beginLabel}\n{labelTitle}\n{endLabel}\n</div>\n{error}\n{endWrapper}\n{hint}";
-   
-
-    public function init()
+    public function value($options = [])
     {
-        parent::init();
+        $this->addAriaAttributes($options);
+        $this->adjustLabelFor($options);
 
-        $languages = Yii::$app->yee->languages;
-        $isCurrentLanguage = (Yii::$app->language == $this->language);
-
-        if ($this->language !== NULL && ($this->model->isMultilingual() || $this->multilingual)) {
-            $languageLabel = $languages[$this->language];
-            $inputLabel = $this->model->getAttributeLabel($this->attribute) . ((count($languages) > 1) ? " [$languageLabel]" : '');
-
-            $this->labelOptions = array_merge($this->labelOptions, [
-                'label' => $inputLabel
-            ]);
-
-            $this->options = array_merge($this->options, [
-                'data-toggle' => 'multilang',
-                'data-lang' => $this->language,
-                'class' => ($isCurrentLanguage ? 'in' : ''),
-            ]);
-
-            $langPart = strtolower(str_replace('-', '_', $this->language));
-            $this->attribute .= ($isCurrentLanguage) ? '' : '_' . $langPart;
+        if (!array_key_exists('id', $options)) {
+            $options['id'] = Html::getInputId($this->model, $this->attribute);
         }
+
+        $value = isset($options['value']) ? $options['value'] : Html::getAttributeValue($this->model, $this->attribute);
+        $this->parts['{input}'] = Html::tag('span', ": {$value}", $options);
+
+        return $this;
     }
 
 }
