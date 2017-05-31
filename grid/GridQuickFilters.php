@@ -73,7 +73,7 @@ class GridQuickFilters extends Widget
                 }
 
                 $count = $searchModel::find()->filterWhere($filter)->count();
-                $count = " ({$count})";
+                $count = " <b>{$count}</b>";
             }
 
             $label = $label . (isset($count) ? $count : '');

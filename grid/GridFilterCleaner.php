@@ -3,46 +3,45 @@
 namespace yeesoft\grid;
 
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\base\Widget;
-use yii\helpers\Url;
+use yii\base\InvalidConfigException;
 
 class GridFilterCleaner extends Widget
 {
 
     /**
-     * You can render different views for different places
-     *
-     * @var string
+     * @var string the grid view ID.
+     */
+    public $gridId;
+
+    /**
+     * @var string clear button label 
+     */
+    public $label;
+
+    /**
+     * @var string filter cleaner view
      */
     public $viewFile = 'grid-filter-cleaner';
 
     /**
-     * @var string the `yii\widgets\Pjax` widget ID. If widget with current
-     * selector is not found, the page will be reloaded after applying the action.
+     * @inheritdoc
      */
-    public $pjaxId;
-
-    /**
-     * Optional. Used only for "Clear filters" button.
-     * If not set, then it will be guessed via $pjaxId
-     *
-     * @var string
-     */
-    public $gridId;
-
     public function init()
     {
         parent::init();
 
-        if (!$this->pjaxId) {
-            throw new InvalidConfigException('GridPageSize configuration must contain a "pjaxId" parameter.');
+        if (!$this->gridId) {
+            throw new InvalidConfigException('GridPageSize configuration must contain a "gridId" parameter.');
+        }
+
+        if (!$this->label) {
+            $this->label = Yii::t('yee', 'Clear filters');
         }
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
-     * @return string
+     * @inheritdoc
      */
     public function run()
     {
@@ -51,49 +50,46 @@ class GridFilterCleaner extends Widget
     }
 
     /**
-     * @return string
+     * @return string JavaScript code for the widget.
      */
     protected function js()
     {
-        $filterSelectors = $this->gridId . ' .filters input[type="text"], ' . $this->gridId . ' .filters select';
-        $clearBtnId = $this->gridId . '-clear-filters-btn';
+        $clearButtonId = "#{$this->gridId} .grid-filter-cleaner";
+        $filtersSelector = "#{$this->gridId} .filters input[type=\"text\"], #{$this->gridId} .filters select";
 
         $js = <<<JS
-            var clearFiltersBtn = $('$clearBtnId');
+            var clearFilterButton = $('$clearButtonId');
 
-            function showOrHideClearFiltersBtn() {
-                var showClearFiltersButton = false;
+            function updateClearButtonState() {
+                var filterSelected = false;
 
-                $('$filterSelectors').each(function(){
-                    var _t = $(this);
-                    if (_t.val()){
-                        showClearFiltersButton = true;
+                $('$filtersSelector').each(function(){
+                    if ($(this).val()) {
+                        filterSelected = true;
                     }
                 });
 
-                if (showClearFiltersButton) {
-                    clearFiltersBtn.show();
+                if (filterSelected) {
+                    clearFilterButton.show();
                 } else {
-                    clearFiltersBtn.hide();
+                    clearFilterButton.hide();
                 }
             }
 
-            showOrHideClearFiltersBtn();
-
-            // Show button if filters not empty and hide it if they are empty
-            $('body').off('change', '$filterSelectors').on('change', '$filterSelectors', function () {
-                showOrHideClearFiltersBtn();
+            $('body').off('change', '$filtersSelector').on('change', '$filtersSelector', function () {
+                updateClearButtonState();
             });
 
-            // Clear filters on button click
-            $('body').off('click', '$clearBtnId').on('click', '$clearBtnId', function () {
+            $('body').off('click', '$clearButtonId').on('click', '$clearButtonId', function () {
                 var filter;
-                $('$filterSelectors').each(function(){
+                $('$filtersSelector').each(function(){
                     filter = $(this);
                     filter.val('');
                 });
                 filter.trigger('change');
             });
+                
+            updateClearButtonState();
 JS;
 
         return $js;

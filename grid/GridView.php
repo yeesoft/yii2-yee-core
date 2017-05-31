@@ -76,11 +76,12 @@ class GridView extends \yii\grid\GridView
      * @inheritdoc
      */
     public $layout = '<div class="row head-row">'
-            . '<div class="col-xs-12">{quickFilters}</div>'
+            . '<div class="col-xs-6">{quickFilters}</div>'
+            . '<div class="col-xs-6 text-right">{filterCleaner} {summary}</div>'
             . '</div>'
             . '<div class="row head-row">'
-            . '<div class="col-xs-12 col-md-6">{bulkActions}{extraActions}</div>'
-            . '<div class="col-xs-12 col-md-6 text-right">{filterCleaner} {summary}</div>'
+            . '<div class="col-xs-12 col-md-6">{bulkActions}</div>'
+            . '<div class="col-xs-12 col-md-6 text-right">{extraActions}</div>'
             . '</div>'
             . '<div class="row">'
             . '<div class="col-xs-12">{items}</div>'
@@ -146,8 +147,8 @@ class GridView extends \yii\grid\GridView
                 $this->filterCleaner['class'] = GridFilterCleaner::class;
             }
 
-            if (!isset($this->filterCleaner['pjaxId']) && $this->pjaxId) {
-                $this->filterCleaner['pjaxId'] = $this->pjaxId;
+            if (!isset($this->filterCleaner['gridId'])) {
+                $this->filterCleaner['gridId'] = $this->id;
             }
 
             return Yii::createObject($this->filterCleaner)->run();
