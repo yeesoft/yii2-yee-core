@@ -169,7 +169,7 @@ abstract class AbstractItem extends ActiveRecord
      */
     public function validateUniqueName($attribute)
     {
-        if (Role::find()->where(['name' => $this->name])->exists()) {
+        if ($this->$attribute !== $this->getOldAttribute($attribute) && Role::find()->where(['name' => $this->$attribute])->exists()) {
             $this->addError('name', Yii::t('yii', '{attribute} "{value}" has already been taken.', [
                         'attribute' => $this->getAttributeLabel($attribute),
                         'value' => $this->$attribute,

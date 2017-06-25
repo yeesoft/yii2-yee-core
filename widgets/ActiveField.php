@@ -11,6 +11,16 @@ class ActiveField extends \yeesoft\multilingual\widgets\ActiveField
 {
 
     /**
+     * @var string the template for checkboxes in default layout
+     */
+    public $checkboxTemplate = "<div class=\"checkbox\">\n{input}\n{beginLabel}\n{labelTitle}\n{endLabel}\n{error}\n{hint}\n</div>";
+
+    /**
+     * @var string the template for radios in default layout
+     */
+    public $radioTemplate = "<div class=\"radio\">\n{input}\n{beginLabel}\n{labelTitle}\n{endLabel}\n{error}\n{hint}\n</div>";
+
+    /**
      * Renders a text value.
      *
      * @return $this the field object itself.
