@@ -156,8 +156,10 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = new $this->modelClass;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('crudMessage', Yii::t('yee', 'Your item has been created.'));
+            Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been created.'));
             return $this->redirect($this->getRedirectPage('create', $model));
+        } else {
+            //print_r($model->getErrors());die;
         }
 
         return $this->renderIsAjax($this->createView, compact('model'));
@@ -177,7 +179,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) AND $model->save()) {
-            Yii::$app->session->setFlash('crudMessage', Yii::t('yee', 'Your item has been updated.'));
+            Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been updated.'));
             return $this->redirect($this->getRedirectPage('update', $model));
         }
 
@@ -198,7 +200,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
         $model = $this->findModel($id);
         $model->delete();
 
-        Yii::$app->session->setFlash('crudMessage', Yii::t('yee', 'Your item has been deleted.'));
+        Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been deleted.'));
         return $this->redirect($this->getRedirectPage('delete', $model));
     }
 

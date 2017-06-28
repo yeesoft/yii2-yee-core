@@ -11,6 +11,11 @@ use yeesoft\theme\assets\AdminThemeAsset;
 
 //\yeesoft\assets\AdminLTEAsset::register($this);
 AdminThemeAsset::register($this);
+
+//Show Flashes
+foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+    $this->registerJs("Notification.show('{$key}', '{$message}');");
+}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

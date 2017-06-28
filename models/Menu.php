@@ -2,14 +2,15 @@
 
 namespace yeesoft\models;
 
-use omgdef\multilingual\MultilingualQuery;
-use yeesoft\behaviors\MultilingualBehavior;
 use Yii;
+use yeesoft\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yeesoft\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
+use yeesoft\behaviors\MultilingualBehavior;
+use yeesoft\multilingual\db\MultilingualQuery;
+use yeesoft\multilingual\db\MultilingualLabelsTrait;
 
 /**
  * This is the model class for table "menu".
@@ -25,6 +26,8 @@ use yii\helpers\ArrayHelper;
  */
 class Menu extends ActiveRecord implements OwnerAccess
 {
+
+    use MultilingualLabelsTrait;
 
     /**
      * @inheritdoc
@@ -63,12 +66,12 @@ class Menu extends ActiveRecord implements OwnerAccess
     public function rules()
     {
         return [
-                [['title'], 'required'],
-                ['id', 'unique'],
-                [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
-                [['id'], 'string', 'max' => 64],
-                [['title'], 'string', 'max' => 255],
-                [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
+            [['title'], 'required'],
+            ['id', 'unique'],
+            [['created_by', 'updated_by', 'created_at', 'updated_at'], 'integer'],
+            [['id'], 'string', 'max' => 64],
+            [['title'], 'string', 'max' => 255],
+            [['id'], 'match', 'pattern' => '/^[a-z0-9_-]+$/', 'message' => Yii::t('yee', 'Menu ID can only contain lowercase alphanumeric characters, underscores and dashes.')],
         ];
     }
 
@@ -88,7 +91,7 @@ class Menu extends ActiveRecord implements OwnerAccess
     }
 
     /**
-     * @return \omgdef\multilingual\MultilingualQuery
+     * @return MultilingualQuery
      */
     public function getLinks()
     {

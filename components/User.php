@@ -36,9 +36,16 @@ class User extends \yii\web\User
     /**
      * @inheritdoc
      */
-    public $loginUrl = ['/auth/login'];
+    public $loginUrl = '/auth/login';
 
-    /**
+    public function init()
+    {
+        parent::init();
+        //TODO: Login redirection for backend
+        //$this->loginUrl = Yii::$app->frontendUrlManager->createUrl([$this->loginUrl, 'language' => Yii::$app->language]);
+    }
+
+        /**
      * Allows to call Yii::$app->user->isSuperadmin
      *
      * @return bool
@@ -64,24 +71,6 @@ class User extends \yii\web\User
         AuthHelper::updatePermissions($identity);
 
         parent::afterLogin($identity, $cookieBased, $duration);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function loginRequired($checkAjax = true, $checkAcceptHeader = true)
-    {
-        $request = Yii::$app->getRequest();
-        if ($this->enableSession && (!$checkAjax || !$request->getIsAjax())) {
-            $this->setReturnUrl($request->getUrl());
-        }
-        if ($this->loginUrl !== null) {
-            $loginUrl = (array)$this->loginUrl;
-            if ($loginUrl[0] !== Yii::$app->requestedRoute) {
-                return Yii::$app->getResponse()->redirect(Yii::$app->urlManager->hostInfo . $this->loginUrl[0]);
-            }
-        }
-        throw new ForbiddenHttpException(Yii::t('yii', 'Login Required'));
     }
 
     /**

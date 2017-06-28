@@ -2,14 +2,15 @@
 
 namespace yeesoft\models;
 
-use omgdef\multilingual\MultilingualQuery;
-use yeesoft\behaviors\MultilingualBehavior;
 use Yii;
+use yeesoft\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
-use yeesoft\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
+use yeesoft\behaviors\MultilingualBehavior;
+use yeesoft\multilingual\db\MultilingualQuery;
+use yeesoft\multilingual\db\MultilingualLabelsTrait;
 
 /**
  * This is the model class for table "menu_link".
@@ -31,6 +32,8 @@ use yii\helpers\ArrayHelper;
  */
 class MenuLink extends ActiveRecord implements OwnerAccess
 {
+
+    use MultilingualLabelsTrait;
 
     /**
      * @inheritdoc

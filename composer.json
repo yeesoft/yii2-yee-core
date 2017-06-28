@@ -14,7 +14,6 @@
         "yiisoft/yii2-jui": "~2.0",
         "bower-asset/metisMenu": "*",
         "yeesoft/yii2-multilingual": "~1.0.0",
-        "omgdef/yii2-multilingual-behavior": "~2.0",
         "rmrevin/yii2-fontawesome": "~2.12"
     },
     "autoload": {
