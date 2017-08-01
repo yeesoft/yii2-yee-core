@@ -111,17 +111,13 @@ class Route extends AbstractItem
         }
 
         foreach ($allowedRoutes as $allowedRoute) {
-            // If some controller fully allowed (wildcard)
+            // If some namespace fully allowed (wildcard)
             if (substr($allowedRoute, -1) == '*') {
-                $routeArray = explode('/', $route);
-                array_splice($routeArray, -1);
+	            $allowedRouteArray = explode('/', $allowedRoute);
+	            array_splice($allowedRouteArray, -1);
 
-                $allowedRouteArray = explode('/', $allowedRoute);
-                array_splice($allowedRouteArray, -1);
-
-                if (array_diff($routeArray, $allowedRouteArray) === array()) {
-                    return true;
-                }
+            	if(strpos($route, join('/', $allowedRouteArray)) === 0)
+            		return true;
             }
         }
 
