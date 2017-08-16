@@ -1,0 +1,16 @@
+.editable .input  {
+    margin: 7px 11px 22px 11px;
+}
+
+.editable .input a {
+    border-bottom: dashed 1px;
+    cursor: pointer;
+}
+
+.editable .input a:empty {
+    padding: 0 5px;
+}
+
+.editable .input-group {
+    display: none;
+}

@@ -1,21 +1,22 @@
 <?php
 
-namespace yeesoft\controllers\admin;
+namespace yeesoft\controllers;
 
-use yeesoft\helpers\YeeHelper;
-use yeesoft\models\OwnerAccess;
-use yeesoft\models\User;
 use Yii;
-use yii\data\ActiveDataProvider;
-use yeesoft\db\ActiveRecord;
+use yii\web\Cookie;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\StringHelper;
-use yii\web\Cookie;
+use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yeesoft\db\ActiveRecord;
+use yeesoft\helpers\YeeHelper;
+use yeesoft\models\OwnerAccess;
+use yeesoft\models\User;
 
-abstract class BaseController extends \yeesoft\controllers\BaseController
+abstract class CrudController extends BaseController
 {
+
     /**
      * @var ActiveRecord
      */
@@ -25,6 +26,11 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      * @var ActiveRecord
      */
     public $modelSearchClass;
+
+    /**
+     * @var string
+     */
+    public $modelPrimaryKey;
 
     /**
      * Actions that will be disabled
@@ -62,28 +68,28 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      * @var string
      */
     public $layout = '@vendor/yeesoft/yii2-yee-core/views/layouts/main';
-    
+
     /**
      * Index page view
      *
      * @var string
      */
     public $indexView = 'index';
-    
+
     /**
      * View page view
      *
      * @var string
      */
     public $viewView = 'view';
-    
+
     /**
      * Create page view
      *
      * @var string
      */
     public $createView = 'create';
-    
+
     /**
      * Update page view
      *
@@ -91,15 +97,38 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     public $updateView = 'update';
 
+    /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function init()
+    {
+        parent::init();
+
+        if ($this->modelPrimaryKey === null) {
+            $modelClass = $this->modelClass;
+            $primaryKey = $modelClass::primaryKey();
+
+            if (isset($primaryKey[0])) {
+                $this->modelPrimaryKey = $primaryKey[0];
+            } else {
+                throw new InvalidConfigException('"' . $modelClass . '" must have a primary key.');
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
+                    'verbs' => [
+                        'class' => VerbFilter::className(),
+                        'actions' => [
+                            'delete' => ['post'],
+                        ],
+                    ],
         ]);
     }
 
@@ -111,8 +140,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
-        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
-            && !User::hasPermission($modelClass::getFullAccessPermission()));
+        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
 
         if ($searchModel) {
             $searchName = StringHelper::basename($searchModel::className());
@@ -141,7 +169,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     public function actionView($id)
     {
         return $this->renderIsAjax($this->viewView, [
-            'model' => $this->findModel($id),
+                    'model' => $this->findModel($id),
         ]);
     }
 
@@ -224,9 +252,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
-                && !User::hasPermission($modelClass::getFullAccessPermission()));
-            $where = ['id' => Yii::$app->request->post('selection', [])];
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
+            $where = [$this->modelPrimaryKey => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
                 $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
@@ -243,9 +270,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
-                && !User::hasPermission($modelClass::getFullAccessPermission()));
-            $where = ['id' => Yii::$app->request->post('selection', [])];
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
+            $where = [$this->modelPrimaryKey => Yii::$app->request->post('selection', [])];
 
             if ($restrictAccess) {
                 $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
@@ -262,11 +288,10 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (Yii::$app->request->post('selection')) {
             $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME)
-                && !User::hasPermission($modelClass::getFullAccessPermission()));
+            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
 
             foreach (Yii::$app->request->post('selection', []) as $id) {
-                $where = ['id' => $id];
+                $where = [$this->modelPrimaryKey => $id];
 
                 if ($restrictAccess) {
                     $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
@@ -274,7 +299,8 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
 
                 $model = $modelClass::findOne($where);
 
-                if ($model) $model->delete();
+                if ($model)
+                    $model->delete();
             }
         }
     }
@@ -292,7 +318,7 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
             $models = $modelClass::findAll(array_keys($sortArray));
 
             foreach ($models as $model) {
-                $model->sorter = $sortArray[$model->id];
+                $model->sorter = $sortArray[$model->{$this->modelPrimaryKey}];
                 $model->save(false);
             }
         }
@@ -327,18 +353,11 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         $modelClass = $this->modelClass;
         $model = new $modelClass;
-        
+
         if (method_exists($model, 'isMultilingual') && $model->isMultilingual()) {
-            $condition = [];
-            $primaryKey = $modelClass::primaryKey();
+
             $query = $modelClass::find();
-
-            if (isset($primaryKey[0])) {
-                $condition = [$primaryKey[0] => $id];
-            } else {
-                throw new InvalidConfigException('"' . Pos . '" must have a primary key.');
-            }
-
+            $condition = [$this->modelPrimaryKey => $id];
             $model = $query->andWhere($condition)->multilingual()->one();
         } else {
             $model = $modelClass::findOne($id);
@@ -361,15 +380,16 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
      */
     protected function getRedirectPage($action, $model = null)
     {
+
         switch ($action) {
             case 'delete':
                 return ['index'];
                 break;
             case 'update':
-                return ['view', 'id' => $model->id];
+                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
                 break;
             case 'create':
-                return ['view', 'id' => $model->id];
+                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
                 break;
             default:
                 return ['index'];
@@ -383,9 +403,9 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
     {
         if (parent::beforeAction($action)) {
 
-            if ($this->enableOnlyActions !== [] AND in_array($action->id, $this->_implementedActions) AND
-                !in_array($action->id, $this->enableOnlyActions)
-            ) {
+            if ($this->enableOnlyActions !== []
+                    AND in_array($action->id, $this->_implementedActions)
+                    AND ! in_array($action->id, $this->enableOnlyActions)) {
                 throw new NotFoundHttpException('Page not found');
             }
 
@@ -398,4 +418,5 @@ abstract class BaseController extends \yeesoft\controllers\BaseController
 
         return false;
     }
+
 }

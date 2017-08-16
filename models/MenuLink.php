@@ -55,6 +55,7 @@ class MenuLink extends ActiveRecord implements OwnerAccess
                 'class' => SluggableBehavior::className(),
                 'slugAttribute' => 'id',
                 'attribute' => 'label',
+                'ensureUnique' => true,
             ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),

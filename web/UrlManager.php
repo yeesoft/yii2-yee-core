@@ -4,7 +4,7 @@ namespace yeesoft\web;
 
 use Yii;
 
-class MultilingualUrlManager extends \yeesoft\multilingual\web\MultilingualUrlManager
+class UrlManager extends \yeesoft\multilingual\web\MultilingualUrlManager
 {
 
     public $showScriptName = false;

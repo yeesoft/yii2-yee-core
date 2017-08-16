@@ -2,6 +2,7 @@
 
 namespace yeesoft\helpers;
 
+use Yii;
 use yeesoft\models\User;
 
 /**
@@ -17,6 +18,26 @@ class Html extends \yii\helpers\Html
      */
     public static function a($text, $url = null, $options = [])
     {
+        return parent::a($text, $url, $options);
+        
+        $id = 'index';//parse unique ids
+        $controller =  Yii::$app->controller->uniqueId;
+        $action = new \yii\base\Action($id, $controller);
+        $user = Yii::$app->user;
+        $request = Yii::$app->getRequest();
+        
+        
+        $rules = [];//Get Rules from DbManager
+        $allow = false;
+        /* @var $rule AccessRule */
+        foreach ($rules as $rule) {
+            if ($rule->allows($action, $user, $request)) {
+                $allow =  true;
+            } 
+        }
+
+        //\Yii::$app->user->can($permissionName);
+        
         if (in_array($url, [null, '', '#'])) {
             return parent::a($text, $url, $options);
         }

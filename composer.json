@@ -14,7 +14,8 @@
         "yiisoft/yii2-jui": "~2.0",
         "bower-asset/metisMenu": "*",
         "yeesoft/yii2-multilingual": "~1.0.0",
-        "rmrevin/yii2-fontawesome": "~2.12"
+        "rmrevin/yii2-fontawesome": "~2.12",
+        "bower-asset/transliteration": "~1.6.2"
     },
     "autoload": {
         "psr-4": {

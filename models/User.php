@@ -242,6 +242,7 @@ class User extends UserIdentity
      */
     public static function canRoute($route, $superAdminAllowed = true)
     {
+        //return true;
         if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
             return true;
         }

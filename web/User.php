@@ -1,16 +1,13 @@
 <?php
 
-namespace yeesoft\components;
+namespace yeesoft\web;
 
-use yeesoft\helpers\AuthHelper;
 use Yii;
+use yeesoft\helpers\AuthHelper;
 
-/**
- * Class User
- * @package yeesoft\components
- */
 class User extends \yii\web\User
 {
+
     /**
      * @inheritdoc
      */
@@ -36,16 +33,9 @@ class User extends \yii\web\User
     /**
      * @inheritdoc
      */
-    public $loginUrl = '/auth/login';
+    public $loginUrl = ['/auth/default/login'];
 
-    public function init()
-    {
-        parent::init();
-        //TODO: Login redirection for backend
-        //$this->loginUrl = Yii::$app->frontendUrlManager->createUrl([$this->loginUrl, 'language' => Yii::$app->language]);
-    }
-
-        /**
+    /**
      * Allows to call Yii::$app->user->isSuperadmin
      *
      * @return bool
@@ -115,6 +105,21 @@ class User extends \yii\web\User
         }
 
         $this->setSettings($settings);
-
     }
+    
+    /**
+     * @inheritdoc
+     */
+    public function can($permissionName, $params = [], $allowCaching = true)
+    {
+      
+        //return true;
+        
+        if ($this->isSuperadmin) {
+            return true;
+        }
+        
+        return parent::can($permissionName, $params, $allowCaching);
+    }
+
 }

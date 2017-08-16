@@ -8,10 +8,93 @@ use yii\base\Action;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
-class Route extends AbstractItem
+/**
+ * This is the model class for table "{{%auth_route}}".
+ *
+ * @property integer $id
+ * @property string $base_url
+ * @property string $controller
+ * @property string $action
+ * @property integer $created_at
+ * @property integer $updated_at
+ *
+ * @property AuthItemRoute[] $authItemRoutes
+ * @property AuthItem[] $itemNames
+ */
+class Route extends \yeesoft\db\ActiveRecord
 {
 
-    const ITEM_TYPE = self::TYPE_ROUTE;
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%auth_route}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['controller'], 'required'],
+            [['created_at', 'updated_at'], 'integer'],
+            [['base_url', 'action'], 'string', 'max' => 63],
+            [['controller'], 'string', 'max' => 127],
+            [['base_url', 'controller', 'action'], 'unique', 'targetAttribute' => ['base_url', 'controller', 'action'], 'message' => 'The combination of Base Url, Controller and Action has already been taken.'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'base_url' => 'Base Url',
+            'controller' => 'Controller',
+            'action' => 'Action',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthItemRoutes()
+    {
+        return $this->hasMany(AuthItemRoute::className(), ['route_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemNames()
+    {
+        return $this->hasMany(AuthItem::className(), ['name' => 'item_name'])->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
+    }
+
+    public function getName()
+    {
+        return '/' . implode('/', array_filter([trim($this->base_url, ' /'), trim($this->controller, ' /'), trim($this->action, ' /')]));
+    }
+
+    public function getRule()
+    {
+        $rule['allow'] = true;
+        $rule['controllers'] = [$this->controller];
+
+        if (!empty($this->action)) {
+            $rule['actions'] = [$this->action];
+        }
+
+        //  $rule['roles'] = ['editPages'];
+
+        return $rule;
+    }
 
     /**
      * Get all routes available for this user
@@ -37,7 +120,7 @@ class Route extends AbstractItem
                 ->from($auth_item)
                 ->innerJoin($auth_item_child, '(' . $auth_item_child . '.child = ' . $auth_item . '.name AND ' . $auth_item . '.type = :type)')
                 ->params([':type' => self::TYPE_ROUTE])
-                ->where([ $auth_item_child . '.parent' => $permissions])
+                ->where([$auth_item_child . '.parent' => $permissions])
                 ->column();
 
         return $withSubRoutes ? static::withSubRoutes($routes, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name')) : $routes;

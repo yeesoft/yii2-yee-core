@@ -196,9 +196,9 @@ More info: [Advanced Application Template Installation](https://github.com/yiiso
        ```php
        namespace backend\controllers;
 
-       use yeesoft\controllers\admin\BaseController;
+       use yeesoft\controllers\CrudController;
 
-       class SiteController extends BaseController
+       class SiteController extends CrudController
        {
            public function actionIndex()
            {

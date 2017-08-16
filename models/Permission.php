@@ -13,6 +13,31 @@ class Permission extends AbstractItem
     const ITEM_TYPE = self::TYPE_PERMISSION;
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoutes()
+    {
+        return $this->hasMany(Route::className(), ['id' => 'route_id'])
+                ->viaTable('auth_item_route', ['item_name' => 'name']);
+    }
+    
+    public function linkRoutes($ids)
+    {
+        $routes = Route::findAll($ids);
+        foreach ($routes as $route) {
+            $this->link('routes', $route);
+        }
+    }
+    
+    public function unlinkRoutes($ids)
+    {
+        $routes = Route::findAll($ids);
+        foreach ($routes as $route) {
+            $this->unlink('routes', $route, true);
+        }
+    }
+    
+    /**
      * @param int $userId
      *
      * @return array|\yii\rbac\Permission[]

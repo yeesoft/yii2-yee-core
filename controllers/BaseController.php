@@ -2,11 +2,11 @@
 
 namespace yeesoft\controllers;
 
-use yeesoft\behaviors\AccessFilter;
 use Yii;
 use yii\web\Controller;
 use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
+use yeesoft\filters\AccessControl;
 
 abstract class BaseController extends Controller
 {
@@ -18,7 +18,14 @@ abstract class BaseController extends Controller
     {
         return [
             'access-filter' => [
-                'class' => AccessFilter::className(),
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['error'],
+                        'roles' => ['?', '@'],
+                    ],
+                ],
             ],
         ];
     }
@@ -45,8 +52,8 @@ abstract class BaseController extends Controller
 
             // If there is a post-request, redirect the application 
             // to the provided url of the selected language
-            if (Yii::$app->getRequest()->post('language', NULL)) {
-                $language = Yii::$app->yee->getSourceLanguageShortcode(Yii::$app->getRequest()->post('language'));
+            if ($language = Yii::$app->request->post('language')) {
+                $language = Yii::$app->yee->getSourceLanguageShortcode($language);
 
                 if (!isset($languages[$language])) {
                     throw new NotFoundHttpException();
@@ -57,7 +64,7 @@ abstract class BaseController extends Controller
             }
 
             // Set the application lang if provided by GET, session or cookie
-            if ($language = Yii::$app->getRequest()->get('language', NULL)) {
+            if ($language = Yii::$app->request->get('language')) {
 
                 $language = Yii::$app->yee->getSourceLanguageShortcode($language);
 
@@ -82,7 +89,6 @@ abstract class BaseController extends Controller
                 }
 
                 Yii::$app->language = $language;
-
             } else if (isset(Yii::$app->request->cookies['language'])) {
 
                 $language = Yii::$app->request->cookies['language']->value;
@@ -93,11 +99,9 @@ abstract class BaseController extends Controller
                 }
 
                 Yii::$app->language = $language;
-
             }
 
             Yii::$app->formatter->locale = Yii::$app->language;
-
         }
     }
 
@@ -117,4 +121,5 @@ abstract class BaseController extends Controller
             return $this->render($view, $params);
         }
     }
+
 }

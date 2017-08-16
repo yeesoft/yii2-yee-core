@@ -64,7 +64,6 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
             <header class="main-header">
                 <div class="logo">
                     <a class="logo-title" href="/admin">
-                        <i class="fa fa-yoast fa-lg" aria-hidden="true"></i>
                         <b>Yee</b>CMS
                     </a>
                     <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">

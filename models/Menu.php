@@ -49,6 +49,7 @@ class Menu extends ActiveRecord implements OwnerAccess
                 'class' => SluggableBehavior::className(),
                 'slugAttribute' => 'id',
                 'attribute' => 'title',
+                'ensureUnique' => true,
             ],
             'multilingual' => [
                 'class' => MultilingualBehavior::className(),
