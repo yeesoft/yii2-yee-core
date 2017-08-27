@@ -52,6 +52,23 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
             .example-modal .modal {
                 background: transparent !important;
             }
+            
+            .logo-block {
+                display: inline-block;
+                height: 22px;
+                width: 23px;
+                background: #fff;
+                color: #202731;
+                line-height: 20px;
+                padding: 1px 6px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            
+            a:hover .logo-block {
+                background: #4d74b0;
+                color: #fff;
+            }
         </style>
     </head>
     <body class="hold-transition skin-dark sidebar-mini">
@@ -64,7 +81,11 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
             <header class="main-header">
                 <div class="logo">
                     <a class="logo-title" href="/admin">
-                        <b>Yee</b>CMS
+                        <span class="logo-block">Y</span>
+                        <span class="logo-block">e</span>
+                        <span class="logo-block">e</span>
+                        
+                        CMS
                     </a>
                     <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                         <span class="sr-only">Toggle navigation</span>

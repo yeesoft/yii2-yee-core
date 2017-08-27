@@ -10,6 +10,8 @@ interface ManagerInterface extends \yii\rbac\ManagerInterface
 {
 
     const AUTH_ROUTES = '__auth_routes';
+    const CACHE_AUTH_FILTERS = '__auth_filters';
+    const CACHE_AUTH_USER_FILTERS = '__auth_user_filters';
     //const AUTH_ROUTES_TIMESTAMP = '__auth_routes_timestamp';
     
     /**

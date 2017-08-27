@@ -57,6 +57,26 @@ class m150319_152141_init_rbac extends m140506_102106_rbac_init
         $this->addForeignKey('fk_auth_item_route_item', $authManager->itemRouteTable, 'item_name', $authManager->itemTable, 'name', 'CASCADE', 'CASCADE');
         $this->addForeignKey('fk_auth_item_route_route', $authManager->itemRouteTable, 'route_id', $authManager->routeTable, 'id', 'CASCADE', 'CASCADE');
 
+        $this->createTable($authManager->filterTable, [
+            'id' => $this->primaryKey(),
+            'name' => $this->string(127)->notNull(),
+            'class_name' => $this->string(255)->notNull(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
+        ], $tableOptions);
+               
+        $this->createIndex('idx_uniq_class_name', $authManager->filterTable, ['class_name'], true);
+        
+        $this->createTable($authManager->itemFilterTable, [
+            'id' => $this->primaryKey(),
+            'item_name' => $this->string(64)->notNull(),
+            'filter_id' => $this->integer()->notNull(),
+        ], $tableOptions);
+        
+        $this->createIndex('idx_auth_item_filter', $authManager->itemFilterTable, ['item_name', 'filter_id'], true);
+        $this->addForeignKey('fk_auth_item_filter_item', $authManager->itemFilterTable, 'item_name', $authManager->itemTable, 'name', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_auth_item_filter_filter', $authManager->itemFilterTable, 'filter_id', $authManager->filterTable, 'id', 'CASCADE', 'CASCADE');
+        
     }
 
     /**
@@ -67,10 +87,16 @@ class m150319_152141_init_rbac extends m140506_102106_rbac_init
         $authManager = $this->getAuthManager();
         $this->db = $authManager->db;
 
+        $this->dropForeignKey('fk_auth_item_filter_filter', $authManager->itemFilterTable);
+        $this->dropForeignKey('fk_auth_item_filter_item', $authManager->itemFilterTable);
+        $this->dropTable($authManager->itemFilterTable);
+        $this->dropTable($authManager->filterTable);
+        
         $this->dropForeignKey('fk_auth_item_route_item', $authManager->itemRouteTable);
         $this->dropForeignKey('fk_auth_item_route_route', $authManager->itemRouteTable);
         $this->dropTable($authManager->itemRouteTable);
         $this->dropTable($authManager->routeTable);
+        
         $this->dropTable($authManager->itemGroupTable);
 
         parent::down();

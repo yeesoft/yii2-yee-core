@@ -21,7 +21,7 @@ class Html extends \yii\helpers\Html
     public static function a($text, $url = null, $options = [])
     {
         if (Yii::$app->user->isSuperadmin) {
-            //  return parent::a($text, $url, $options);
+            return parent::a($text, $url, $options);
         }
 
         if (is_array($url)) {

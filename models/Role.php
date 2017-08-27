@@ -14,6 +14,15 @@ class Role extends AbstractItem
     const ITEM_TYPE = self::TYPE_ROLE;
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFilters()
+    {
+        return $this->hasMany(Filter::className(), ['id' => 'filter_id'])
+                ->viaTable('{{%auth_item_filter}}', ['item_name' => 'name']);
+    }
+    
+    /**
      * @param int $userId
      *
      * @return array|\yii\rbac\Role[]

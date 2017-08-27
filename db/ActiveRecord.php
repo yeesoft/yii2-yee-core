@@ -2,12 +2,23 @@
 
 namespace yeesoft\db;
 
+use Yii;
+
 /**
  * @inheritdoc
  */
 class ActiveRecord extends \yii\db\ActiveRecord
 {
-    
+
+    /**
+     * @inheritdoc
+     * @return ActiveQuery the newly created [[ActiveQuery]] instance.
+     */
+    public static function find()
+    {
+        return Yii::createObject(ActiveQuery::className(), [get_called_class()]);
+    }
+
     /**
      * Returns TRUE if model support multilingual behavior.
      *
@@ -18,5 +29,5 @@ class ActiveRecord extends \yii\db\ActiveRecord
     {
         return ($this->getBehavior('multilingual') !== NULL);
     }
-    
+
 }
