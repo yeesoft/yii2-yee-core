@@ -8,6 +8,7 @@ use yeesoft\models\Route;
 use yeesoft\helpers\YeeHelper;
 use yeesoft\models\OwnerAccess;
 use yeesoft\rbac\ManagerInterface;
+use yii\helpers\ArrayHelper;
 
 class AccessControl extends \yii\filters\AccessControl
 {
@@ -36,15 +37,8 @@ class AccessControl extends \yii\filters\AccessControl
     {
         parent::attach($owner);
 
-        $routes = Route::findAll(['base_url' => $this->baseUrl]);
-        foreach ($routes as $route) {
-            $this->rules[] = Yii::createObject(array_merge($this->ruleConfig, $route->rule));
-        }
-    }
-    
-    protected function getBaseUrl()
-    {
-        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
+        $rules = Yii::$app->authManager->getRouteRules($this->ruleConfig);
+        $this->rules = ArrayHelper::merge($this->rules, $rules);
     }
 
     /**

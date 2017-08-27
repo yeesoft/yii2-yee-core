@@ -58,7 +58,7 @@ class User extends \yii\web\User
      */
     protected function afterLogin($identity, $cookieBased, $duration)
     {
-        AuthHelper::updatePermissions($identity);
+        //AuthHelper::updatePermissions($identity);
 
         parent::afterLogin($identity, $cookieBased, $duration);
     }
@@ -116,7 +116,7 @@ class User extends \yii\web\User
         //return true;
         
         if ($this->isSuperadmin) {
-            return true;
+           // return true;
         }
         
         return parent::can($permissionName, $params, $allowCaching);

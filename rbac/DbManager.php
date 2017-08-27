@@ -7,6 +7,7 @@ use yii\db\Query;
 use yii\rbac\Item;
 use yii\rbac\Role;
 use yii\rbac\Permission;
+use yeesoft\models\Route;
 use yii\helpers\ArrayHelper;
 
 class DbManager extends \yii\rbac\DbManager implements ManagerInterface
@@ -18,6 +19,11 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     public $freeAccessActions = [];
 
     /**
+     * @var array the default configuration of access rules.
+     */
+    public $ruleConfig = ['class' => 'yeesoft\filters\AccessRule'];
+
+    /**
      * @var string the name of common permission. 
      */
     public $commonPermissionName = 'commonPermission';
@@ -26,23 +32,28 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      * @var string the name of the table storing authorization item groups. Defaults to "auth_item_group".
      */
     public $itemGroupTable = '{{%auth_item_group}}';
-    
+
     /**
      * @var string the name of the table storing authorization routes. Defaults to "auth_route".
      */
     public $routeTable = '{{%auth_route}}';
-    
+
     /**
      * @var string the name of the table storing relations between permissions and routes. Defaults to "auth_item_route".
      */
     public $itemRouteTable = '{{%auth_item_route}}';
+
+    /**
+     * @var array the list of access rules generated from routes settings.
+     */
+    private $_routeRules;
 
     public function init()
     {
         parent::init();
 
         $this->freeAccessActions = ArrayHelper::merge($this->freeAccessActions, [
-            Yii::$app->errorHandler->errorAction,
+                    Yii::$app->errorHandler->errorAction,
         ]);
     }
 
@@ -195,5 +206,51 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
 //
 //        return $routes;
 //    }
+
+
+    public function getRoutes()
+    {
+        Yii::$app->cache->flush();
+
+        return Yii::$app->cache->getOrSet([$this->baseUrl, static::AUTH_ROUTES], function($cache) {
+                    return Route::find()
+                                    ->where(['base_url' => $this->baseUrl])
+                                    ->joinWith(['permissions' => function($query) {
+                                            $query->select(['name'])->where(['type' => Permission::TYPE_PERMISSION]);
+                                        }])->all();
+                });
+    }
+
+    public function flushRouteCache()
+    {
+        $baseUrls = Route::find()->distinct('base_url')->select('base_url')->column();
+        foreach ($baseUrls as $baseUrl) {
+            Yii::$app->cache->delete([trim($baseUrl, ' /'), ManagerInterface::AUTH_ROUTES]);
+        }
+    }
+
+    protected function getBaseUrl()
+    {
+        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
+    }
+
+    public function getRouteRules($ruleConfig = null)
+    {
+        if (!$this->_routeRules) {
+
+            $this->_routeRules = [];
+
+            if (!$ruleConfig) {
+                $ruleConfig = $this->ruleConfig;
+            }
+
+            $routes = $this->getRoutes();
+            foreach ($routes as $route) {
+                $this->_routeRules[] = Yii::createObject(array_merge($ruleConfig, $route->rule));
+            }
+        }
+
+        return $this->_routeRules;
+    }
 
 }

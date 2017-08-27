@@ -2,11 +2,11 @@
 
 namespace yeesoft\models;
 
-use yeesoft\helpers\AuthHelper;
 use Yii;
 use yii\base\Action;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yeesoft\helpers\AuthHelper;
 
 /**
  * This is the model class for table "{{%auth_route}}".
@@ -64,17 +64,9 @@ class Route extends \yeesoft\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAuthItemRoutes()
+    public function getPermissions()
     {
-        return $this->hasMany(AuthItemRoute::className(), ['route_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getItemNames()
-    {
-        return $this->hasMany(AuthItem::className(), ['name' => 'item_name'])->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
+        return $this->hasMany(Permission::className(), ['name' => 'item_name'])->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
     }
 
     public function getName()
@@ -90,8 +82,10 @@ class Route extends \yeesoft\db\ActiveRecord
         if (!empty($this->action)) {
             $rule['actions'] = [$this->action];
         }
-
-        //  $rule['roles'] = ['editPages'];
+        
+        foreach ($this->permissions as $permission) {
+            $rule['roles'][] = $permission->name;
+        }
 
         return $rule;
     }
