@@ -33,14 +33,13 @@ trait ActiveQueryFilterTrait
     public function getFilters($modelClass)
     {
         $user = Yii::$app->user;
-        $filters = Yii::$app->authManager->getFiltersByUserId($user->id);
+        $filters = Yii::$app->authManager->getFiltersByUserId($modelClass, $user->id);
 
         if (!$this->_filters) {
             $this->_filters = [];
             foreach ($filters as $filter) {
                 $this->_filters[] = (new $filter);
             }
-            
         }
 
         return $this->_filters;

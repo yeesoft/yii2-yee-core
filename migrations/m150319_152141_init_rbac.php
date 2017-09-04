@@ -77,6 +77,26 @@ class m150319_152141_init_rbac extends m140506_102106_rbac_init
         $this->addForeignKey('fk_auth_item_filter_item', $authManager->itemFilterTable, 'item_name', $authManager->itemTable, 'name', 'CASCADE', 'CASCADE');
         $this->addForeignKey('fk_auth_item_filter_filter', $authManager->itemFilterTable, 'filter_id', $authManager->filterTable, 'id', 'CASCADE', 'CASCADE');
         
+        $this->createTable($authManager->modelTable, [
+            'id' => $this->primaryKey(),
+            'name' => $this->string(127)->notNull(),
+            'class_name' => $this->string(255)->notNull(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
+        ], $tableOptions);
+               
+        $this->createIndex('idx_uniq_class_name', $authManager->modelTable, ['class_name'], true);
+        
+        $this->createTable($authManager->itemModelTable, [
+            'id' => $this->primaryKey(),
+            'model_id' => $this->integer()->notNull(),
+            'filter_id' => $this->integer()->notNull(),
+        ], $tableOptions);
+        
+        $this->createIndex('idx_auth_model_filter', $authManager->itemModelTable, ['model_id', 'filter_id'], true);
+        $this->addForeignKey('fk_auth_model_filter_model', $authManager->itemModelTable, 'model_id', $authManager->modelTable, 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_auth_model_filter_filter', $authManager->itemModelTable, 'filter_id', $authManager->filterTable, 'id', 'CASCADE', 'CASCADE');
+ 
     }
 
     /**
@@ -87,6 +107,11 @@ class m150319_152141_init_rbac extends m140506_102106_rbac_init
         $authManager = $this->getAuthManager();
         $this->db = $authManager->db;
 
+        $this->dropForeignKey('fk_auth_model_filter_filter', $authManager->itemModelTable);
+        $this->dropForeignKey('fk_auth_model_filter_model', $authManager->itemModelTable);
+        $this->dropTable($authManager->itemModelTable);
+        $this->dropTable($authManager->modelTable);
+        
         $this->dropForeignKey('fk_auth_item_filter_filter', $authManager->itemFilterTable);
         $this->dropForeignKey('fk_auth_item_filter_item', $authManager->itemFilterTable);
         $this->dropTable($authManager->itemFilterTable);

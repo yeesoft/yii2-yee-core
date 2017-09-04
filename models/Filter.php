@@ -60,7 +60,36 @@ class Filter extends \yeesoft\db\ActiveRecord
     public function getRoles()
     {
         return $this->hasMany(Role::className(), ['name' => 'item_name'])
-                ->viaTable('{{%auth_item_filter}}', ['filter_id' => 'id']);
+                        ->viaTable('{{%auth_item_filter}}', ['filter_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getModels()
+    {
+        return $this->hasMany(AuthModel::className(), ['id' => 'model_id'])
+                        ->viaTable('{{%auth_model_filter}}', ['filter_id' => 'id']);
+    }
+
+    public function linkModels($modelIds)
+    {
+        foreach ($modelIds as $modelId) {
+            static::getDb()->createCommand()
+                    ->insert('{{%auth_model_filter}}', [
+                        'filter_id' => $this->id,
+                        'model_id' => $modelId,
+                    ])->execute();
+        }
+    }
+
+    public function unlinkModels($modelIds)
+    {
+        foreach ($modelIds as $modelId) {
+            static::getDb()->createCommand()
+                    ->delete('{{%auth_model_filter}}', ['filter_id' => $this->id, 'model_id' => $modelId])
+                    ->execute();
+        }
     }
 
 }

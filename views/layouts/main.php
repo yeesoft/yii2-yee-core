@@ -53,6 +53,20 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                 background: transparent !important;
             }
             
+            .logo-1, .logo-2 {
+                display: inline-block;
+                font-size: 26px;
+                font-weight: bold;
+            }
+            
+            .logo-1 {
+                color: #4d74b0;
+            }
+            
+            .logo-2 {
+                color: #fff;
+            }
+            
             .logo-block {
                 display: inline-block;
                 height: 22px;
@@ -80,13 +94,19 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
 
             <header class="main-header">
                 <div class="logo">
+                    
                     <a class="logo-title" href="/admin">
+                        <span class="logo-1">yee</span>
+                        <span class="logo-2">cms</span>
+                    </a>
+                    
+<!--                    <a class="logo-title" href="/admin">
                         <span class="logo-block">Y</span>
                         <span class="logo-block">e</span>
                         <span class="logo-block">e</span>
                         
                         CMS
-                    </a>
+                    </a>-->
                     <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>

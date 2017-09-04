@@ -43,6 +43,16 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      * @var string the name of the table storing relations between roles and filters. Defaults to "auth_item_filter".
      */
     public $itemFilterTable = '{{%auth_item_filter}}';
+    
+    /**
+     * @var string the name of the table storing ActiveRecord list. Defaults to "auth_model".
+     */
+    public $modelTable = '{{%auth_model}}';
+
+    /**
+     * @var string the name of the table storing relations between models and filters. Defaults to "auth_model_filter".
+     */
+    public $itemModelTable = '{{%auth_model_filter}}';
 
     /**
      * @var string the name of the table storing authorization routes. Defaults to "auth_route".
@@ -264,27 +274,31 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         return $this->_routeRules;
     }
 
-    public function getFiltersByRole($role)
+    public function getFiltersByRole($modelClass, $role)
     {
-        return Yii::$app->cache->getOrSet([$role, static::CACHE_AUTH_FILTERS], function($cache) use($role) {
+        return Yii::$app->cache->getOrSet([$role, $modelClass, static::CACHE_AUTH_FILTERS], function($cache) use($modelClass, $role) {
                     $filters = [];
-
+                    
                     if ($role = RoleModel::findOne($role)) {
-                        $filters = $role->getFilters()->select('class_name')->column();
+                        $filters = $role->getFilters()
+                                ->joinWith('models')
+                                ->andWhere(['auth_model.class_name' => $modelClass])
+                                ->select('auth_filter.class_name')->column();
+
                     }
                     
                     return $filters;
                 });
     }
 
-    public function getFiltersByUserId($userId)
+    public function getFiltersByUserId($modelClass, $userId)
     {
-        return Yii::$app->cache->getOrSet([$userId, static::CACHE_AUTH_USER_FILTERS], function($cache) use($userId) {
+        return Yii::$app->cache->getOrSet([$userId, $modelClass, static::CACHE_AUTH_USER_FILTERS], function($cache) use($modelClass, $userId) {
                     $filters = [];
                     $roles = array_keys($this->getRolesByUser($userId));
 
                     foreach ($roles as $role) {
-                        $filters = ArrayHelper::merge($filters, $this->getFiltersByRole($role));
+                        $filters = ArrayHelper::merge($filters, $this->getFiltersByRole($modelClass, $role));
                     }
 
                     return $filters;

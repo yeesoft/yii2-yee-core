@@ -15,6 +15,12 @@ abstract class ActiveQueryFilter extends Object
      */
     public function apply(&$query)
     {
+        $tableName = $this->getTableNameFromQuery($query);
+        $query->andWhere($this->getCondition($tableName));
+    }
+
+    protected function getTableNameFromQuery($query)
+    {
         /* @var $modelClass ActiveRecord */
         $modelClass = $query->modelClass;
         $tableName = $modelClass::tableName();
@@ -22,16 +28,16 @@ abstract class ActiveQueryFilter extends Object
         // Looking for the table alias in $query
         if (!empty($query->from)) {
             if ($alias = array_search($tableName, $query->from)) {
-                $tableName = $alias;
-            } else {
-                $rawTableName = Yii::$app->db->schema->getRawTableName($tableName);
-                if ($alias = array_search($rawTableName, $query->from)) {
-                    $tableName = $alias;
-                }
+                return $alias;
+            }
+
+            $rawTableName = Yii::$app->db->schema->getRawTableName($tableName);
+            if ($alias = array_search($rawTableName, $query->from)) {
+                return $alias;
             }
         }
 
-        $query->andWhere($this->getCondition($tableName));
+        return $tableName;
     }
 
     /**
