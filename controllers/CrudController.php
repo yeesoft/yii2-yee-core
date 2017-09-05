@@ -140,19 +140,20 @@ abstract class CrudController extends BaseController
     {
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
-        $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
+        //$restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
 
         if ($searchModel) {
             $searchName = StringHelper::basename($searchModel::className());
             $params = Yii::$app->request->getQueryParams();
 
-            if ($restrictAccess) {
-                $params[$searchName][$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
-            }
+            //if ($restrictAccess) {
+            //    $params[$searchName][$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+            //}
 
             $dataProvider = $searchModel->search($params);
         } else {
-            $restrictParams = ($restrictAccess) ? [$modelClass::getOwnerField() => Yii::$app->user->identity->id] : [];
+            //$restrictParams = ($restrictAccess) ? [$modelClass::getOwnerField() => Yii::$app->user->identity->id] : [];
+            $restrictParams = [];
             $dataProvider = new ActiveDataProvider(['query' => $modelClass::find()->where($restrictParams)]);
         }
 

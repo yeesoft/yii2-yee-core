@@ -48,7 +48,7 @@ class AccessControl extends \yii\filters\AccessControl
      */
     public function beforeAction($action)
     {
-        return true;
+        //return true;
         
         /* @var $auth \yeesoft\rbac\DbManager */
         $user = $this->user;

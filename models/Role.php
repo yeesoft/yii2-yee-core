@@ -19,9 +19,31 @@ class Role extends AbstractItem
     public function getFilters()
     {
         return $this->hasMany(Filter::className(), ['id' => 'filter_id'])
-                ->viaTable('{{%auth_item_filter}}', ['item_name' => 'name']);
+                        ->viaTable('{{%auth_item_filter}}', ['item_name' => 'name']);
     }
-    
+
+    public function linkFilters($filterIds)
+    {
+        foreach ($filterIds as $filterId) {
+            static::getDb()->createCommand()
+                    ->insert('{{%auth_item_filter}}', [
+                        'item_name' => $this->name,
+                        'filter_id' => $filterId,
+                    ])->execute();
+        }
+    }
+
+    public function unlinkFilters($filterIds)
+    {
+        foreach ($filterIds as $filterId) {
+            static::getDb()->createCommand()
+                    ->delete('{{%auth_item_filter}}', [
+                        'item_name' => $this->name,
+                        'filter_id' => $filterId
+                    ])->execute();
+        }
+    }
+
     /**
      * @param int $userId
      *

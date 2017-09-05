@@ -18,10 +18,12 @@ trait ActiveQueryFilterTrait
      */
     public function applyFilters()
     {
+        //TODO: check if is applied already
+        
         /* @var $this ActiveQuery */
         $modelClass = $this->modelClass;
         $filters = $this->getFilters($modelClass);
-
+        
         /* @var $filter \yeesoft\filters\ActiveQueryFilter */
         foreach ($filters as $filter) {
             $filter->apply($this);
