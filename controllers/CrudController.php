@@ -6,13 +6,12 @@ use Yii;
 use yii\web\Cookie;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\helpers\StringHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\base\InvalidConfigException;
+use yii\base\InvalidParamException;
 use yeesoft\db\ActiveRecord;
-use yeesoft\helpers\YeeHelper;
-use yeesoft\models\OwnerAccess;
-use yeesoft\models\User;
+use yeesoft\db\FilterableQuery;
 
 abstract class CrudController extends BaseController
 {
@@ -33,7 +32,7 @@ abstract class CrudController extends BaseController
     public $modelPrimaryKey;
 
     /**
-     * Actions that will be disabled
+     * Actions that will be disabled.
      *
      * List of available actions:
      *
@@ -45,22 +44,13 @@ abstract class CrudController extends BaseController
     public $disabledActions = [];
 
     /**
-     * Opposite to $disabledActions. Every action from AdminDefaultController except those will be disabled
+     * Opposite to $disabledActions. Actions not listed in the array will be disabled.
      *
-     * But if action listed both in $disabledActions and $enableOnlyActions
-     * then it will be disabled
-     *
-     * @var array
-     */
-    public $enableOnlyActions = [];
-
-    /**
-     * List of actions in this controller. Needed fo $enableOnlyActions
+     * Action listed both in $disabledActions and $enabledOnlyActions will be disabled.
      *
      * @var array
      */
-    protected $_implementedActions = ['index', 'view', 'create', 'update', 'delete',
-        'toggle-attribute', 'bulk-activate', 'bulk-deactivate', 'bulk-delete', 'grid-sort', 'grid-page-size'];
+    public $enabledOnlyActions = [];
 
     /**
      * Layout file for admin panel
@@ -133,6 +123,52 @@ abstract class CrudController extends BaseController
     }
 
     /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+        if (parent::beforeAction($action)) {
+
+            if (!empty($this->enabledOnlyActions) && !in_array($action->id, $this->enabledOnlyActions)) {
+                throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+            }
+
+            if (in_array($action->id, $this->disabledActions)) {
+                throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Define redirect page after update, create, delete, etc
+     *
+     * @param string $action
+     * @param ActiveRecord $model
+     *
+     * @return string|array
+     */
+    protected function getRedirectPage($action, $model = null)
+    {
+        switch ($action) {
+            case 'delete':
+                return ['index'];
+                break;
+            case 'update':
+                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
+                break;
+            case 'create':
+                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
+                break;
+            default:
+                return ['index'];
+        }
+    }
+
+    /**
      * Lists all models.
      * @return mixed
      */
@@ -140,21 +176,17 @@ abstract class CrudController extends BaseController
     {
         $modelClass = $this->modelClass;
         $searchModel = $this->modelSearchClass ? new $this->modelSearchClass : null;
-        //$restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
 
         if ($searchModel) {
-            $searchName = StringHelper::basename($searchModel::className());
-            $params = Yii::$app->request->getQueryParams();
-
-            //if ($restrictAccess) {
-            //    $params[$searchName][$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
-            //}
-
-            $dataProvider = $searchModel->search($params);
+            $dataProvider = $searchModel->search(Yii::$app->request->getQueryParams());
         } else {
-            //$restrictParams = ($restrictAccess) ? [$modelClass::getOwnerField() => Yii::$app->user->identity->id] : [];
-            $restrictParams = [];
-            $dataProvider = new ActiveDataProvider(['query' => $modelClass::find()->where($restrictParams)]);
+            $query = $modelClass::find();
+
+            if ($query instanceof FilterableQuery) {
+                $query->applyFilters();
+            }
+
+            $dataProvider = new ActiveDataProvider(['query' => $query]);
         }
 
         return $this->renderIsAjax($this->indexView, compact('dataProvider', 'searchModel'));
@@ -170,7 +202,7 @@ abstract class CrudController extends BaseController
     public function actionView($id)
     {
         return $this->renderIsAjax($this->viewView, [
-                    'model' => $this->findModel($id),
+                    'model' => $this->findModel($id)
         ]);
     }
 
@@ -187,8 +219,6 @@ abstract class CrudController extends BaseController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been created.'));
             return $this->redirect($this->getRedirectPage('create', $model));
-        } else {
-            //print_r($model->getErrors());die;
         }
 
         return $this->renderIsAjax($this->createView, compact('model'));
@@ -239,71 +269,62 @@ abstract class CrudController extends BaseController
      */
     public function actionToggleAttribute($attribute, $id)
     {
-        //TODO: Restrict owner access
         /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
+
+        if (!$model->hasAttribute($attribute)) {
+            throw new InvalidParamException('Model has no attribute with the name "' . $attribute . '"');
+        }
+
         $model->{$attribute} = ($model->{$attribute} == 1) ? 0 : 1;
         $model->save(false);
     }
 
     /**
-     * Activate all selected grid items
+     * Activate all selected grid items.
+     * 
+     * @throws \Exception
      */
     public function actionBulkActivate()
     {
-        if (Yii::$app->request->post('selection')) {
-            $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
-            $where = [$this->modelPrimaryKey => Yii::$app->request->post('selection', [])];
-
-            if ($restrictAccess) {
-                $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+        $selection = Yii::$app->request->post('selection');
+        /* @var $model \yeesoft\db\ActiveRecord */
+        $this->bulkAction($selection, function($model) {
+            if ($model->hasAttribute('status')) {
+                $model->status = 1;
+                $model->save(false);
             }
-
-            $modelClass::updateAll(['status' => 1], $where);
-        }
+        });
     }
 
     /**
-     * Deactivate all selected grid items
+     * Deactivate all selected grid items.
+     * 
+     * @throws \Exception
      */
     public function actionBulkDeactivate()
     {
-        if (Yii::$app->request->post('selection')) {
-            $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
-            $where = [$this->modelPrimaryKey => Yii::$app->request->post('selection', [])];
-
-            if ($restrictAccess) {
-                $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
+        $selection = Yii::$app->request->post('selection');
+        $this->bulkAction($selection, function($model) {
+            if ($model->hasAttribute('status')) {
+                $model->status = 0;
+                $model->save(false);
             }
-
-            $modelClass::updateAll(['status' => 0], $where);
-        }
+        });
     }
 
     /**
-     * Deactivate all selected grid items
+     * Delete all selected grid items.
+     * 
+     * @throws \Exception
      */
     public function actionBulkDelete()
     {
-        if (Yii::$app->request->post('selection')) {
-            $modelClass = $this->modelClass;
-            $restrictAccess = (YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()));
-
-            foreach (Yii::$app->request->post('selection', []) as $id) {
-                $where = [$this->modelPrimaryKey => $id];
-
-                if ($restrictAccess) {
-                    $where[$modelClass::getOwnerField()] = Yii::$app->user->identity->id;
-                }
-
-                $model = $modelClass::findOne($where);
-
-                if ($model)
-                    $model->delete();
-            }
-        }
+        $selection = Yii::$app->request->post('selection');
+        $this->bulkAction($selection, function($model) {
+            /* @var $model \yeesoft\db\ActiveRecord */
+            $model->delete();
+        });
     }
 
     /**
@@ -355,69 +376,61 @@ abstract class CrudController extends BaseController
         $modelClass = $this->modelClass;
         $model = new $modelClass;
 
-        if (method_exists($model, 'isMultilingual') && $model->isMultilingual()) {
+        $query = $modelClass::find()->andWhere([$this->modelPrimaryKey => $id]);
 
-            $query = $modelClass::find();
-            $condition = [$this->modelPrimaryKey => $id];
-            $model = $query->andWhere($condition)->multilingual()->one();
-        } else {
-            $model = $modelClass::findOne($id);
+        if ($model instanceof ActiveRecord && $model->isMultilingual()) {
+            $query->multilingual();
         }
 
-        if ($model !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+        if ($query instanceof FilterableQuery) {
+            $query->applyFilters();
         }
+
+        if ($result = $query->one()) {
+            return $result;
+        }
+
+        throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
     }
 
     /**
-     * Define redirect page after update, create, delete, etc
-     *
-     * @param string $action
-     * @param ActiveRecord $model
-     *
-     * @return string|array
+     * Run bulk action.
+     * 
+     * @param array $selection
+     * @param string $attribute
+     * @param mixed $value
+     * @throws \Exception
      */
-    protected function getRedirectPage($action, $model = null)
+    protected function bulkAction($selection, $action)
     {
+        if (is_array($selection)) {
+            /* @var $modelClass \yeesoft\db\ActiveRecord */
+            $modelClass = $this->modelClass;
 
-        switch ($action) {
-            case 'delete':
-                return ['index'];
-                break;
-            case 'update':
-                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
-                break;
-            case 'create':
-                return ['view', 'id' => $model->{$this->modelPrimaryKey}];
-                break;
-            default:
-                return ['index'];
-        }
-    }
+            /* @var $query \yeesoft\db\ActiveQuery */
+            $query = $modelClass::find()->where([$this->modelPrimaryKey => $selection]);
 
-    /**
-     * @inheritdoc
-     */
-    public function beforeAction($action)
-    {
-        if (parent::beforeAction($action)) {
-
-            if ($this->enableOnlyActions !== []
-                    AND in_array($action->id, $this->_implementedActions)
-                    AND ! in_array($action->id, $this->enableOnlyActions)) {
-                throw new NotFoundHttpException('Page not found');
+            if ($query instanceof FilterableQuery) {
+                $query->applyFilters();
             }
 
-            if (in_array($action->id, $this->disabledActions)) {
-                throw new NotFoundHttpException('Page not found');
+            $models = $query->all();
+            $transaction = Yii::$app->db->beginTransaction();
+
+            try {
+                foreach ($models as $model) {
+                    $action($model);
+                }
+
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
             }
-
-            return true;
         }
-
-        return false;
     }
 
 }

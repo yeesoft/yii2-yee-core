@@ -24,7 +24,7 @@ use yeesoft\multilingual\db\MultilingualLabelsTrait;
  *
  * @property MenuLink[] $menuLinks
  */
-class Menu extends ActiveRecord implements OwnerAccess
+class Menu extends ActiveRecord
 {
 
     use MultilingualLabelsTrait;

@@ -30,7 +30,7 @@ use yeesoft\multilingual\db\MultilingualLabelsTrait;
  *
  * @property Menu $menu
  */
-class MenuLink extends ActiveRecord implements OwnerAccess
+class MenuLink extends ActiveRecord
 {
 
     use MultilingualLabelsTrait;

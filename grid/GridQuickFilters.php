@@ -3,11 +3,10 @@
 namespace yeesoft\grid;
 
 use Yii;
+use yii\helpers\Html;
 use yii\base\Widget;
 use yii\base\InvalidConfigException;
-use yeesoft\helpers\YeeHelper;
-use yeesoft\models\OwnerAccess;
-use yeesoft\models\User;
+use yeesoft\db\FilterableQuery;
 
 class GridQuickFilters extends Widget
 {
@@ -67,16 +66,19 @@ class GridQuickFilters extends Widget
         }
 
         foreach ($this->filters as $label => $filter) {
-            if (($this->showCount)) {
-                if ((YeeHelper::isImplemented($searchModel, OwnerAccess::CLASSNAME) && !User::hasPermission($searchModel::getFullAccessPermission()))) {
-                    $option['filter'][$searchModel::getOwnerField()] = Yii::$app->user->identity->id;
-                }
+            if ($this->showCount) {
 
-                $count = $searchModel::find()->filterWhere($filter)->count();
-                $count = " <b>{$count}</b>";
+                $query = $searchModel::find()->filterWhere($filter);
+                
+                if ($query instanceof FilterableQuery) {
+                    $query->applyFilters();
+                }
+                
+                $count = $query->count();
+                $count = Html::tag('b', $count);
             }
 
-            $label = $label . (isset($count) ? $count : '');
+            $label = $label . (isset($count) ? " {$count}" : '');
             $filter = ($formName) ? [$formName => $filter] : $filter;
             $url = [$this->action] + $filter;
 

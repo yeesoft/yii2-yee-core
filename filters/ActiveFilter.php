@@ -5,7 +5,7 @@ namespace yeesoft\filters;
 use Yii;
 use yii\base\Object;
 
-abstract class ActiveQueryFilter extends Object
+abstract class ActiveFilter extends Object implements ActiveFilterInterface
 {
 
     /**

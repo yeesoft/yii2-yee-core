@@ -27,7 +27,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
      */
     public function isMultilingual()
     {
-        return ($this->getBehavior('multilingual') !== NULL);
+        return ($this->getBehavior('multilingual') !== null);
     }
 
 }

@@ -6,7 +6,6 @@ use Yii;
 use yeesoft\models\User;
 use yeesoft\models\Route;
 use yeesoft\helpers\YeeHelper;
-use yeesoft\models\OwnerAccess;
 use yeesoft\rbac\ManagerInterface;
 use yii\helpers\ArrayHelper;
 
