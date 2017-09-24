@@ -21,7 +21,7 @@ class AuthItemGroup extends \yeesoft\db\ActiveRecord
      */
     public static function tableName()
     {
-        return Yii::$app->yee->auth_item_group_table;
+        return Yii::$app->authManager->itemGroupTable;
     }
 
     /**

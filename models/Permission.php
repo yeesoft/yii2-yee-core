@@ -76,7 +76,7 @@ class Permission extends AbstractItem
             $route = '/' . ltrim($route, '/');
             try {
                 Yii::$app->db->createCommand()
-                        ->insert(Yii::$app->yee->auth_item_child_table, [
+                        ->insert(Yii::$app->authManager->itemChildTable, [
                             'parent' => $permission->name,
                             'child' => $route,
                         ])->execute();

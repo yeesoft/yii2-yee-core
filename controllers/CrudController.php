@@ -290,10 +290,12 @@ abstract class CrudController extends BaseController
         $selection = Yii::$app->request->post('selection');
         /* @var $model \yeesoft\db\ActiveRecord */
         $this->bulkAction($selection, function($model) {
-            if ($model->hasAttribute('status')) {
-                $model->status = 1;
-                $model->save(false);
+            if (!$model->hasAttribute('status')) {
+                throw new InvalidParamException('Model has no attribute with the name "status"');
             }
+
+            $model->status = 1;
+            $model->save(false);
         });
     }
 
@@ -306,10 +308,12 @@ abstract class CrudController extends BaseController
     {
         $selection = Yii::$app->request->post('selection');
         $this->bulkAction($selection, function($model) {
-            if ($model->hasAttribute('status')) {
-                $model->status = 0;
-                $model->save(false);
+            if (!$model->hasAttribute('status')) {
+                throw new InvalidParamException('Model has no attribute with the name "status"');
             }
+
+            $model->status = 0;
+            $model->save(false);
         });
     }
 

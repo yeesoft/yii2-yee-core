@@ -19,14 +19,14 @@ class Role extends AbstractItem
     public function getFilters()
     {
         return $this->hasMany(Filter::className(), ['id' => 'filter_id'])
-                        ->viaTable('{{%auth_item_filter}}', ['item_name' => 'name']);
+                        ->viaTable(Yii::$app->authManager->itemFilterTable, ['item_name' => 'name']);
     }
 
     public function linkFilters($filterIds)
     {
         foreach ($filterIds as $filterId) {
             static::getDb()->createCommand()
-                    ->insert('{{%auth_item_filter}}', [
+                    ->insert(Yii::$app->authManager->itemFilterTable, [
                         'item_name' => $this->name,
                         'filter_id' => $filterId,
                     ])->execute();
@@ -37,7 +37,7 @@ class Role extends AbstractItem
     {
         foreach ($filterIds as $filterId) {
             static::getDb()->createCommand()
-                    ->delete('{{%auth_item_filter}}', [
+                    ->delete(Yii::$app->authManager->itemFilterTable, [
                         'item_name' => $this->name,
                         'filter_id' => $filterId
                     ])->execute();
@@ -123,7 +123,7 @@ class Role extends AbstractItem
 
         try {
             Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->yee->auth_item_child_table, [
+                    ->insert(Yii::$app->authManager->itemChildTable, [
                         'parent' => $role->name,
                         'child' => $permission->name,
                     ])->execute();
@@ -141,7 +141,7 @@ class Role extends AbstractItem
 
             try {
                 Yii::$app->db->createCommand()
-                        ->insert(Yii::$app->yee->auth_item_child_table, [
+                        ->insert(Yii::$app->authManager->itemChildTable, [
                             'parent' => $permission->name,
                             'child' => $route,
                         ])->execute();

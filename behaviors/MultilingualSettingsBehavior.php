@@ -105,7 +105,7 @@ class MultilingualSettingsBehavior extends Behavior
     {
         parent::init();
 
-        $this->languages = Yii::$app->yee->languages;
+        $this->languages = Yii::$app->languages;
         $this->defaultLanguage = Yii::$app->language;
     }
 

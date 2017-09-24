@@ -106,8 +106,8 @@ class Route extends \yeesoft\db\ActiveRecord
             return [];
         }
 
-        $auth_item = Yii::$app->yee->auth_item_table;
-        $auth_item_child = Yii::$app->yee->auth_item_child_table;
+        $auth_item = Yii::$app->authManager->itemTable;
+        $auth_item_child = Yii::$app->authManager->itemChildTable;
 
         $routes = (new Query)
                 ->select(['name'])
@@ -230,45 +230,15 @@ class Route extends \yeesoft\db\ActiveRecord
 
         $systemPages = [
             '/auth/logout',
-            AuthHelper::unifyRoute(Yii::$app->errorHandler->errorAction),
-            AuthHelper::unifyRoute(Yii::$app->user->loginUrl),
+            //Yii::$app->errorHandler->errorAction,
+            Yii::$app->user->loginUrl,
         ];
 
         if (in_array($route, $systemPages)) {
             return true;
         }
 
-        if (static::isInCommonPermission($route)) {
-            return true;
-        }
-
         return false;
-    }
-
-    /**
-     * Check if current route allowed for everyone (in commonPermission routes)
-     *
-     * @param string $currentFullRoute
-     *
-     * @return bool
-     */
-    protected static function isInCommonPermission($currentFullRoute)
-    {
-        $commonRoutes = Yii::$app->cache->get('__commonRoutes');
-
-        if ($commonRoutes === false) {
-            $commonRoutesDB = (new Query())
-                    ->select('child')
-                    ->from(Yii::$app->yee->auth_item_child_table)
-                    ->where(['parent' => Yii::$app->yee->commonPermissionName])
-                    ->column();
-
-            $commonRoutes = Route::withSubRoutes($commonRoutesDB, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name'));
-
-            Yii::$app->cache->set('__commonRoutes', $commonRoutes, 3600);
-        }
-
-        return in_array($currentFullRoute, $commonRoutes);
     }
 
 }

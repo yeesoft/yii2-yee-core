@@ -12,7 +12,7 @@ class MultilingualBehavior extends \yeesoft\multilingual\behaviors\MultilingualB
      */
     public function init()
     {
-        $this->languages = Yii::$app->yee->languages;
+        $this->languages = Yii::$app->languages;
         
         parent::init();
     }

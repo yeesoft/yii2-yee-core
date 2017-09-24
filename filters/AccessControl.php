@@ -3,11 +3,9 @@
 namespace yeesoft\filters;
 
 use Yii;
-use yeesoft\models\User;
-use yeesoft\models\Route;
-use yeesoft\helpers\YeeHelper;
-use yeesoft\rbac\ManagerInterface;
 use yii\helpers\ArrayHelper;
+use yeesoft\models\User;
+use yeesoft\rbac\ManagerInterface;
 
 class AccessControl extends \yii\filters\AccessControl
 {
@@ -24,9 +22,9 @@ class AccessControl extends \yii\filters\AccessControl
     {
         parent::init();
 
-//        if (!Yii::$app->authManager instanceof ManagerInterface) {
-//            throw new \yii\base\InvalidConfigException('`Yii::$app->authManager` must implement `yeesoft\rbac\ManagerInterface`');
-//        }
+        if (!Yii::$app->authManager instanceof ManagerInterface) {
+            throw new \yii\base\InvalidConfigException('`Yii::$app->authManager` must implement `yeesoft\rbac\ManagerInterface`');
+        }
     }
 
     /**
@@ -47,50 +45,28 @@ class AccessControl extends \yii\filters\AccessControl
      */
     public function beforeAction($action)
     {
-        //return true;
-        
         /* @var $auth \yeesoft\rbac\DbManager */
         $user = $this->user;
         $auth = Yii::$app->authManager;
-        $request = Yii::$app->getRequest();
-        $route = '/' . $action->uniqueId;
 
-        //return true;
-//        if ($auth->hasFreeAccess($route, $action)) {
-//            return true;
-//        }
-//
-//        if ($user->isGuest) {
-//            $this->denyAccess($user);
-//        }
-        // If user has been deleted, then destroy session and deny access
-//        if (!$user->isGuest AND $user->identity === null) {
-//            Yii::$app->getSession()->destroy();
-//            $this->denyAccess($user);
-//        }
+        if ($auth->hasFreeAccess($action->uniqueId, $action)) {
+            return true;
+        }
+
+        //If user has been deleted, then destroy session and deny access
+        if (!$user->isGuest AND $user->identity === null) {
+            Yii::$app->getSession()->destroy();
+            $this->denyAccess($user);
+        }
+
+        if ($user->identity AND $user->identity->status != User::STATUS_ACTIVE) {
+            $user->logout();
+            $this->denyAccess($user);
+        }
+
         if ($user->isSuperadmin) {
             //return true;
         }
-//        if ($user->identity AND $user->identity->status != User::STATUS_ACTIVE) {
-//            $user->logout();
-//            Yii::$app->response->redirect(Yii::$app->getHomeUrl());
-//        }
-//
-//        if (User::canRoute($route)) {
-//            $modelId = Yii::$app->getRequest()->getQueryParam('id');
-//            $modelClass = (isset($this->owner->modelClass)) ? $this->owner->modelClass : null;
-//
-//            //Check access for owners
-//            if ($modelClass && YeeHelper::isImplemented($modelClass, OwnerAccess::CLASSNAME) && !User::hasPermission($modelClass::getFullAccessPermission()) && $modelId) {
-//                $model = $modelClass::findOne(['id' => $modelId]);
-//                if ($model && $user->identity->id == $model->{$modelClass::getOwnerField()}) {
-//                    return true;
-//                }
-//            } else {
-//                return true;
-//            }
-//        }
-
 
         return parent::beforeAction($action);
     }

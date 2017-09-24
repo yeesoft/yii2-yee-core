@@ -78,7 +78,7 @@ class UserVisitLog extends ActiveRecord
      */
     public static function tableName()
     {
-        return Yii::$app->yee->user_visit_log_table;
+        return '{{%user_visit_log}}';
     }
 
     /**

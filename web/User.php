@@ -112,9 +112,6 @@ class User extends \yii\web\User
      */
     public function can($permissionName, $params = [], $allowCaching = true)
     {
-      
-        //return true;
-        
         if ($this->isSuperadmin) {
            // return true;
         }

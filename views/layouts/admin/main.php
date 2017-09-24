@@ -1,10 +1,8 @@
 <?php
 
 use backend\assets\AppAsset;
-use yeesoft\assets\MetisMenuAsset;
 use yeesoft\assets\YeeAsset;
 use yeesoft\models\Menu;
-use yeesoft\widgets\LanguageSelector;
 use yeesoft\widgets\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
@@ -15,7 +13,7 @@ use yii\widgets\Breadcrumbs;
 
 AppAsset::register($this);
 $assetBundle = YeeAsset::register($this);
-MetisMenuAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -67,13 +65,13 @@ MetisMenuAsset::register($this);
                     'items' => $menuItems,
                 ]);
 
-                echo LanguageSelector::widget(['display' => 'label', 'view' => 'pills']);
+               // echo LanguageSelector::widget(['display' => 'label', 'view' => 'pills']);
 
                 NavBar::end();
                 ?>
 
                 <!-- SIDEBAR NAV -->
-                <div class="navbar-default sidebar metismenu" role="navigation">
+                <div class="navbar-default sidebar" role="navigation">
                     <?=
                     Nav::widget([
                         'encodeLabels' => false,

@@ -12,8 +12,8 @@ class UrlManager extends \yeesoft\multilingual\web\MultilingualUrlManager
 
     public function init()
     {
-        $this->languages = Yii::$app->yee->languages;
-        $this->languageRedirects = Yii::$app->yee->languageRedirects;
+        $this->languages = Yii::$app->languages;
+        $this->languageRedirects = Yii::$app->languageRedirects;
 
         parent::init();
     }

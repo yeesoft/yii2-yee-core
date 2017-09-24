@@ -27,8 +27,6 @@ trait ActiveFilterTrait
      */
     public function applyFilters()
     {
-
-
         if (!$this->_filterApplied) {
             /* @var $this ActiveQuery */
             $modelClass = $this->modelClass;
@@ -58,7 +56,7 @@ trait ActiveFilterTrait
 
             $this->_filters = [];
             $user = Yii::$app->user;
-            $filters = Yii::$app->authManager->getFiltersByUserId($modelClass, $user->id);
+            $filters = Yii::$app->authManager->getFiltersByUser($modelClass, $user->id);
             
             foreach ($filters as $filter) {
                 $activeFilter = (new $filter);

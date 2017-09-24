@@ -3,13 +3,10 @@
 namespace yeesoft\rbac;
 
 use Yii;
-use yii\db\Query;
-use yii\rbac\Item;
-use yii\rbac\Role;
 use yii\rbac\Permission;
-use yeesoft\models\Route;
-use yeesoft\models\Role as RoleModel;
 use yii\helpers\ArrayHelper;
+use yeesoft\models\Role;
+use yeesoft\models\Route;
 
 class DbManager extends \yii\rbac\DbManager implements ManagerInterface
 {
@@ -25,11 +22,6 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     public $ruleConfig = ['class' => 'yeesoft\filters\AccessRule'];
 
     /**
-     * @var string the name of common permission. 
-     */
-    public $commonPermissionName = 'commonPermission';
-
-    /**
      * @var string the name of the table storing authorization item groups. Defaults to "auth_item_group".
      */
     public $itemGroupTable = '{{%auth_item_group}}';
@@ -43,7 +35,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      * @var string the name of the table storing relations between roles and filters. Defaults to "auth_item_filter".
      */
     public $itemFilterTable = '{{%auth_item_filter}}';
-    
+
     /**
      * @var string the name of the table storing ActiveRecord list. Defaults to "auth_model".
      */
@@ -52,7 +44,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     /**
      * @var string the name of the table storing relations between models and filters. Defaults to "auth_model_filter".
      */
-    public $itemModelTable = '{{%auth_model_filter}}';
+    public $modelFilterTable = '{{%auth_model_filter}}';
 
     /**
      * @var string the name of the table storing authorization routes. Defaults to "auth_route".
@@ -69,6 +61,9 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      */
     private $_routeRules;
 
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         parent::init();
@@ -79,86 +74,6 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
             ]);
         }
     }
-
-//    /**
-//     * @inheritdoc
-//     */
-//    public function createRoute($name)
-//    {
-//        $route = new Route();
-//        $route->name = $name;
-//        return $route;
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getRoute($name)
-//    {
-//        $item = $this->getItem($name);
-//        return $item instanceof Item && $item->type == Route::TYPE_ROUTE ? $item : null;
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getRoutes()
-//    {
-//        return $this->getItems(Route::TYPE_ROUTE);
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getRoutesByUser($userId)
-//    {
-//        if (empty($userId)) {
-//            return [];
-//        }
-//
-//        $permissions = @array_keys($this->getPermissionsByUser($userId));
-//        if (empty($permissions)) {
-//            return [];
-//        }
-//
-//        return $this->getRoutesByItem($permissions);
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getRoutesByRole($roleName)
-//    {
-//        return $this->getRoutesByItem($roleName);
-//    }
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getRoutesByPermission($permissionName)
-//    {
-//        return $this->getRoutesByItem($permissionName);
-//    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCommonPermissions()
-    {
-        if ($this->commonPermissionName) {
-            return $this->getChildren($this->commonPermissionName);
-        }
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-//    public function getCommonRoutes()
-//    {
-//        $commonPermissions = array_keys($this->getCommonPermissions());
-//        return $this->getRoutesByPermission($commonPermissions);
-//    }
 
     /**
      * @inheritdoc
@@ -181,59 +96,15 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
             return true;
         }
 
-//        if (in_array($route, array_keys($this->getCommonRoutes()))) {
-//            return true;
-//        }
-
         return false;
     }
 
     /**
-     * Returns all routes that the specified authorization item (Role or Permission) represents.
-     * @param string|array $itemName the authorization item name or an array of names
-     * @return Route[] all routes that the authorization item represents. The array is indexed by the route names.
+     * @inheritdoc
      */
-//    protected function getRoutesByItem($itemName)
-//    {
-//        $result = [];
-//        $childrenList = $this->getChildrenList();
-//
-//        if (is_string($itemName)) {
-//            $itemName = [$itemName];
-//        } elseif (!is_array($itemName)) {
-//            throw new \yii\base\InvalidParamException('Parameter $itemName must be either a string of an array.');
-//        }
-//
-//        foreach ($itemName as $item) {
-//            if (isset($childrenList[$item])) {
-//                foreach ($childrenList[$item] as $child) {
-//                    $result[$child] = true;
-//                    $this->getChildrenRecursive($child, $childrenList, $result);
-//                }
-//            }
-//        }
-//
-//        if (empty($result)) {
-//            return [];
-//        }
-//
-//        $query = (new Query)->from($this->itemTable)->where([
-//            'type' => Route::TYPE_ROUTE,
-//            'name' => array_keys($result),
-//        ]);
-//
-//        $routes = [];
-//        foreach ($query->all($this->db) as $row) {
-//            $routes[$row['name']] = $this->populateItem($row);
-//        }
-//
-//        return $routes;
-//    }
-
-
     public function getRoutes()
     {
-        return Yii::$app->cache->getOrSet([$this->baseUrl, static::AUTH_ROUTES], function($cache) {
+        return Yii::$app->cache->getOrSet([$this->baseUrl, static::CACHE_AUTH_ROUTES], function($cache) {
                     return Route::find()
                                     ->where(['base_url' => $this->baseUrl])
                                     ->joinWith(['permissions' => function($query) {
@@ -242,19 +113,9 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
                 });
     }
 
-    public function flushRouteCache()
-    {
-        $baseUrls = Route::find()->distinct('base_url')->select('base_url')->column();
-        foreach ($baseUrls as $baseUrl) {
-            Yii::$app->cache->delete([trim($baseUrl, ' /'), ManagerInterface::AUTH_ROUTES]);
-        }
-    }
-
-    protected function getBaseUrl()
-    {
-        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
-    }
-
+    /**
+     * @inheritdoc
+     */
     public function getRouteRules($ruleConfig = null)
     {
         if (!$this->_routeRules) {
@@ -274,24 +135,29 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         return $this->_routeRules;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getFiltersByRole($modelClass, $role)
     {
         return Yii::$app->cache->getOrSet([$role, $modelClass, static::CACHE_AUTH_FILTERS], function($cache) use($modelClass, $role) {
                     $filters = [];
-                    
-                    if ($role = RoleModel::findOne($role)) {
-                        $filters = $role->getFilters()
-                                ->joinWith('models')
-                                ->andWhere(['auth_model.class_name' => $modelClass])
-                                ->select('auth_filter.class_name')->column();
 
+                    if ($role = Role::findOne($role)) {
+                        $filters = $role->getFilters()
+                                        ->joinWith('models')
+                                        ->andWhere(["{$this->modelTable}.class_name" => $modelClass])
+                                        ->select("{$this->filterTable}.class_name")->column();
                     }
-                    
+
                     return $filters;
                 });
     }
 
-    public function getFiltersByUserId($modelClass, $userId)
+    /**
+     * @inheritdoc
+     */
+    public function getFiltersByUser($modelClass, $userId)
     {
         return Yii::$app->cache->getOrSet([$userId, $modelClass, static::CACHE_AUTH_USER_FILTERS], function($cache) use($modelClass, $userId) {
                     $filters = [];
@@ -303,6 +169,25 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
 
                     return $filters;
                 });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function flushRouteCache()
+    {
+        $baseUrls = Route::find()->distinct('base_url')->select('base_url')->column();
+        foreach ($baseUrls as $baseUrl) {
+            Yii::$app->cache->delete([trim($baseUrl, ' /'), static::CACHE_AUTH_ROUTES]);
+        }
+    }
+
+    /**
+     * @return string base URL
+     */
+    protected function getBaseUrl()
+    {
+        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
     }
 
 }

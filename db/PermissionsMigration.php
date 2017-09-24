@@ -2,44 +2,59 @@
 
 namespace yeesoft\db;
 
+use Yii;
+use yii\db\Query;
+use yeesoft\rbac\DbManager;
+
 /**
  * This class helps to create migrations for modules permissions. 
  */
 abstract class PermissionsMigration extends \yii\db\Migration
 {
 
-    const AUTH_ITEM_TABLE = '{{%auth_item}}';
-    const AUTH_ITEM_GROUP_TABLE = '{{%auth_item_group}}';
-    const AUTH_ITEM_CHILD_TABLE = '{{%auth_item_child}}';
-    const ROLE_AUTHOR = 'author';
     const ROLE_ADMIN = 'administrator';
     const ROLE_MODERATOR = 'moderator';
+    const ROLE_AUTHOR = 'author';
     const ROLE_USER = 'user';
+
+    /**
+     * @throws yii\base\InvalidConfigException
+     * @return DbManager
+     */
+    protected function getAuthManager()
+    {
+        $authManager = Yii::$app->getAuthManager();
+        if (!$authManager instanceof DbManager) {
+            throw new InvalidConfigException('You should configure "authManager" component to use database before executing this migration.');
+        }
+        return $authManager;
+    }
 
     public function safeUp()
     {
         $this->beforeUp();
 
+        $authManager = $this->getAuthManager();
         $params = $this->getPermissions();
 
         //Insert new items
         foreach ($params as $group => $permissions) {
-            
+
             //Insert general links
             if (isset($permissions['links'])) {
                 foreach ($permissions['links'] as $link) {
-                    $this->insert(self::AUTH_ITEM_TABLE, ['name' => $link, 'type' => '3', 'created_at' => time(), 'updated_at' => time()]);
+                    $this->insert($authManager->itemTable, ['name' => $link, 'type' => '3', 'created_at' => time(), 'updated_at' => time()]);
                 }
                 unset($permissions['links']);
             }
 
             foreach ($permissions as $code => $permission) {
                 $title = (isset($permission['title'])) ? $permission['title'] : '';
-                $this->insert(self::AUTH_ITEM_TABLE, ['name' => $code, 'group_code' => $group, 'description' => $title, 'type' => '2', 'created_at' => time(), 'updated_at' => time()]);
+                $this->insert($authManager->itemTable, ['name' => $code, 'group_code' => $group, 'description' => $title, 'type' => '2', 'created_at' => time(), 'updated_at' => time()]);
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
-                        $this->insert(self::AUTH_ITEM_TABLE, ['name' => $link, 'type' => '3', 'created_at' => time(), 'updated_at' => time()]);
+                        $this->insert($authManager->itemTable, ['name' => $link, 'type' => '3', 'created_at' => time(), 'updated_at' => time()]);
                     }
                 }
             }
@@ -51,19 +66,19 @@ abstract class PermissionsMigration extends \yii\db\Migration
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
-                        $this->insert(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $code, 'child' => $link]);
+                        $this->insert($authManager->itemChildTable, ['parent' => $code, 'child' => $link]);
                     }
                 }
 
                 if (isset($permission['roles'])) {
                     foreach ($permission['roles'] as $role) {
-                        $this->insert(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $role, 'child' => $code]);
+                        $this->insert($authManager->itemChildTable, ['parent' => $role, 'child' => $code]);
                     }
                 }
 
                 if (isset($permission['childs'])) {
                     foreach ($permission['childs'] as $child) {
-                        $this->insert(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $code, 'child' => $child]);
+                        $this->insert($authManager->itemChildTable, ['parent' => $code, 'child' => $child]);
                     }
                 }
             }
@@ -76,15 +91,16 @@ abstract class PermissionsMigration extends \yii\db\Migration
     {
         $this->beforeDown();
 
+        $authManager = $this->getAuthManager();
         $params = $this->getPermissions();
 
         //Delete Link created items
         foreach ($params as $group => $permissions) {
-            
+
             //Delete general links
             if (isset($permissions['links'])) {
                 foreach ($permissions['links'] as $link) {
-                    $this->delete(self::AUTH_ITEM_TABLE, ['name' => $link, 'type' => '3']);
+                    $this->delete($authManager->itemTable, ['name' => $link, 'type' => '3']);
                 }
                 unset($permissions['links']);
             }
@@ -93,19 +109,19 @@ abstract class PermissionsMigration extends \yii\db\Migration
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
-                        $this->delete(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $code, 'child' => $link]);
+                        $this->delete($authManager->itemChildTable, ['parent' => $code, 'child' => $link]);
                     }
                 }
 
                 if (isset($permission['roles'])) {
                     foreach ($permission['roles'] as $role) {
-                        $this->delete(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $role, 'child' => $code]);
+                        $this->delete($authManager->itemChildTable, ['parent' => $role, 'child' => $code]);
                     }
                 }
 
                 if (isset($permission['childs'])) {
                     foreach ($permission['childs'] as $child) {
-                        $this->delete(self::AUTH_ITEM_CHILD_TABLE, ['parent' => $code, 'child' => $child]);
+                        $this->delete($authManager->itemChildTable, ['parent' => $code, 'child' => $child]);
                     }
                 }
             }
@@ -114,11 +130,11 @@ abstract class PermissionsMigration extends \yii\db\Migration
         //Delete created items
         foreach ($params as $group => $permissions) {
             foreach ($permissions as $code => $permission) {
-                $this->delete(self::AUTH_ITEM_TABLE, ['name' => $code, 'group_code' => $group]);
+                $this->delete($authManager->itemTable, ['name' => $code, 'group_code' => $group]);
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
-                        $this->delete(self::AUTH_ITEM_TABLE, ['name' => $link, 'type' => '3']);
+                        $this->delete($authManager->itemTable, ['name' => $link, 'type' => '3']);
                     }
                 }
             }
@@ -209,7 +225,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function addPermissionsGroup($code, $name)
     {
-        $this->insert(self::AUTH_ITEM_GROUP_TABLE, ['code' => $code, 'name' => $name, 'created_at' => time(), 'updated_at' => time()]);
+        $this->insert($this->getAuthManager()->itemGroupTable, ['code' => $code, 'name' => $name, 'created_at' => time(), 'updated_at' => time()]);
     }
 
     /**
@@ -217,9 +233,9 @@ abstract class PermissionsMigration extends \yii\db\Migration
      * 
      * @param string $code
      */
-    public function deletePermissionsGroup($code)
+    public function removePermissionsGroup($code)
     {
-        $this->delete(self::AUTH_ITEM_GROUP_TABLE, ['code' => $code]);
+        $this->delete($this->getAuthManager()->itemGroupTable, ['code' => $code]);
     }
 
     /**
@@ -230,7 +246,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function addRole($name, $description)
     {
-        $this->insert(self::AUTH_ITEM_TABLE, ['name' => $name, 'type' => '1', 'description' => $description, 'created_at' => time(), 'updated_at' => time()]);
+        $this->insert($this->getAuthManager()->itemTable, ['name' => $name, 'type' => '1', 'description' => $description, 'created_at' => time(), 'updated_at' => time()]);
     }
 
     /**
@@ -238,9 +254,105 @@ abstract class PermissionsMigration extends \yii\db\Migration
      * 
      * @param string $name
      */
-    public function deleteRole($name)
+    public function removeRole($name)
     {
-        $this->delete(self::AUTH_ITEM_TABLE, ['name' => $name, 'type' => '1']);
+        $this->delete($this->getAuthManager()->itemTable, ['name' => $name, 'type' => '1']);
+    }
+
+    /**
+     * Link child auth item to parent.
+     * 
+     * @param string $parent
+     * @param string|array $child
+     */
+    public function addChild($parent, $children)
+    {
+        if (!is_array($children)) {
+            $children = [$children];
+        }
+
+        foreach ($children as $child) {
+            $this->insert($this->getAuthManager()->itemChildTable, ['parent' => $parent, 'child' => $child]);
+        }
+    }
+
+    /**
+     * Unlink child auth item from parent record.
+     * 
+     * @param string $parent
+     * @param string $child
+     */
+    public function removeChild($parent, $child)
+    {
+        $this->delete($this->getAuthManager()->itemChildTable, ['parent' => $parent, 'child' => $child]);
+    }
+
+    public function addRule($name, $className)
+    {
+        $rule = new $className;
+        $this->insert($this->getAuthManager()->ruleTable, ['name' => $name, 'class_name' => $className, 'data' => serialize($rule), 'created_at' => time(), 'updated_at' => time()]);
+    }
+
+    public function removeRule($name)
+    {
+        $this->delete($this->getAuthManager()->ruleTable, ['name' => $name]);
+    }
+
+    public function addModel($name, $className)
+    {
+        $this->insert($this->getAuthManager()->modelTable, ['name' => $name, 'class_name' => $className, 'created_at' => time(), 'updated_at' => time()]);
+    }
+
+    public function removeModel($name)
+    {
+        $this->delete($this->getAuthManager()->modelTable, ['name' => $name]);
+    }
+
+    public function addFilter($name, $className)
+    {
+        $this->insert($this->getAuthManager()->filterTable, ['name' => $name, 'class_name' => $className, 'created_at' => time(), 'updated_at' => time()]);
+    }
+
+    public function removeFilter($name)
+    {
+        $this->delete($this->getAuthManager()->filterTable, ['name' => $name]);
+    }
+
+    public function addFilterToModel($filters, $models)
+    {
+        $filterIds = (new Query())->select(['id'])
+                ->from($this->getAuthManager()->filterTable)
+                ->where(['name' => (!is_array($filters)) ? [$filters] : $filters])
+                ->column();
+
+        $modelIds = (new Query())->select(['id'])
+                ->from($this->getAuthManager()->modelTable)
+                ->where(['name' => (!is_array($models)) ? [$models] : $models])
+                ->column();
+
+        foreach ($modelIds as $modelId) {
+            foreach ($filterIds as $filterId) {
+                $this->insert($this->getAuthManager()->modelFilterTable, ['model_id' => $modelId, 'filter_id' => $filterId]);
+            }
+        }
+    }
+    
+    public function addFilterToRole($filters, $roles)
+    {
+        if(!is_array($roles)){
+            $roles = [$roles];
+        }
+        
+        $filterIds = (new Query())->select(['id'])
+                ->from($this->getAuthManager()->filterTable)
+                ->where(['name' => (!is_array($filters)) ? [$filters] : $filters])
+                ->column();
+
+        foreach ($roles as $role) {
+            foreach ($filterIds as $filterId) {
+                $this->insert($this->getAuthManager()->modelFilterTable, ['item_name' => $role, 'filter_id' => $filterId]);
+            }
+        }
     }
 
 }

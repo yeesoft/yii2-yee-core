@@ -57,7 +57,7 @@ class User extends UserIdentity
      */
     public static function tableName()
     {
-        return Yii::$app->yee->user_table;
+        return '{{%user}}';
     }
 
     /**
@@ -78,8 +78,8 @@ class User extends UserIdentity
         return [
             [['username', 'email'], 'required'],
             ['username', 'unique'],
-            ['username', 'match', 'pattern' => Yii::$app->yee->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
-            ['username', 'match', 'not' => true, 'pattern' => Yii::$app->yee->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
+            ['username', 'match', 'pattern' => Yii::$app->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
+            ['username', 'match', 'not' => true, 'pattern' => Yii::$app->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
             [['username', 'email', 'bind_to_ip'], 'trim'],
             [['status', 'email_confirmed'], 'integer'],
             ['email', 'email'],
@@ -141,7 +141,7 @@ class User extends UserIdentity
     {
         try {
             Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->yee->auth_assignment_table, [
+                    ->insert(Yii::$app->authManager->assignmentTable, [
                         'user_id' => $userId,
                         'item_name' => $roleName,
                         'created_at' => time(),
@@ -181,7 +181,7 @@ class User extends UserIdentity
     public static function revokeRole($userId, $roleName)
     {
         $result = Yii::$app->db->createCommand()
-                        ->delete(Yii::$app->yee->auth_assignment_table, ['user_id' => $userId, 'item_name' => $roleName])
+                        ->delete(Yii::$app->authManager->assignmentTable, ['user_id' => $userId, 'item_name' => $roleName])
                         ->execute() > 0;
 
         if ($result) {
@@ -389,7 +389,7 @@ class User extends UserIdentity
     public function getRoles()
     {
         return $this->hasMany(Role::className(), ['name' => 'item_name'])
-                        ->viaTable(Yii::$app->yee->auth_assignment_table, ['user_id' => 'id']);
+                        ->viaTable(Yii::$app->authManager->assignmentTable, ['user_id' => 'id']);
     }
 
     /**
