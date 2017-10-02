@@ -10,28 +10,146 @@ use yii\helpers\Inflector;
 use yii\rbac\DbManager;
 
 /**
- * @property integer $type
+ * This is the model class for table "auth_item".
+ *
  * @property string $name
+ * @property integer $type
  * @property string $description
- * @property string $group_code
  * @property string $rule_name
- * @property string $data
+ * @property resource $data
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property AuthItemGroup $group
+ * @property AuthRule $rule
+ * @property AuthItem[] $children
+ * @property AuthItem[] $parents
+ * @property AuthFilter[] $filters
+ * @property AuthGroup[] $groups
+ * @property AuthRoute[] $routes
  */
-abstract class AbstractItem extends ActiveRecord
+abstract class AuthItem extends ActiveRecord
 {
 
     const TYPE_ROLE = 1;
     const TYPE_PERMISSION = 2;
-    const TYPE_ROUTE = 3;
 
     /**
      * Reassigned in child classes to type role, permission or route
      */
     const ITEM_TYPE = 0;
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return Yii::$app->authManager->itemTable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['name'], 'required'],
+            [['type', 'created_at', 'updated_at'], 'integer'],
+            [['description', 'data'], 'string'],
+            [['name', 'rule_name'], 'string', 'max' => 64],
+            [['rule_name'], 'exist', 'skipOnError' => true, 'targetClass' => AuthRule::className(), 'targetAttribute' => ['rule_name' => 'name']],
+            [['name', 'rule_name', 'description'], 'trim'],
+            ['name', 'validateUniqueName'],
+            ['type', 'in', 'range' => [static::TYPE_ROLE, static::TYPE_PERMISSION]],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'name' => 'Name',
+            'type' => 'Type',
+            'description' => 'Description',
+            'rule_name' => 'Rule Name',
+            'data' => 'Data',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     * @return ActiveQuery the newly created [[ActiveQuery]] instance.
+     */
+    public static function find()
+    {
+        return parent::find()->andWhere([Yii::$app->authManager->itemTable . '.type' => static::ITEM_TYPE]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRule()
+    {
+        return $this->hasOne(AuthRule::className(), ['name' => 'rule_name']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildren()
+    {
+        return $this->hasMany(AuthItem::className(), ['name' => 'child'])
+                        ->viaTable('auth_item_child', ['parent' => 'name']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParents()
+    {
+        return $this->hasMany(AuthItem::className(), ['name' => 'parent'])
+                        ->viaTable('auth_item_child', ['child' => 'name']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFilters()
+    {
+        return $this->hasMany(AuthFilter::className(), ['name' => 'filter_name'])
+                        ->viaTable('auth_item_filter', ['item_name' => 'name']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroups()
+    {
+        return $this->hasMany(AuthGroup::className(), ['name' => 'group_name'])
+                        ->viaTable('auth_item_group', ['item_name' => 'name']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoutes()
+    {
+        return $this->hasMany(AuthRoute::className(), ['id' => 'route_id'])
+                        ->viaTable('auth_item_route', ['item_name' => 'name']);
+    }
 
     /**
      * Useful helper for migrations and other stuff
@@ -45,7 +163,7 @@ abstract class AbstractItem extends ActiveRecord
      *
      * @return static
      */
-    public static function create($name, $description = null, $groupCode = null, $ruleName = null, $data = null)
+    public static function create($name, $description = null, $ruleName = null, $data = null)
     {
         $item = new static;
 
@@ -53,7 +171,6 @@ abstract class AbstractItem extends ActiveRecord
         $item->name = $name;
         $item->description = ($description === null AND static::ITEM_TYPE != static::TYPE_ROUTE) ? Inflector::titleize($name) : $description;
         $item->rule_name = $ruleName;
-        $item->group_code = $groupCode;
         $item->data = $data;
 
         $item->save();
@@ -85,8 +202,8 @@ abstract class AbstractItem extends ActiveRecord
                 $dbManager->addChild($parent, $child);
             } catch (\Exception $e) {
                 //if ($throwException) {
-                    throw $e;
-               // }
+                throw $e;
+                // }
             }
         }
 
@@ -129,86 +246,16 @@ abstract class AbstractItem extends ActiveRecord
     }
 
     /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            TimestampBehavior::className(),
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function tableName()
-    {
-        return Yii::$app->authManager->itemTable;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['name', 'rule_name', 'description', 'group_code'], 'trim'],
-            ['description', 'required', 'on' => 'webInput'],
-            ['description', 'string', 'max' => 255],
-            ['name', 'required'],
-            ['name', 'validateUniqueName'],
-            [['name', 'rule_name', 'group_code'], 'string', 'max' => 64],
-            [['rule_name', 'description', 'group_code', 'data'], 'default', 'value' => null],
-            ['type', 'integer'],
-            ['type', 'in', 'range' => [static::TYPE_ROLE, static::TYPE_PERMISSION, static::TYPE_ROUTE]],
-        ];
-    }
-
-    /**
      * Default unique validator search only within specific class (Role, Route or Permission) because of the overwritten find() method
      */
     public function validateUniqueName($attribute)
     {
-        if ($this->$attribute !== $this->getOldAttribute($attribute) && Role::find()->where(['name' => $this->$attribute])->exists()) {
+        if ($this->$attribute !== $this->getOldAttribute($attribute) && AuthRole::find()->where(['name' => $this->$attribute])->exists()) {
             $this->addError('name', Yii::t('yii', '{attribute} "{value}" has already been taken.', [
                         'attribute' => $this->getAttributeLabel($attribute),
                         'value' => $this->$attribute,
             ]));
         }
-    }
-
-    /**
-     * @inheritdoc
-     * @return ActiveQuery the newly created [[ActiveQuery]] instance.
-     */
-    public static function find()
-    {
-        return parent::find()->andWhere([Yii::$app->authManager->itemTable . '.type' => static::ITEM_TYPE]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'name' => Yii::t('yee', 'Code'),
-            'description' => Yii::t('yee', 'Role'),
-            'rule_name' => Yii::t('yee', 'Rule'),
-            'group_code' => Yii::t('yee', 'Group'),
-            'data' => Yii::t('yee', 'Data'),
-            'type' => Yii::t('yee', 'Type'),
-            'created_at' => Yii::t('yee', 'Created'),
-            'updated_at' => Yii::t('yee', 'Updated'),
-        ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGroup()
-    {
-        return $this->hasOne(AuthItemGroup::className(), ['code' => 'group_code']);
     }
 
     /**

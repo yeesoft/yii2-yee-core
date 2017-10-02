@@ -2,11 +2,15 @@
 
 use yeesoft\db\PermissionsMigration;
 
-class m150821_140141_add_core_permissions extends PermissionsMigration
+class m150821_140142_add_core_permissions extends PermissionsMigration
 {
 
-    public function beforeUp()
+    public function safeUp()
     {
+        $this->createPermissions($this->getPermissions());
+
+        die;
+
         $this->addRole(self::ROLE_USER, 'User');
 
         $this->addRole(self::ROLE_AUTHOR, 'Author');
@@ -21,20 +25,18 @@ class m150821_140141_add_core_permissions extends PermissionsMigration
         $this->addPermissionsGroup('Dashboard', 'Dashboard');
         $this->addPermissionsGroup('UserCommonPermissions', 'Common Permissions');
 
-        $this->addRule('AuthorRule', 'yeesoft\rbac\AuthorRule');
+        $this->addRule('AuthorRule', yeesoft\rbac\AuthorRule::class);
 
-        $this->addModel('Page', 'yeesoft\page\models\Page');
-        $this->addModel('Post', 'yeesoft\post\models\Post');
+        $this->addModel('Page', yeesoft\page\models\Page::class);
+        $this->addModel('Post', yeesoft\post\models\Post::class);
 
-        $this->addFilter('AuthorFilter', 'yeesoft\filters\AuthorFilter');
-        
+        $this->addFilter('AuthorFilter', yeesoft\filters\AuthorFilter::class);
+
         $this->addFilterToModel('AuthorFilter', ['Page', 'Post']);
         //add remove method
-        
+
         $this->addFilterToRole('AuthorFilter', [self::ROLE_USER, self::ROLE_AUTHOR]);
         //add remove method
-        
-        
         //add permission
         //add child permission
         //add rule to permision
@@ -63,29 +65,17 @@ class m150821_140141_add_core_permissions extends PermissionsMigration
     public function getPermissions()
     {
         return [
-            'dashboard' => [
-                'links' => [
-                    '/admin/*',
-                    '/admin/default/*',
-                ],
-                'viewDashboard' => [
-                    'title' => 'View Dashboard',
+            'page-management' => [
+                'edit-pages' => [
+                    'title' => 'View Pages',
+                    'rule' => 'isAuthor',
+                    'child' => ['view-pages'],
                     'roles' => [self::ROLE_AUTHOR],
-                    'links' => [
-                        '/admin',
-                        '/admin/site/index',
+                    'routes' => [
+                        ['bundle' => self::ADMIN_BUNDLE, 'controller' => 'page/default_', 'action' => 'index'],
                     ],
                 ],
-            ],
-            'userCommonPermissions' => [
-                'commonPermission' => [
-                    'title' => 'Common Permission',
-                    'roles' => [self::ROLE_USER],
-                ],
-                'changeOwnPassword' => [
-                    'title' => 'Change Own Password',
-                    'roles' => [self::ROLE_USER],
-                ],
+            //'view-dashboard' => []
             ],
         ];
     }

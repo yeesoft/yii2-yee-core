@@ -5,8 +5,8 @@ namespace yeesoft\rbac;
 use Yii;
 use yii\rbac\Permission;
 use yii\helpers\ArrayHelper;
-use yeesoft\models\Role;
-use yeesoft\models\Route;
+use yeesoft\models\AuthRole;
+use yeesoft\models\AuthRoute;
 
 class DbManager extends \yii\rbac\DbManager implements ManagerInterface
 {
@@ -22,7 +22,12 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     public $ruleConfig = ['class' => 'yeesoft\filters\AccessRule'];
 
     /**
-     * @var string the name of the table storing authorization item groups. Defaults to "auth_item_group".
+     * @var string the name of the table storing permission groups. Defaults to "auth_group".
+     */
+    public $groupTable = '{{%auth_group}}';
+    
+    /**
+     * @var string the name of the table storing relations between permissions and permission groups. Defaults to "auth_item_group".
      */
     public $itemGroupTable = '{{%auth_item_group}}';
 
@@ -105,8 +110,8 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     public function getRoutes()
     {
         return Yii::$app->cache->getOrSet([$this->baseUrl, static::CACHE_AUTH_ROUTES], function($cache) {
-                    return Route::find()
-                                    ->where(['base_url' => $this->baseUrl])
+                    return AuthRoute::find()
+                                    ->where(['bundle' => $this->baseUrl])
                                     ->joinWith(['permissions' => function($query) {
                                             $query->select(['name'])->where(['type' => Permission::TYPE_PERMISSION]);
                                         }])->all();
@@ -143,7 +148,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         return Yii::$app->cache->getOrSet([$role, $modelClass, static::CACHE_AUTH_FILTERS], function($cache) use($modelClass, $role) {
                     $filters = [];
 
-                    if ($role = Role::findOne($role)) {
+                    if ($role = AuthRole::findOne($role)) {
                         $filters = $role->getFilters()
                                         ->joinWith('models')
                                         ->andWhere(["{$this->modelTable}.class_name" => $modelClass])
@@ -176,9 +181,9 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      */
     public function flushRouteCache()
     {
-        $baseUrls = Route::find()->distinct('base_url')->select('base_url')->column();
-        foreach ($baseUrls as $baseUrl) {
-            Yii::$app->cache->delete([trim($baseUrl, ' /'), static::CACHE_AUTH_ROUTES]);
+        $bundles = AuthRoute::find()->distinct('bundle')->select('bundle')->column();
+        foreach ($bundles as $bundle) {
+            Yii::$app->cache->delete([trim($bundle, ' /'), static::CACHE_AUTH_ROUTES]);
         }
     }
 

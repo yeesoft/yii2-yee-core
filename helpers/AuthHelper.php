@@ -2,10 +2,10 @@
 
 namespace yeesoft\helpers;
 
-use yeesoft\models\AbstractItem;
-use yeesoft\models\Permission;
-use yeesoft\models\Role;
-use yeesoft\models\Route;
+use yeesoft\models\AuthItem;
+use yeesoft\models\AuthPermission;
+use yeesoft\models\AuthRole;
+use yeesoft\models\AuthRoute;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\helpers\Inflector;
@@ -39,7 +39,7 @@ class AuthHelper
 
         // Save roles, permissions and routes in session
         $session->set(self::SESSION_PREFIX_ROLES,
-            array_keys(Role::getUserRoles($identity->id)));
+            array_keys(AuthRole::getUserRoles($identity->id)));
         $session->set(self::SESSION_PREFIX_PERMISSIONS,
             array_keys(Permission::getUserPermissions($identity->id)));
         $session->set(self::SESSION_PREFIX_ROUTES,
@@ -173,7 +173,7 @@ class AuthHelper
         $permissions = [];
 
         foreach ($arrayOfPermissions as $id => $item) {
-            if ($item->type == AbstractItem::TYPE_ROUTE) {
+            if ($item->type == AuthItem::TYPE_ROUTE) {
                 $routes[$id] = $item;
             } else {
                 $permissions[$id] = $item;

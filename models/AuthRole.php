@@ -8,7 +8,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rbac\DbManager;
 
-class Role extends AbstractItem
+class AuthRole extends AuthItem
 {
 
     const ITEM_TYPE = self::TYPE_ROLE;
@@ -98,12 +98,12 @@ class Role extends AbstractItem
      * @param string $permissionName
      * @param array $routes
      * @param null|string $permissionDescription
-     * @param null|string $groupCode
+     * @param null|string $groupName
      *
      * @throws \InvalidArgumentException
      * @return true|static|string
      */
-    public static function assignRoutesViaPermission($roleName, $permissionName, $routes, $permissionDescription = null, $groupCode = null)
+    public static function assignRoutesViaPermission($roleName, $permissionName, $routes, $permissionDescription = null, $groupName = null)
     {
         $role = static::findOne(['name' => $roleName]);
 
@@ -114,7 +114,7 @@ class Role extends AbstractItem
         $permission = Permission::findOne(['name' => $permissionName]);
 
         if (!$permission) {
-            $permission = Permission::create($permissionName, $permissionDescription, $groupCode);
+            $permission = Permission::create($permissionName, $permissionDescription, $groupName);
 
             if ($permission->hasErrors()) {
                 return $permission;

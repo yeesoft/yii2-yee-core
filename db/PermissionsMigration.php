@@ -3,8 +3,15 @@
 namespace yeesoft\db;
 
 use Yii;
+use Exception;
 use yii\db\Query;
+use yii\rbac\Role as RoleItem;
+use yii\rbac\Permission as PermissionItem;
 use yeesoft\rbac\DbManager;
+use yeesoft\models\AuthRole;
+use yeesoft\models\AuthGroup;
+use yeesoft\models\AuthRoute;
+use yeesoft\models\AuthPermission;
 
 /**
  * This class helps to create migrations for modules permissions. 
@@ -12,6 +19,9 @@ use yeesoft\rbac\DbManager;
 abstract class PermissionsMigration extends \yii\db\Migration
 {
 
+    const ADMIN_BUNDLE = 'admin';
+    const SITE_BUNDLE = '';
+    const API_BUNDLE = 'api';
     const ROLE_ADMIN = 'administrator';
     const ROLE_MODERATOR = 'moderator';
     const ROLE_AUTHOR = 'author';
@@ -30,13 +40,66 @@ abstract class PermissionsMigration extends \yii\db\Migration
         return $authManager;
     }
 
-    public function safeUp()
+    public function createPermissions($params)
     {
-        $this->beforeUp();
-
         $authManager = $this->getAuthManager();
-        $params = $this->getPermissions();
 
+        //$this->validatePermissionGroupNames(array_keys($params));
+
+        foreach ($params as $groupName => $permissions) {
+
+            //$this->validatePermissionNames(array_keys($permissions));
+
+            foreach ($permissions as $permissionName => $permission) {
+
+                if (!isset($permission['title'])) {
+                    throw new Exception('Permission title is required.');
+                }
+
+                if (isset($permission['routes'])) {
+                    foreach ($permission['routes'] as $route) {
+                        if (!isset($route['bundle']) || !isset($route['controller'])) {
+                            throw new Exception('Bundle and controller are required for the route.');
+                        }
+                        $this->addRoute($route['bundle'], $route['controller'], isset($route['action']) ? $route['action'] : null);
+                    }
+                }
+
+                $this->addPermission($permissionName, $groupName, $permission['title'], isset($permission['rule']) ? $permission['rule'] : null);
+
+                if (isset($permission['routes'])) {
+                    foreach ($permission['routes'] as $route) {
+                        $this->addRouteToPermission($permissionName, $route['bundle'], $route['controller'], isset($route['action']) ? $route['action'] : null);
+                    }
+                }
+
+                if (isset($permission['rule'])) {
+                    $this->setPermissionRule($permissionName, $permission['rule']);
+                }
+
+                if (isset($permission['child'])) {
+                    $this->addChild($permissionName, $permission['child']);
+                }
+            }
+        }
+
+
+
+        die;
+
+
+
+//            'group' => [
+//                'permission' => [
+//                    'title' => 'View Dashboard',
+//                    'child' => ['childPermission'],
+//                    'roles' => [self::ROLE_AUTHOR],
+//                    'rules' => ['authorRule'],
+//                    'routes' => [
+//                        ['base' => 'admin', 'controller' => 'site/default', 'action' => 'index'],
+//                     ],
+//                ],
+//            ],
         //Insert new items
         foreach ($params as $group => $permissions) {
 
@@ -50,7 +113,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
 
             foreach ($permissions as $code => $permission) {
                 $title = (isset($permission['title'])) ? $permission['title'] : '';
-                $this->insert($authManager->itemTable, ['name' => $code, 'group_code' => $group, 'description' => $title, 'type' => '2', 'created_at' => time(), 'updated_at' => time()]);
+                $this->insert($authManager->itemTable, ['name' => $code, 'group_name' => $group, 'description' => $title, 'type' => '2', 'created_at' => time(), 'updated_at' => time()]);
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
@@ -87,7 +150,35 @@ abstract class PermissionsMigration extends \yii\db\Migration
         $this->afterUp();
     }
 
-    public function safeDown()
+    private function validatePermissionGroupNames($groups)
+    {
+        $current = AuthGroup::find()->select('name')->column();
+        $diff = array_diff($groups, $current);
+
+        if (!empty($diff)) {
+            $names = '"' . implode('", "', $diff) . '"';
+            $message = (count($diff) == 1) ? 'Permission group with name ' . $names . ' does not exist.' : 'Permission groups with name ' . $names . ' do not exist.';
+            throw new Exception($message);
+        }
+
+        return true;
+    }
+
+    private function validatePermissionNames($permissions)
+    {
+        $current = AuthPermission::find()->select('name')->column();
+        $intersect = array_intersect($current, $permissions);
+
+        if (!empty($intersect)) {
+            $names = '"' . implode('", "', $intersect) . '"';
+            $message = (count($intersect) == 1) ? 'Permission with name ' . $names . ' already exists.' : 'Permissions with name ' . $names . ' already exist.';
+            throw new Exception($message);
+        }
+
+        return true;
+    }
+
+    public function removePermissions()
     {
         $this->beforeDown();
 
@@ -130,7 +221,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
         //Delete created items
         foreach ($params as $group => $permissions) {
             foreach ($permissions as $code => $permission) {
-                $this->delete($authManager->itemTable, ['name' => $code, 'group_code' => $group]);
+                $this->delete($authManager->itemTable, ['name' => $code, 'group_name' => $group]);
 
                 if (isset($permission['links'])) {
                     foreach ($permission['links'] as $link) {
@@ -175,47 +266,47 @@ abstract class PermissionsMigration extends \yii\db\Migration
      * ]
      * ```
      */
-    abstract public function getPermissions();
+    //abstract public function getPermissions();
 
     /**
      * Executes before up method.
      * 
      * @return mixed
      */
-    public function beforeUp()
-    {
-        return;
-    }
+//    public function beforeUp()
+//    {
+//        return;
+//    }
 
     /**
      * Executes after up method.
      * 
      * @return mixed
      */
-    public function afterUp()
-    {
-        return;
-    }
+//    public function afterUp()
+//    {
+//        return;
+//    }
 
     /**
      * Executes before down method.
      * 
      * @return mixed
      */
-    public function beforeDown()
-    {
-        return;
-    }
+//    public function beforeDown()
+//    {
+//        return;
+//    }
 
     /**
      * Executes after down method.
      * 
      * @return mixed
      */
-    public function afterDown()
-    {
-        return;
-    }
+//    public function afterDown()
+//    {
+//        return;
+//    }
 
     /**
      * Creates new permissions group.
@@ -225,7 +316,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function addPermissionsGroup($code, $name)
     {
-        $this->insert($this->getAuthManager()->itemGroupTable, ['code' => $code, 'name' => $name, 'created_at' => time(), 'updated_at' => time()]);
+        $this->insert($this->getAuthManager()->groupTable, ['code' => $code, 'name' => $name, 'created_at' => time(), 'updated_at' => time()]);
     }
 
     /**
@@ -235,7 +326,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function removePermissionsGroup($code)
     {
-        $this->delete($this->getAuthManager()->itemGroupTable, ['code' => $code]);
+        $this->delete($this->getAuthManager()->groupTable, ['code' => $code]);
     }
 
     /**
@@ -246,7 +337,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function addRole($name, $description)
     {
-        $this->insert($this->getAuthManager()->itemTable, ['name' => $name, 'type' => '1', 'description' => $description, 'created_at' => time(), 'updated_at' => time()]);
+        $this->insert($this->getAuthManager()->itemTable, ['name' => $name, 'type' => AuthRole::ITEM_TYPE, 'description' => $description, 'created_at' => time(), 'updated_at' => time()]);
     }
 
     /**
@@ -256,24 +347,66 @@ abstract class PermissionsMigration extends \yii\db\Migration
      */
     public function removeRole($name)
     {
-        $this->delete($this->getAuthManager()->itemTable, ['name' => $name, 'type' => '1']);
+        $this->delete($this->getAuthManager()->itemTable, ['name' => $name, 'type' => AuthRole::ITEM_TYPE]);
     }
 
     /**
-     * Link child auth item to parent.
+     * Creates new permission.
+     * 
+     * @param string $name
+     * @param string $description
+     */
+    public function addPermission($name, $group, $description, $rule = null)
+    {
+        $this->insert($this->getAuthManager()->itemTable, ['name' => $name, 'type' => AuthPermission::ITEM_TYPE, 'description' => $description, 'group_name' => $group, 'rule_name' => $rule, 'created_at' => time(), 'updated_at' => time()]);
+    }
+
+    /**
+     * Deletes permission.
+     * 
+     * @param string $name
+     */
+    public function removePermission($name)
+    {
+        $this->delete($this->getAuthManager()->itemTable, ['name' => $name, 'type' => AuthPermission::ITEM_TYPE]);
+    }
+
+    public function setPermissionRule($permission, $rule)
+    {
+        $this->update($this->getAuthManager()->itemTable, ['rule_name' => $rule], ['name' => $permission, 'type' => Permission::ITEM_TYPE, 'updated_at' => time()]);
+    }
+
+    /**
+     * Link child role item to parent.
      * 
      * @param string $parent
-     * @param string|array $child
+     * @param string $child
      */
-    public function addChild($parent, $children)
+    public function addChildRole($parent, $child)
     {
-        if (!is_array($children)) {
-            $children = [$children];
-        }
+        $this->getAuthManager()->addChild(new RoleItem(['name' => $parent]), new RoleItem(['name' => $child]));
+    }
 
-        foreach ($children as $child) {
-            $this->insert($this->getAuthManager()->itemChildTable, ['parent' => $parent, 'child' => $child]);
-        }
+    /**
+     * Link child permission item to parent.
+     * 
+     * @param string $parent
+     * @param string $child
+     */
+    public function addChildPermission($parent, $child)
+    {
+        $this->getAuthManager()->addChild(new PermissionItem(['name' => $parent]), new PermissionItem(['name' => $child]));
+    }
+
+    /**
+     * Link permission to role.
+     * 
+     * @param string $role
+     * @param string $permission
+     */
+    public function addPermissionToRole($role, $permission)
+    {
+        $this->getAuthManager()->addChild(new RoleItem(['name' => $role]), new PermissionItem(['name' => $permission]));
     }
 
     /**
@@ -308,6 +441,31 @@ abstract class PermissionsMigration extends \yii\db\Migration
         $this->delete($this->getAuthManager()->modelTable, ['name' => $name]);
     }
 
+    public function addRoute($bundle, $controller, $action = null)
+    {
+        $this->insert($this->getAuthManager()->routeTable, ['bundle' => $bundle, 'controller' => $controller, 'action' => $action, 'created_at' => time(), 'updated_at' => time()]);
+    }
+
+    public function removeRoute($bundle, $controller, $action = null)
+    {
+        $this->delete($this->getAuthManager()->routeTable, ['bundle' => $bundle, 'controller' => $controller, 'action' => $action]);
+    }
+
+    public function addRouteToPermission($permission, $bundle, $controller, $action = null)
+    {
+        $route = (new Query())->select(['id'])
+                ->from($this->getAuthManager()->routeTable)
+                ->where(['bundle' => $bundle, 'controller' => $controller, 'action' => $action])
+                ->one();
+
+        if (!$route) {
+            $path = implode('/', [$bundle, $controller, $action]);
+            throw new Exception('Route "' . $path . '" does not exist.');
+        }
+
+        $this->insert($this->getAuthManager()->itemRouteTable, ['item_name' => $permission, 'route_id' => $route['id']]);
+    }
+
     public function addFilter($name, $className)
     {
         $this->insert($this->getAuthManager()->filterTable, ['name' => $name, 'class_name' => $className, 'created_at' => time(), 'updated_at' => time()]);
@@ -336,13 +494,13 @@ abstract class PermissionsMigration extends \yii\db\Migration
             }
         }
     }
-    
+
     public function addFilterToRole($filters, $roles)
     {
-        if(!is_array($roles)){
+        if (!is_array($roles)) {
             $roles = [$roles];
         }
-        
+
         $filterIds = (new Query())->select(['id'])
                 ->from($this->getAuthManager()->filterTable)
                 ->where(['name' => (!is_array($filters)) ? [$filters] : $filters])

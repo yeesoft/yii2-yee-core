@@ -7,7 +7,7 @@ use yii\rbac\Rule;
 class AuthorRule extends Rule
 {
 
-    public $name = 'isAuthor';
+    public $name = 'AuthorRule';
 
     /**
      * @param string|int $userId the user ID.

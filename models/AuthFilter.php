@@ -2,20 +2,19 @@
 
 namespace yeesoft\models;
 
-use Yii;
-
 /**
  * This is the model class for table "auth_filter".
  *
- * @property integer $id
+ * @property string $name
+ * @property string $title
  * @property string $class_name
  * @property integer $created_at
  * @property integer $updated_at
  *
- * @property AuthItemFilter[] $authItemFilters
- * @property AuthItem[] $itemNames
+ * @property AuthRole[] $roles
+ * @property AuthModel[] $models
  */
-class Filter extends \yeesoft\db\ActiveRecord
+class AuthFilter extends \yeesoft\db\ActiveRecord
 {
 
     /**
@@ -32,9 +31,9 @@ class Filter extends \yeesoft\db\ActiveRecord
     public function rules()
     {
         return [
-            [['class_name', 'name'], 'required'],
+            [['name', 'title', 'class_name'], 'required'],
             [['created_at', 'updated_at'], 'integer'],
-            [['name'], 'string', 'max' => 127],
+            [['name', 'title'], 'string', 'max' => 64],
             [['class_name'], 'string', 'max' => 255],
             [['class_name'], 'unique'],
         ];
@@ -46,8 +45,8 @@ class Filter extends \yeesoft\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
             'name' => 'Name',
+            'title' => 'Title',
             'class_name' => 'Class Name',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -60,7 +59,7 @@ class Filter extends \yeesoft\db\ActiveRecord
     public function getRoles()
     {
         return $this->hasMany(Role::className(), ['name' => 'item_name'])
-                        ->viaTable('{{%auth_item_filter}}', ['filter_id' => 'id']);
+                        ->viaTable('{{%auth_item_filter}}', ['filter_name' => 'name']);
     }
 
     /**
@@ -68,26 +67,26 @@ class Filter extends \yeesoft\db\ActiveRecord
      */
     public function getModels()
     {
-        return $this->hasMany(AuthModel::className(), ['id' => 'model_id'])
-                        ->viaTable('{{%auth_model_filter}}', ['filter_id' => 'id']);
+        return $this->hasMany(AuthModel::className(), ['name' => 'model_name'])
+                        ->viaTable('{{%auth_model_filter}}', ['filter_name' => 'name']);
     }
 
-    public function linkModels($modelIds)
+    public function linkModels($modelNames)
     {
-        foreach ($modelIds as $modelId) {
+        foreach ($modelNames as $modelName) {
             static::getDb()->createCommand()
                     ->insert('{{%auth_model_filter}}', [
-                        'filter_id' => $this->id,
-                        'model_id' => $modelId,
+                        'filter_name' => $this->name,
+                        'model_name' => $modelName,
                     ])->execute();
         }
     }
 
-    public function unlinkModels($modelIds)
+    public function unlinkModels($modelNames)
     {
-        foreach ($modelIds as $modelId) {
+        foreach ($modelNames as $modelName) {
             static::getDb()->createCommand()
-                    ->delete('{{%auth_model_filter}}', ['filter_id' => $this->id, 'model_id' => $modelId])
+                    ->delete('{{%auth_model_filter}}', ['filter_name' => $this->name, 'model_name' => $modelName])
                     ->execute();
         }
     }

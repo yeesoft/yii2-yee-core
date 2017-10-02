@@ -11,7 +11,7 @@ interface ManagerInterface extends \yii\rbac\ManagerInterface
 
     /**
      * Returns list of routes for current application tier (front end, back end).
-     * @return \yeesoft\models\Route[] list of routes for current application tier.
+     * @return \yeesoft\models\AuthRoute[] list of routes for current application tier.
      */
     public function getRoutes();
 

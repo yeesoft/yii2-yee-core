@@ -9,10 +9,10 @@ use yii\helpers\ArrayHelper;
 use yeesoft\helpers\AuthHelper;
 
 /**
- * This is the model class for table "{{%auth_route}}".
+ * This is the model class for table "auth_route".
  *
  * @property integer $id
- * @property string $base_url
+ * @property string $bundle
  * @property string $controller
  * @property string $action
  * @property integer $created_at
@@ -21,7 +21,7 @@ use yeesoft\helpers\AuthHelper;
  * @property AuthItemRoute[] $authItemRoutes
  * @property AuthItem[] $itemNames
  */
-class Route extends \yeesoft\db\ActiveRecord
+class AuthRoute extends \yeesoft\db\ActiveRecord
 {
 
     /**
@@ -40,9 +40,9 @@ class Route extends \yeesoft\db\ActiveRecord
         return [
             [['controller'], 'required'],
             [['created_at', 'updated_at'], 'integer'],
-            [['base_url', 'action'], 'string', 'max' => 63],
-            [['controller'], 'string', 'max' => 127],
-            [['base_url', 'controller', 'action'], 'unique', 'targetAttribute' => ['base_url', 'controller', 'action'], 'message' => 'The combination of Base Url, Controller and Action has already been taken.'],
+            [['bundle', 'action'], 'string', 'max' => 64],
+            [['controller'], 'string', 'max' => 128],
+            [['bundle', 'controller', 'action'], 'unique', 'targetAttribute' => ['bundle', 'controller', 'action'], 'message' => 'The combination of Bundle, Controller and Action has already been taken.'],
         ];
     }
 
@@ -53,7 +53,7 @@ class Route extends \yeesoft\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'base_url' => 'Base Url',
+            'bundle' => 'Bundle',
             'controller' => 'Controller',
             'action' => 'Action',
             'created_at' => 'Created At',
@@ -66,12 +66,13 @@ class Route extends \yeesoft\db\ActiveRecord
      */
     public function getPermissions()
     {
-        return $this->hasMany(Permission::className(), ['name' => 'item_name'])->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
+        return $this->hasMany(AuthPermission::className(), ['name' => 'item_name'])
+                ->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
     }
 
     public function getName()
     {
-        return '/' . implode('/', array_filter([trim($this->base_url, ' /'), trim($this->controller, ' /'), trim($this->action, ' /')]));
+        return '/' . implode('/', array_filter([trim($this->bundle, ' /'), trim($this->controller, ' /'), trim($this->action, ' /')]));
     }
 
     public function getRule()
@@ -82,7 +83,7 @@ class Route extends \yeesoft\db\ActiveRecord
         if (!empty($this->action)) {
             $rule['actions'] = [$this->action];
         }
-        
+
         foreach ($this->permissions as $permission) {
             $rule['roles'][] = $permission->name;
         }

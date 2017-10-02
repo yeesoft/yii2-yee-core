@@ -7,20 +7,11 @@ use yeesoft\helpers\AuthHelper;
 use Yii;
 use yii\rbac\DbManager;
 
-class Permission extends AbstractItem
+class AuthPermission extends AuthItem
 {
 
     const ITEM_TYPE = self::TYPE_PERMISSION;
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRoutes()
-    {
-        return $this->hasMany(Route::className(), ['id' => 'route_id'])
-                ->viaTable('auth_item_route', ['item_name' => 'name']);
-    }
-    
     public function linkRoutes($ids)
     {
         $routes = Route::findAll($ids);
@@ -54,18 +45,18 @@ class Permission extends AbstractItem
      * @param string $permissionName
      * @param array|string $routes
      * @param null|string $permissionDescription
-     * @param null|string $groupCode
+     * @param null|string $groupName
      *
      * @throws \InvalidArgumentException
      * @return true|static|string
      */
-    public static function assignRoutes($permissionName, $routes, $permissionDescription = null, $groupCode = null)
+    public static function assignRoutes($permissionName, $routes, $permissionDescription = null, $groupName = null)
     {
         $permission = static::findOne(['name' => $permissionName]);
         $routes = (array) $routes;
 
         if (!$permission) {
-            $permission = static::create($permissionName, $permissionDescription, $groupCode);
+            $permission = static::create($permissionName, $permissionDescription, $groupName);
 
             if ($permission->hasErrors()) {
                 return $permission;

@@ -33,7 +33,7 @@ class AccessControl extends \yii\filters\AccessControl
     public function attach($owner)
     {
         parent::attach($owner);
-
+        
         $rules = Yii::$app->authManager->getRouteRules($this->ruleConfig);
         $this->rules = ArrayHelper::merge($this->rules, $rules);
     }
@@ -45,6 +45,9 @@ class AccessControl extends \yii\filters\AccessControl
      */
     public function beforeAction($action)
     {
+        return true;
+        
+        
         /* @var $auth \yeesoft\rbac\DbManager */
         $user = $this->user;
         $auth = Yii::$app->authManager;
