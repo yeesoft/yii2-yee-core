@@ -25,7 +25,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
      * @var string the name of the table storing permission groups. Defaults to "auth_group".
      */
     public $groupTable = '{{%auth_group}}';
-    
+
     /**
      * @var string the name of the table storing relations between permissions and permission groups. Defaults to "auth_item_group".
      */
@@ -193,6 +193,58 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     protected function getBaseUrl()
     {
         return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
+    }
+
+    public function addFilterToModel($filter, $models)
+    {
+        $models = is_array($models) ? $models : [$models];
+
+        foreach ($models as $model) {
+            $this->db->createCommand()
+                    ->insert($this->modelFilterTable, [
+                        'filter_name' => $filter,
+                        'model_name' => $model,
+                    ])->execute();
+        }
+    }
+
+    public function removeFilterFromModel($filter, $models)
+    {
+        $models = is_array($models) ? $models : [$models];
+
+        foreach ($models as $model) {
+            $this->db->createCommand()
+                    ->delete($this->modelFilterTable, [
+                        'filter_name' => $filter,
+                        'model_name' => $model,
+                    ])->execute();
+        }
+    }
+
+    public function addRoutesToPermission($permission, $routes)
+    {
+        $routes = is_array($routes) ? $routes : [$routes];
+
+        foreach ($routes as $route) {
+            $this->db->createCommand()
+                    ->insert($this->itemRouteTable, [
+                        'item_name' => $permission,
+                        'route_id' => $route,
+                    ])->execute();
+        }
+    }
+
+    public function removeRoutesFromPermission($permission, $routes)
+    {
+        $routes = is_array($routes) ? $routes : [$routes];
+
+        foreach ($routes as $route) {
+            $this->db->createCommand()
+                    ->delete($this->itemRouteTable, [
+                        'item_name' => $permission,
+                        'route_id' => $route,
+                    ])->execute();
+        }
     }
 
 }

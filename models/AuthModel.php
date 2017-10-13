@@ -29,6 +29,16 @@ class AuthModel extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['update'] = ['title', 'class_name'];
+        return $scenarios;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [

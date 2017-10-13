@@ -28,6 +28,16 @@ class AuthFilter extends \yeesoft\db\ActiveRecord
     /**
      * @inheritdoc
      */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['update'] = ['title', 'class_name'];
+        return $scenarios;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -69,26 +79,6 @@ class AuthFilter extends \yeesoft\db\ActiveRecord
     {
         return $this->hasMany(AuthModel::className(), ['name' => 'model_name'])
                         ->viaTable('{{%auth_model_filter}}', ['filter_name' => 'name']);
-    }
-
-    public function linkModels($modelNames)
-    {
-        foreach ($modelNames as $modelName) {
-            static::getDb()->createCommand()
-                    ->insert('{{%auth_model_filter}}', [
-                        'filter_name' => $this->name,
-                        'model_name' => $modelName,
-                    ])->execute();
-        }
-    }
-
-    public function unlinkModels($modelNames)
-    {
-        foreach ($modelNames as $modelName) {
-            static::getDb()->createCommand()
-                    ->delete('{{%auth_model_filter}}', ['filter_name' => $this->name, 'model_name' => $modelName])
-                    ->execute();
-        }
     }
 
 }

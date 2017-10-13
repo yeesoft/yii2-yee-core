@@ -2,32 +2,45 @@
 
 namespace yeesoft\models;
 
-use Exception;
-use yeesoft\helpers\AuthHelper;
 use Yii;
+use Exception;
 use yii\rbac\DbManager;
+use yii\helpers\ArrayHelper;
+use yeesoft\helpers\AuthHelper;
 
 class AuthPermission extends AuthItem
 {
 
+    public $groupName;
+
     const ITEM_TYPE = self::TYPE_PERMISSION;
 
-    public function linkRoutes($ids)
+    /**
+     * @inheritdoc
+     */
+    public function rules()
     {
-        $routes = Route::findAll($ids);
-        foreach ($routes as $route) {
-            $this->link('routes', $route);
-        }
+        return ArrayHelper::merge(parent::rules(), [
+            ['groupName', 'string']
+        ]);
     }
-    
-    public function unlinkRoutes($ids)
-    {
-        $routes = Route::findAll($ids);
-        foreach ($routes as $route) {
-            $this->unlink('routes', $route, true);
-        }
-    }
-    
+
+//    public function linkRoutes($ids)
+//    {
+//        $routes = AuthRoute::findAll($ids);
+//        foreach ($routes as $route) {
+//            $this->link('routes', $route);
+//        }
+//    }
+//
+//    public function unlinkRoutes($ids)
+//    {
+//        $routes = AuthRoute::findAll($ids);
+//        foreach ($routes as $route) {
+//            $this->unlink('routes', $route, true);
+//        }
+//    }
+
     /**
      * @param int $userId
      *
@@ -80,6 +93,39 @@ class AuthPermission extends AuthItem
         AuthHelper::invalidatePermissions();
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_AFTER_FIND, [$this, 'loadGroupName']);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'saveGroup']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'saveGroup']);
+    }
+
+    public function getGroup()
+    {
+        return ($groups = $this->groups) ? array_shift($groups) : null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function loadGroupName()
+    {
+        $this->groupName = @$this->group->name;
+    }
+
+    public function saveGroup()
+    {
+        if ($this->groupName AND $group = AuthGroup::findOne($this->groupName)) {
+            $this->unlinkAll('groups', true);
+            $this->link('groups', $group);
+        }
     }
 
 }

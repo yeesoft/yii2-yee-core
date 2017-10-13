@@ -59,6 +59,16 @@ abstract class AuthItem extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['update'] = ['description', 'rule_name'];
+        return $scenarios;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -81,12 +91,23 @@ abstract class AuthItem extends ActiveRecord
         return [
             'name' => 'Name',
             'type' => 'Type',
-            'description' => 'Description',
+            'description' => 'Title',
             'rule_name' => 'Rule Name',
             'data' => 'Data',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'resetRuleName']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'resetRuleName']);
     }
 
     /**
@@ -278,6 +299,13 @@ abstract class AuthItem extends ActiveRecord
         parent::afterDelete();
 
         AuthHelper::invalidatePermissions();
+    }
+
+    public function resetRuleName()
+    {
+        if (empty($this->rule_name)) {
+            $this->rule_name = null;
+        }
     }
 
 }

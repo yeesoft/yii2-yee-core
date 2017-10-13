@@ -11,7 +11,7 @@ namespace yeesoft;
 /**
  * YeeCMS component. Contains basic settings and functions of YeeCMS.
  */
-class Yee extends yii\base\Component
+class Yee extends \yii\base\Component
 {
 
     /**

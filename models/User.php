@@ -2,11 +2,11 @@
 
 namespace yeesoft\models;
 
-use yeesoft\helpers\AuthHelper;
-use yeesoft\helpers\YeeHelper;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
+use yeesoft\helpers\YeeHelper;
+use yeesoft\helpers\AuthHelper;
 
 /**
  * This is the model class for table "user".
@@ -388,7 +388,7 @@ class User extends UserIdentity
      */
     public function getRoles()
     {
-        return $this->hasMany(Role::className(), ['name' => 'item_name'])
+        return $this->hasMany(AuthRole::className(), ['name' => 'item_name'])
                         ->viaTable(Yii::$app->authManager->assignmentTable, ['user_id' => 'id']);
     }
 

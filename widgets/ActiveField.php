@@ -3,7 +3,7 @@
 namespace yeesoft\widgets;
 
 use Yii;
-use yii\helpers\Html;
+use yeesoft\helpers\Html;
 use yeesoft\helpers\FA;
 use yeesoft\widgets\assets\EditableTextInputAsset;
 use yeesoft\widgets\assets\SlugableTextInputAsset;
@@ -111,6 +111,34 @@ class ActiveField extends \yeesoft\multilingual\widgets\ActiveField
         $link = Html::tag('div', $linkPrefix . Html::tag('a', $value) . $linkSuffix, ['class' => 'input']);
 
         return Html::tag('div', $link . $inputGroup, ['class' => 'editable']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function checkboxList($items, $options = [])
+    {
+        if ($this->inline) {
+            if (!isset($options['template'])) {
+                $this->template = $this->inlineCheckboxListTemplate;
+            } else {
+                $this->template = $options['template'];
+                unset($options['template']);
+            }
+            if (!isset($options['itemOptions'])) {
+                $options['itemOptions'] = [
+                    'labelOptions' => ['class' => 'checkbox-inline'],
+                ];
+            }
+        } elseif (!isset($options['item'])) {
+            $itemOptions = isset($options['itemOptions']) ? $options['itemOptions'] : [];
+            $options['item'] = function ($index, $label, $name, $checked, $value) use ($itemOptions) {
+                $options = array_merge(['label' => $label, 'value' => $value], $itemOptions);
+                return '<div class="checkbox">' . Html::checkbox($name, $checked, $options) . '</div>';
+            };
+        }
+        parent::checkboxList($items, $options);
+        return $this;
     }
 
 }

@@ -173,11 +173,7 @@ class AuthHelper
         $permissions = [];
 
         foreach ($arrayOfPermissions as $id => $item) {
-            if ($item->type == AuthItem::TYPE_ROUTE) {
-                $routes[$id] = $item;
-            } else {
-                $permissions[$id] = $item;
-            }
+            $permissions[$id] = $item;
         }
 
         return (object)compact('routes', 'permissions');

@@ -2,11 +2,11 @@
 
 namespace yeesoft\models;
 
-use Exception;
-use yeesoft\helpers\AuthHelper;
 use Yii;
-use yii\helpers\ArrayHelper;
+use Exception;
 use yii\rbac\DbManager;
+use yii\helpers\ArrayHelper;
+use yeesoft\helpers\AuthHelper;
 
 class AuthRole extends AuthItem
 {
@@ -18,28 +18,28 @@ class AuthRole extends AuthItem
      */
     public function getFilters()
     {
-        return $this->hasMany(Filter::className(), ['id' => 'filter_id'])
+        return $this->hasMany(AuthFilter::className(), ['name' => 'filter_name'])
                         ->viaTable(Yii::$app->authManager->itemFilterTable, ['item_name' => 'name']);
     }
 
-    public function linkFilters($filterIds)
+    public function linkFilters($filterNames)
     {
-        foreach ($filterIds as $filterId) {
+        foreach ($filterNames as $filterName) {
             static::getDb()->createCommand()
                     ->insert(Yii::$app->authManager->itemFilterTable, [
                         'item_name' => $this->name,
-                        'filter_id' => $filterId,
+                        'filter_name' => $filterName,
                     ])->execute();
         }
     }
 
-    public function unlinkFilters($filterIds)
+    public function unlinkFilters($filterNames)
     {
-        foreach ($filterIds as $filterId) {
+        foreach ($filterNames as $filterName) {
             static::getDb()->createCommand()
                     ->delete(Yii::$app->authManager->itemFilterTable, [
                         'item_name' => $this->name,
-                        'filter_id' => $filterId
+                        'filter_name' => $filterName
                     ])->execute();
         }
     }

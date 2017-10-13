@@ -3,6 +3,7 @@
 namespace yeesoft\controllers;
 
 use Yii;
+use yii\base\Model;
 use yii\web\Cookie;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -167,6 +168,17 @@ abstract class CrudController extends BaseController
                 return ['index'];
         }
     }
+    
+    /**
+     * Returns ActiveRecord scenario identifier for specific action.
+     *
+     * @param string $action
+     * @return string scenario identifier
+     */
+    protected function getActionScenario($action = null)
+    {
+        return Model::SCENARIO_DEFAULT;
+    }
 
     /**
      * Lists all models.
@@ -202,7 +214,7 @@ abstract class CrudController extends BaseController
     public function actionView($id)
     {
         return $this->renderIsAjax($this->viewView, [
-                    'model' => $this->findModel($id)
+            'model' => $this->findModel($id)
         ]);
     }
 
@@ -215,6 +227,7 @@ abstract class CrudController extends BaseController
     {
         /* @var $model \yeesoft\db\ActiveRecord */
         $model = new $this->modelClass;
+        $model->scenario = $this->getActionScenario($this->action->id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been created.'));
@@ -236,6 +249,7 @@ abstract class CrudController extends BaseController
     {
         /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
+        $model->scenario = $this->getActionScenario($this->action->id);
 
         if ($model->load(Yii::$app->request->post()) AND $model->save()) {
             Yii::$app->session->setFlash('success', Yii::t('yee', 'Your item has been updated.'));
@@ -271,6 +285,7 @@ abstract class CrudController extends BaseController
     {
         /* @var $model \yeesoft\db\ActiveRecord */
         $model = $this->findModel($id);
+        $model->scenario = $this->getActionScenario($this->action->id);
 
         if (!$model->hasAttribute($attribute)) {
             throw new InvalidParamException('Model has no attribute with the name "' . $attribute . '"');
