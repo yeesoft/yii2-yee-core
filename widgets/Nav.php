@@ -26,7 +26,7 @@ class Nav extends \yii\bootstrap\Nav
      * @var array the HTML attributes for the widget container tag.
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
-    public $options = ['class' => 'sidebar-menu'];
+    public $options = ['class' => 'sidebar-menu', 'data-widget' => 'tree'];
 
     /**
      * @var array the HTML attributes for the inner container tag.

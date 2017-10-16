@@ -4,12 +4,13 @@ use yeesoft\models\Menu;
 use yeesoft\widgets\Breadcrumbs;
 use yeesoft\widgets\Nav;
 use yeesoft\helpers\Html;
+use yeesoft\theme\assets\CheckboxAsset;
 use yeesoft\theme\assets\AdminThemeAsset;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-//\yeesoft\assets\AdminLTEAsset::register($this);
+CheckboxAsset::register($this);
 AdminThemeAsset::register($this);
 
 //Show Flashes
@@ -108,7 +109,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                         
                         CMS
                     </a>-->
-                    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>

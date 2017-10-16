@@ -8,8 +8,7 @@ use yeesoft\helpers\Url;
 /**
  * @inheritdoc
  */
-class Html extends \yii\helpers\Html
-{
+class Html extends \yii\helpers\Html {
 
     protected $_rules;
 
@@ -18,8 +17,7 @@ class Html extends \yii\helpers\Html
      *
      * @inheritdoc
      */
-    public static function a($text, $url = null, $options = [])
-    {
+    public static function a($text, $url = null, $options = []) {
         if (Yii::$app->user->isSuperadmin) {
             return parent::a($text, $url, $options);
         }
@@ -44,37 +42,13 @@ class Html extends \yii\helpers\Html
     }
 
     /**
-     *
-     * @inheritdoc
-     */
-    public static function checkbox($name, $checked = false, $options = [])
-    {
-        $options['checked'] = (bool) $checked;
-        $value = array_key_exists('value', $options) ? $options['value'] : '1';
-        if (isset($options['uncheck'])) {
-            // add a hidden field so that if the checkbox is not selected, it still submits a value
-            $hidden = static::hiddenInput($name, $options['uncheck']);
-            unset($options['uncheck']);
-        } else {
-            $hidden = '';
-        }
-
-        $label = (isset($options['label'])) ? $options['label'] : ' ';
-        $labelOptions = isset($options['labelOptions']) ? $options['labelOptions'] : [];
-        unset($options['label'], $options['labelOptions']);
-        $content = static::input('checkbox', $name, $value, $options) . static::label($label, null, $labelOptions);
-        return '<div class="checkbox">' . $hidden . $content . '</div>';
-    }
-
-    /**
      * Return abstract Action from $route for checking access.
      * 
      * @param array $route
      * @return \stdClass
      * @throws \yii\base\InvalidParamException
      */
-    protected static function getActionByRoute($route)
-    {
+    protected static function getActionByRoute($route) {
         if (!is_array($route) || !isset($route[0])) {
             throw new \yii\base\InvalidParamException();
         }
