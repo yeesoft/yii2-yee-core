@@ -67,7 +67,7 @@ class AuthRoute extends \yeesoft\db\ActiveRecord
     public function getPermissions()
     {
         return $this->hasMany(AuthPermission::className(), ['name' => 'item_name'])
-                ->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
+                        ->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
     }
 
     public function getName()
@@ -240,6 +240,12 @@ class AuthRoute extends \yeesoft\db\ActiveRecord
         }
 
         return false;
+    }
+
+    public static function getRoutes()
+    {
+        $routes = static::find()->orderBy(['bundle' => SORT_ASC, 'controller' => SORT_ASC, 'action' => SORT_ASC])->all();
+        return ArrayHelper::map($routes, 'id', 'name');
     }
 
 }

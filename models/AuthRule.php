@@ -4,6 +4,7 @@ namespace yeesoft\models;
 
 use Yii;
 use yii\rbac\Rule;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "auth_rule".
@@ -136,5 +137,8 @@ class AuthRule extends \yii\db\ActiveRecord
             //do nothing
         }
     }
-
+    
+    public static function getRules() {
+        return ArrayHelper::map(static::find()->asArray()->all(), 'name', 'name');
+    }
 }

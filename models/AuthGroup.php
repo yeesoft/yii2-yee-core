@@ -3,6 +3,7 @@
 namespace yeesoft\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\behaviors\TimestampBehavior;
 
 /**
@@ -15,22 +16,19 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property AuthItem[] $authItems
  */
-class AuthGroup extends \yeesoft\db\ActiveRecord
-{
+class AuthGroup extends \yeesoft\db\ActiveRecord {
 
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return Yii::$app->authManager->groupTable;
     }
 
     /**
      * @inheritdoc
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             TimestampBehavior::className(),
         ];
@@ -39,8 +37,7 @@ class AuthGroup extends \yeesoft\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function scenarios()
-    {
+    public function scenarios() {
         $scenarios = parent::scenarios();
         $scenarios['update'] = ['title'];
         return $scenarios;
@@ -49,20 +46,18 @@ class AuthGroup extends \yeesoft\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['name', 'title'], 'required'],
-            [['created_at', 'updated_at'], 'integer'],
-            [['name', 'title'], 'string', 'max' => 64],
+                [['name', 'title'], 'required'],
+                [['created_at', 'updated_at'], 'integer'],
+                [['name', 'title'], 'string', 'max' => 64],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'name' => 'Name',
             'title' => 'Title',
@@ -74,10 +69,13 @@ class AuthGroup extends \yeesoft\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAuthItems()
-    {
+    public function getAuthItems() {
         return $this->hasMany(AuthItem::className(), ['name' => 'item_name'])
                         ->viaTable('{{%auth_item_group}}', ['group_name' => 'name']);
+    }
+
+    public static function getGroups() {
+        return ArrayHelper::map(static::find()->asArray()->all(), 'name', 'title');
     }
 
 }

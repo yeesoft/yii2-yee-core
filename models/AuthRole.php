@@ -22,28 +22,6 @@ class AuthRole extends AuthItem
                         ->viaTable(Yii::$app->authManager->itemFilterTable, ['item_name' => 'name']);
     }
 
-    public function linkFilters($filterNames)
-    {
-        foreach ($filterNames as $filterName) {
-            static::getDb()->createCommand()
-                    ->insert(Yii::$app->authManager->itemFilterTable, [
-                        'item_name' => $this->name,
-                        'filter_name' => $filterName,
-                    ])->execute();
-        }
-    }
-
-    public function unlinkFilters($filterNames)
-    {
-        foreach ($filterNames as $filterName) {
-            static::getDb()->createCommand()
-                    ->delete(Yii::$app->authManager->itemFilterTable, [
-                        'item_name' => $this->name,
-                        'filter_name' => $filterName
-                    ])->execute();
-        }
-    }
-
     /**
      * @param int $userId
      *
@@ -155,5 +133,17 @@ class AuthRole extends AuthItem
 
         return true;
     }
+    
+    /**
+     * 
+     * @param array $exclude
+     * @return array
+     */
+    public static function getRoles($exclude = [])
+    {
+        $items = static::find()->andWhere(['not in', Yii::$app->authManager->itemTable . '.name', is_array($exclude) ? $exclude : [$exclude]])->all();
+        return ArrayHelper::map($items, 'name', 'description');
+    }
+
 
 }

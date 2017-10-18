@@ -2,6 +2,8 @@
 
 namespace yeesoft\models;
 
+use yii\helpers\ArrayHelper;
+
 /**
  * This is the model class for table "auth_filter".
  *
@@ -80,5 +82,8 @@ class AuthFilter extends \yeesoft\db\ActiveRecord
         return $this->hasMany(AuthModel::className(), ['name' => 'model_name'])
                         ->viaTable('{{%auth_model_filter}}', ['filter_name' => 'name']);
     }
-
+    
+    public static function getFilters() {
+        return ArrayHelper::map(static::find()->asArray()->all(), 'name', 'title');
+    }
 }

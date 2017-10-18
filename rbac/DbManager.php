@@ -195,7 +195,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
     }
 
-    public function addFilterToModel($filter, $models)
+    public function addModelToFilter($filter, $models)
     {
         $models = is_array($models) ? $models : [$models];
 
@@ -208,7 +208,7 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         }
     }
 
-    public function removeFilterFromModel($filter, $models)
+    public function removeModelFromFilter($filter, $models)
     {
         $models = is_array($models) ? $models : [$models];
 
@@ -217,6 +217,32 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
                     ->delete($this->modelFilterTable, [
                         'filter_name' => $filter,
                         'model_name' => $model,
+                    ])->execute();
+        }
+    }
+    
+    public function addFilterToRole($role, $filters)
+    {
+        $filters = is_array($filters) ? $filters : [$filters];
+
+        foreach ($filters as $filter) {
+            $this->db->createCommand()
+                    ->insert($this->itemFilterTable, [
+                        'filter_name' => $filter,
+                        'item_name' => $role,
+                    ])->execute();
+        }
+    }
+
+    public function removeFilterFromRole($role, $filters)
+    {
+        $filters = is_array($filters) ? $filters : [$filters];
+
+        foreach ($filters as $filter) {
+            $this->db->createCommand()
+                    ->delete($this->itemFilterTable, [
+                        'filter_name' => $filter,
+                        'item_name' => $role,
                     ])->execute();
         }
     }

@@ -32,7 +32,7 @@ class m150821_140142_add_core_permissions extends PermissionsMigration
 
         $this->addFilter('AuthorFilter', yeesoft\filters\AuthorFilter::class);
 
-        $this->addFilterToModel('AuthorFilter', ['Page', 'Post']);
+        $this->addModelToFilter('AuthorFilter', ['Page', 'Post']);
         //add remove method
 
         $this->addFilterToRole('AuthorFilter', [self::ROLE_USER, self::ROLE_AUTHOR]);

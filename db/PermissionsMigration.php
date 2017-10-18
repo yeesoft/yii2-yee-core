@@ -476,7 +476,7 @@ abstract class PermissionsMigration extends \yii\db\Migration
         $this->delete($this->getAuthManager()->filterTable, ['name' => $name]);
     }
 
-    public function addFilterToModel($filters, $models)
+    public function addModelToFilter($filters, $models)
     {
         $filterIds = (new Query())->select(['id'])
                 ->from($this->getAuthManager()->filterTable)
