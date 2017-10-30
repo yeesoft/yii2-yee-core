@@ -53,7 +53,10 @@ abstract class PermissionsMigration extends \yii\db\Migration
      * ]
      * ```
      */
-    abstract public function getPermissions();
+    public function getPermissions()
+    {
+        return [];
+    }
 
     public function safeUp()
     {

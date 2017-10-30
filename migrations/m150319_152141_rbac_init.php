@@ -23,8 +23,6 @@ class m150319_152141_rbac_init extends m140506_102106_rbac_init
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
         
-        //$this->addColumn($authManager->ruleTable, 'class_name', $this->string(255));
-
         $this->createTable($authManager->groupTable, [
             'name' => $this->string(64)->notNull(),
             'title' => $this->string(64)->notNull(),
@@ -112,8 +110,6 @@ class m150319_152141_rbac_init extends m140506_102106_rbac_init
         $authManager = $this->getAuthManager();
         $this->db = $authManager->db;
         
-        //TODO: Update down method
-
         $this->dropForeignKey('fk_auth_model_filter_filter', $authManager->modelFilterTable);
         $this->dropForeignKey('fk_auth_model_filter_model', $authManager->modelFilterTable);
         $this->dropTable($authManager->modelFilterTable);
