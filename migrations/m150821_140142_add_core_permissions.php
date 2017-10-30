@@ -5,79 +5,84 @@ use yeesoft\db\PermissionsMigration;
 class m150821_140142_add_core_permissions extends PermissionsMigration
 {
 
+    public function getPermissions()
+    {
+        return [
+            'page-management' => [
+                'view-pages' => [
+                    'title' => 'View Pages',
+                    'roles' => [self::ROLE_AUTHOR],
+                    'routes' => [
+                        ['bundle' => self::ADMIN_BUNDLE, 'controller' => 'page/default', 'action' => 'index'],
+                    ],
+                ],
+                'edit-pages' => [
+                    'title' => 'Edit Pages',
+                    'child' => ['view-pages'],
+                    'roles' => [self::ROLE_AUTHOR],
+                    'rule' => yeesoft\rbac\AuthorRule::class,
+                    'routes' => [
+                        ['bundle' => self::ADMIN_BUNDLE, 'controller' => 'page/default', 'action' => 'update'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function safeUp()
     {
-        $this->createPermissions($this->getPermissions());
-
-        die;
-
         $this->addRole(self::ROLE_USER, 'User');
 
         $this->addRole(self::ROLE_AUTHOR, 'Author');
-        $this->addChild(self::ROLE_AUTHOR, self::ROLE_USER);
+        $this->addChildRole(self::ROLE_AUTHOR, self::ROLE_USER);
 
         $this->addRole(self::ROLE_MODERATOR, 'Moderator');
-        $this->addChild(self::ROLE_MODERATOR, [self::ROLE_USER, self::ROLE_AUTHOR]);
+        $this->addChildRole(self::ROLE_MODERATOR, self::ROLE_USER);
+        $this->addChildRole(self::ROLE_MODERATOR, self::ROLE_AUTHOR);
 
         $this->addRole(self::ROLE_ADMIN, 'Administrator');
-        $this->addChild(self::ROLE_ADMIN, [self::ROLE_USER, self::ROLE_AUTHOR, self::ROLE_MODERATOR]);
+        $this->addChildRole(self::ROLE_ADMIN, self::ROLE_USER);
+        $this->addChildRole(self::ROLE_ADMIN, self::ROLE_AUTHOR);
+        $this->addChildRole(self::ROLE_ADMIN, self::ROLE_MODERATOR);
 
-        $this->addPermissionsGroup('Dashboard', 'Dashboard');
-        $this->addPermissionsGroup('UserCommonPermissions', 'Common Permissions');
+        $this->addPermissionsGroup('common-permissions', 'Common Permissions');
+        $this->addPermissionsGroup('page-management', 'Page Management');
+        $this->addPermissionsGroup('dashboard', 'Dashboard');
 
-        $this->addRule('AuthorRule', yeesoft\rbac\AuthorRule::class);
+        $this->addRule(yeesoft\rbac\AuthorRule::class);
 
-        $this->addModel('Page', yeesoft\page\models\Page::class);
-        $this->addModel('Post', yeesoft\post\models\Post::class);
+        $this->addModel('page', 'Page', yeesoft\page\models\Page::class);
+        $this->addModel('post', 'Post', yeesoft\post\models\Post::class);
 
-        $this->addFilter('AuthorFilter', yeesoft\filters\AuthorFilter::class);
+        $this->addFilter('author-filter', 'Author Filter', yeesoft\filters\AuthorFilter::class);
 
-        $this->addModelToFilter('AuthorFilter', ['Page', 'Post']);
-        //add remove method
+        $this->addModelToFilter('author-filter', ['page', 'post']);
 
-        $this->addFilterToRole('AuthorFilter', [self::ROLE_USER, self::ROLE_AUTHOR]);
-        //add remove method
-        //add permission
-        //add child permission
-        //add rule to permision
-        //add route to permission
-        //add route
+        $this->addFilterToRole(self::ROLE_USER, 'author-filter');
+        $this->addFilterToRole(self::ROLE_AUTHOR, 'author-filter');
+
+        $this->createPermissions($this->getPermissions());
     }
 
-    public function afterDown()
+    public function safeDown()
     {
-        $this->removeFilter('AuthorFilter');
+        $this->removePermissions($this->getPermissions());
 
-        $this->removeModel('Post');
-        $this->removeModel('Page');
+        $this->removeFilter('author-filter');
 
-        $this->removeRule('authorRule');
+        $this->removeModel('post');
+        $this->removeModel('page');
 
+        $this->removeRule(yeesoft\rbac\AuthorRule::class);
+
+        $this->removePermissionsGroup('common-permissions');
+        $this->removePermissionsGroup('page-management');
         $this->removePermissionsGroup('dashboard');
-        $this->removePermissionsGroup('userCommonPermissions');
 
         $this->removeRole(self::ROLE_ADMIN);
         $this->removeRole(self::ROLE_MODERATOR);
         $this->removeRole(self::ROLE_AUTHOR);
         $this->removeRole(self::ROLE_USER);
-    }
-
-    public function getPermissions()
-    {
-        return [
-            'page-management' => [
-                'edit-pages' => [
-                    'title' => 'View Pages',
-                    'rule' => 'isAuthor',
-                    'child' => ['view-pages'],
-                    'roles' => [self::ROLE_AUTHOR],
-                    'routes' => [
-                        ['bundle' => self::ADMIN_BUNDLE, 'controller' => 'page/default_', 'action' => 'index'],
-                    ],
-                ],
-            //'view-dashboard' => []
-            ],
-        ];
     }
 
 }

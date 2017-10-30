@@ -81,63 +81,173 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     }
 
     /**
-     * @inheritdoc
+     * 
+     * @param string $name
+     * @param string $title
+     * @param string $className
      */
-    public function hasFreeAccess($route, $action = null)
+    public function addFilter($name, $title, $className)
     {
-        if ($action) {
-            $controller = $action->controller;
+        $this->db->createCommand()
+                ->insert($this->filterTable, [
+                    'name' => $name,
+                    'title' => $title,
+                    'class_name' => $className,
+                    'created_at' => time(),
+                    'updated_at' => time()
+                ])->execute();
+    }
 
-            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess === true) {
-                return true;
-            }
+    /**
+     * 
+     * @param string $role
+     * @param string $filters
+     */
+    public function addFilterToRole($role, $filters)
+    {
+        $filters = is_array($filters) ? $filters : [$filters];
 
-            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions)) {
-                return true;
-            }
+        foreach ($filters as $filter) {
+            $this->db->createCommand()
+                    ->insert($this->itemFilterTable, [
+                        'filter_name' => $filter,
+                        'item_name' => $role,
+                    ])->execute();
         }
+    }
 
-        if (in_array($route, $this->freeAccessActions)) {
-            return true;
+    /**
+     * 
+     * @param string $name
+     * @param string $title
+     * @param string $className
+     */
+    public function addModel($name, $title, $className)
+    {
+        $this->db->createCommand()
+                ->insert($this->modelTable, [
+                    'name' => $name,
+                    'title' => $title,
+                    'class_name' => $className,
+                    'created_at' => time(),
+                    'updated_at' => time()
+                ])->execute();
+    }
+
+    /**
+     * 
+     * @param string $filter
+     * @param string|array $models
+     */
+    public function addModelToFilter($filter, $models)
+    {
+        $models = is_array($models) ? $models : [$models];
+
+        foreach ($models as $model) {
+            $this->db->createCommand()
+                    ->insert($this->modelFilterTable, [
+                        'filter_name' => $filter,
+                        'model_name' => $model,
+                    ])->execute();
         }
+    }
 
-        return false;
+    /**
+     * 
+     * @param string $item
+     * @param string $group
+     */
+    public function addPermissionToGroup($item, $group)
+    {
+        $this->db->createCommand()
+                ->insert($this->itemGroupTable, [
+                    'item_name' => $item,
+                    'group_name' => $group,
+                ])->execute();
+    }
+
+    /**
+     * Creates new permissions group.
+     * 
+     * @param string $name
+     * @param string $title
+     */
+    public function addPermissionsGroup($name, $title)
+    {
+        $this->db->createCommand()
+                ->insert($this->groupTable, [
+                    'name' => $name,
+                    'title' => $title,
+                    'created_at' => time(),
+                    'updated_at' => time()
+                ])->execute();
+    }
+
+    /**
+     * 
+     * @param string $bundle
+     * @param string $controller
+     * @param string $action
+     */
+    public function addRoute($bundle, $controller, $action = null)
+    {
+        $this->db->createCommand()
+                ->insert($this->routeTable, [
+                    'bundle' => $bundle,
+                    'controller' => $controller,
+                    'action' => $action,
+                    'created_at' => time(),
+                    'updated_at' => time()
+                ])->execute();
+    }
+
+    /**
+     * 
+     * @param string $permission
+     * @param string|array $routes
+     */
+    public function addRoutesToPermission($permission, $routes)
+    {
+        $routes = is_array($routes) ? $routes : [$routes];
+
+        foreach ($routes as $route) {
+            $this->db->createCommand()
+                    ->insert($this->itemRouteTable, [
+                        'item_name' => $permission,
+                        'route_id' => $route,
+                    ])->execute();
+        }
+    }
+
+    /**
+     * 
+     * @param string $permission
+     * @param string $rule
+     */
+    public function addRuleToPermission($permission, $rule)
+    {
+        $this->db->createCommand()
+                ->update($this->itemTable, ['rule_name' => $rule], ['name' => $permission, 'type' => Permission::TYPE_PERMISSION, 'updated_at' => time()])
+                ->execute();
     }
 
     /**
      * @inheritdoc
      */
-    public function getRoutes()
+    public function flushRouteCache()
     {
-        return Yii::$app->cache->getOrSet([$this->baseUrl, static::CACHE_AUTH_ROUTES], function($cache) {
-                    return AuthRoute::find()
-                                    ->where(['bundle' => $this->baseUrl])
-                                    ->joinWith(['permissions' => function($query) {
-                                            $query->select(['name'])->where(['type' => Permission::TYPE_PERMISSION]);
-                                        }])->all();
-                });
+        $bundles = AuthRoute::find()->distinct('bundle')->select('bundle')->column();
+        foreach ($bundles as $bundle) {
+            Yii::$app->cache->delete([trim($bundle, ' /'), static::CACHE_AUTH_ROUTES]);
+        }
     }
 
     /**
-     * @inheritdoc
+     * @return string base URL
      */
-    public function getRouteRules($ruleConfig = null)
+    protected function getBaseUrl()
     {
-        if (!$this->_routeRules) {
-
-            $this->_routeRules = [];
-
-            if (!$ruleConfig) {
-                $ruleConfig = $this->ruleConfig;
-            }
-
-            $routes = $this->getRoutes();
-            foreach ($routes as $route) {
-                $this->_routeRules[] = Yii::createObject(array_merge($ruleConfig, $route->rule));
-            }
-        }
-
-        return $this->_routeRules;
+        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
     }
 
     /**
@@ -179,61 +289,78 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
     /**
      * @inheritdoc
      */
-    public function flushRouteCache()
+    public function getRouteRules($ruleConfig = null)
     {
-        $bundles = AuthRoute::find()->distinct('bundle')->select('bundle')->column();
-        foreach ($bundles as $bundle) {
-            Yii::$app->cache->delete([trim($bundle, ' /'), static::CACHE_AUTH_ROUTES]);
+        if (!$this->_routeRules) {
+
+            $this->_routeRules = [];
+
+            if (!$ruleConfig) {
+                $ruleConfig = $this->ruleConfig;
+            }
+
+            $routes = $this->getRoutes();
+            foreach ($routes as $route) {
+                $this->_routeRules[] = Yii::createObject(array_merge($ruleConfig, $route->rule));
+            }
         }
+
+        return $this->_routeRules;
     }
 
     /**
-     * @return string base URL
+     * @inheritdoc
      */
-    protected function getBaseUrl()
+    public function getRoutes()
     {
-        return trim(Yii::$app->getUrlManager()->getBaseUrl(), ' /');
+        return Yii::$app->cache->getOrSet([$this->baseUrl, static::CACHE_AUTH_ROUTES], function($cache) {
+                    return AuthRoute::find()
+                                    ->where(['bundle' => $this->baseUrl])
+                                    ->joinWith(['permissions' => function($query) {
+                                            $query->select(['name'])->where(['type' => Permission::TYPE_PERMISSION]);
+                                        }])->all();
+                });
     }
 
-    public function addModelToFilter($filter, $models)
+    /**
+     * @inheritdoc
+     */
+    public function hasFreeAccess($route, $action = null)
     {
-        $models = is_array($models) ? $models : [$models];
+        if ($action) {
+            $controller = $action->controller;
 
-        foreach ($models as $model) {
-            $this->db->createCommand()
-                    ->insert($this->modelFilterTable, [
-                        'filter_name' => $filter,
-                        'model_name' => $model,
-                    ])->execute();
+            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess === true) {
+                return true;
+            }
+
+            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions)) {
+                return true;
+            }
         }
-    }
 
-    public function removeModelFromFilter($filter, $models)
-    {
-        $models = is_array($models) ? $models : [$models];
-
-        foreach ($models as $model) {
-            $this->db->createCommand()
-                    ->delete($this->modelFilterTable, [
-                        'filter_name' => $filter,
-                        'model_name' => $model,
-                    ])->execute();
+        if (in_array($route, $this->freeAccessActions)) {
+            return true;
         }
+
+        return false;
     }
-    
-    public function addFilterToRole($role, $filters)
+
+    /**
+     * 
+     * @param string $name
+     */
+    public function removeFilter($name)
     {
-        $filters = is_array($filters) ? $filters : [$filters];
-
-        foreach ($filters as $filter) {
-            $this->db->createCommand()
-                    ->insert($this->itemFilterTable, [
-                        'filter_name' => $filter,
-                        'item_name' => $role,
-                    ])->execute();
-        }
+        $this->db->createCommand()
+                ->delete($this->filterTable, ['name' => $name])->execute();
     }
 
+    /**
+     * 
+     * @param string $role
+     * @param string|array $filters
+     */
     public function removeFilterFromRole($role, $filters)
     {
         $filters = is_array($filters) ? $filters : [$filters];
@@ -247,19 +374,74 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
         }
     }
 
-    public function addRoutesToPermission($permission, $routes)
+    /**
+     * 
+     * @param string $name
+     */
+    public function removeModel($name)
     {
-        $routes = is_array($routes) ? $routes : [$routes];
+        $this->db->createCommand()->delete($this->modelTable, ['name' => $name])->execute();
+    }
 
-        foreach ($routes as $route) {
+    /**
+     * 
+     * @param string $filter
+     * @param string $models
+     */
+    public function removeModelFromFilter($filter, $models)
+    {
+        $models = is_array($models) ? $models : [$models];
+
+        foreach ($models as $model) {
             $this->db->createCommand()
-                    ->insert($this->itemRouteTable, [
-                        'item_name' => $permission,
-                        'route_id' => $route,
+                    ->delete($this->modelFilterTable, [
+                        'filter_name' => $filter,
+                        'model_name' => $model,
                     ])->execute();
         }
     }
 
+    /**
+     * 
+     * @param string $item
+     * @param string $group
+     */
+    public function removePermissionFromGroup($item, $group)
+    {
+        $this->db->createCommand()
+                ->delete($this->itemGroupTable, [
+                    'item_name' => $item,
+                    'group_name' => $group,
+                ])->execute();
+    }
+
+    /**
+     * Deletes permissions group.
+     * 
+     * @param string $name
+     */
+    public function removePermissionsGroup($name)
+    {
+        $this->db->createCommand()->delete($this->groupTable, ['name' => $name])->execute();
+    }
+
+    /**
+     * 
+     * @param string $bundle
+     * @param string $controller
+     * @param string $action
+     */
+    public function removeRoute($bundle, $controller, $action = null)
+    {
+        $this->db->createCommand()
+                ->delete($this->routeTable, ['bundle' => $bundle, 'controller' => $controller, 'action' => $action])->execute();
+    }
+
+    /**
+     * 
+     * @param string $permission
+     * @param string|array $routes
+     */
     public function removeRoutesFromPermission($permission, $routes)
     {
         $routes = is_array($routes) ? $routes : [$routes];
@@ -271,6 +453,17 @@ class DbManager extends \yii\rbac\DbManager implements ManagerInterface
                         'route_id' => $route,
                     ])->execute();
         }
+    }
+
+    /**
+     * 
+     * @param string $permission
+     */
+    public function removeRuleFromPermission($permission)
+    {
+        $this->db->createCommand()
+                ->update($this->itemTable, ['rule_name' => null], ['name' => $permission, 'type' => Permission::TYPE_PERMISSION, 'updated_at' => time()])
+                ->execute();
     }
 
 }
