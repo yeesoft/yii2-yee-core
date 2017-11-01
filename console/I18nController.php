@@ -5,11 +5,8 @@ namespace yeesoft\console;
 use Yii;
 use yii\db\Query;
 use yii\helpers\Console;
-use yii\console\Exception;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
-
-//php yii i18n --mode=soft --lookup=@yeesoft/yii2-yee-page/i18n/ --language=uk
 
 /**
  *  @property \yii\db\Connection $db The database connection. This property is read-only.
@@ -26,26 +23,26 @@ class I18nController extends Controller
     const MODE_UPDATE = 'update';
 
     /**
-     * @var string the directory storing the migration classes. This can be either
+     * @var string the default directory storing the translation files. This can be either
      * a path alias or a directory.
      */
-    public $path = '@app/i18n';
+    public $path = '@common/i18n';
 
     /**
-     * @var array additional aliases of migration directories
+     * @var array additional aliases of translation file directories
      */
     public $lookup = [];
 
     /**
-     * @var string 
+     * @var string the mode of update. Possible modes:
+     * soft - adds new translations only (default);
+     * update - rewrites modified translations and adds new;
+     * hard - clears translation category and creates translations from scratch;
      */
-    public $mode;
-    //hard - clear category + add
-    //update - rewrite modified messages + add new
-    //soft - add new only
+    public $mode = 'soft';
 
     /**
-     * @var string 
+     * @var string translation language. If not set only source messages will be added. 
      */
     public $language;
 
@@ -58,14 +55,189 @@ class I18nController extends Controller
         return Yii::$app->db;
     }
 
+    /**
+     * 
+     * @inheritdoc
+     */
     public function options($actionID)
     {
         return ['mode', 'path', 'language', 'lookup'];
     }
 
+    /**
+     * 
+     * @inheritdoc
+     */
     public function optionAliases()
     {
         return ['m' => 'mode', 'p' => 'path', 'l' => 'language'];
+    }
+
+    /**
+     * Upgrades the application i18n by applying translation files.
+     * For example,
+     *
+     * ~~~
+     * yii i18n --lookup=@yeesoft    # apply Yee CMS source messages
+     * yii i18n --lookup=@yeesoft --language=de   # apply Yee CMS German translations
+     * yii i18n --lookup=@yeesoft/yii2-yee-page/i18n --language=de # apply Page module German translations
+     * yii i18n --lookup=@yeesoft --language=de --mode=hard   # apply Yee CMS German translations in hard mode
+     * ~~~
+     *
+     * applying all available translation.
+     */
+    public function actionIndex()
+    {
+        $files = $this->findFiles();
+
+        $list = '';
+        $count = 0;
+
+        if (isset($files['source']) && is_array($files['source'])) {
+            foreach ($files['source'] as $alias) {
+                $list .= "*** {$alias}" . PHP_EOL;
+                $count++;
+            }
+        }
+
+        if (isset($files['translation']) && is_array($files['translation'])) {
+            foreach ($files['translation'] as $alias) {
+                $list .= "*** {$alias}" . PHP_EOL;
+                $count++;
+            }
+        }
+
+        if (isset($files['menu']) && is_array($files['menu'])) {
+            foreach ($files['menu'] as $alias) {
+                $list .= "*** {$alias}" . PHP_EOL;
+                $count++;
+            }
+        }
+
+        if ($count) {
+            echo $this->ansiFormat("You are going to apply {$count} message translations in '{$this->mode}' mode from files: " . PHP_EOL, Console::FG_BLUE, Console::BOLD);
+
+            echo $list . PHP_EOL;
+
+            if ($this->confirm('Are you sure you want to continue?')) {
+                $this->update($files);
+                $this->ansiFormat(PHP_EOL . "Translations applied successfully." . PHP_EOL, Console::FG_GREEN, Console::BOLD);
+            }
+        } else {
+            echo $this->ansiFormat("No translations found." . PHP_EOL, Console::FG_BLUE, Console::BOLD);
+        }
+    }
+
+    /**
+     * Update message translation with the specified list of translation files.
+     *
+     * @param array $files the list of translation files.
+     *
+     * @return boolean whether the update is successful
+     */
+    protected function update($files)
+    {
+        $start = microtime(true);
+
+        //Source Messages
+        if (isset($files['source']) && is_array($files['source'])) {
+            echo $this->ansiFormat("Source Messages:" . PHP_EOL, Console::FG_GREEN, Console::BOLD);
+
+            foreach ($files['source'] as $alias) {
+                echo "*** Applying {$alias}" . PHP_EOL;
+                $this->sourceUp(require(Yii::getAlias($alias)));
+            }
+
+            $time = microtime(true) - $start;
+            echo "*** Source Messages Applied (time: " . sprintf("%.3f", $time) . "s)" . PHP_EOL . PHP_EOL;
+        }
+
+        //Message Translations
+        if (isset($files['translation']) && is_array($files['translation'])) {
+            echo $this->ansiFormat("Message Translations:" . PHP_EOL, Console::FG_GREEN, Console::BOLD);
+
+            foreach ($files['translation'] as $alias) {
+                echo "*** Applying {$alias}" . PHP_EOL;
+                $this->translationUp(require(Yii::getAlias($alias)));
+            }
+
+            $time = microtime(true) - $start;
+            echo "*** Message Translations Applied (time: " . sprintf("%.3f", $time) . "s)" . PHP_EOL . PHP_EOL;
+        }
+
+        //Menu Link Translations
+        if (isset($files['menu']) && is_array($files['menu'])) {
+            echo $this->ansiFormat("Menu Link Translations:" . PHP_EOL, Console::FG_GREEN, Console::BOLD);
+
+            foreach ($files['menu'] as $alias) {
+                echo "*** Applying {$alias}" . PHP_EOL;
+                $this->menuUp(require(Yii::getAlias($alias)));
+            }
+
+            $time = microtime(true) - $start;
+            echo "*** Menu Link Translations Applied (time: " . sprintf("%.3f", $time) . "s)" . PHP_EOL . PHP_EOL;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the translation files.
+     * @return array list of translation files.
+     */
+    protected function findFiles()
+    {
+        $this->lookup = array_unique($this->lookup);
+
+        //replace @yeesoft shortcut with module subdirectorias
+        if (in_array('@yeesoft', $this->lookup)) {
+            unset($this->lookup[array_search('@yeesoft', $this->lookup)]);
+
+            $dir = Yii::getAlias('@yeesoft');
+            if (is_dir($dir)) {
+                $handle = opendir($dir);
+                while (($child = readdir($handle)) !== false) {
+                    if ($child === '.' || $child === '..') {
+                        continue;
+                    }
+
+                    if (is_dir($dir . DIRECTORY_SEPARATOR . $child . DIRECTORY_SEPARATOR . 'i18n')) {
+                        $this->lookup[] = Yii::getAlias('@yeesoft') . DIRECTORY_SEPARATOR . $child . DIRECTORY_SEPARATOR . 'i18n';
+                    }
+                }
+                closedir($handle);
+            }
+        }
+
+        $directories = ArrayHelper::merge([$this->path], $this->lookup);
+
+        if ($this->language) {
+            $directories[] = rtrim($this->path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->language;
+            foreach ($this->lookup as $lookup) {
+                $directories[] = rtrim($lookup, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $this->language;
+            }
+        }
+
+        $files = [];
+        foreach ($directories AS $alias) {
+            $dir = Yii::getAlias($alias);
+
+            if (is_dir($dir)) {
+                $handle = opendir($dir);
+                while (($file = readdir($handle)) !== false) {
+                    if ($file === '.' || $file === '..') {
+                        continue;
+                    }
+                    $path = $dir . DIRECTORY_SEPARATOR . $file;
+                    if (preg_match('/^.*?_(source|translation|menu)\.php$/', $file, $matches) && is_file($path)) {
+                        $files[$matches[1]][] = rtrim($alias, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $matches[0];
+                    }
+                }
+                closedir($handle);
+            }
+        }
+
+        return $files;
     }
 
     protected function addSourceMessage($category, $message)
@@ -171,13 +343,38 @@ class I18nController extends Controller
     protected function removeMenuLinkTranslation($link, $language)
     {
         $this->db->createCommand()
-                ->delete(static::TABLE_MESSAGE_TRANSLATIONS, ['and', 'language = :language', 'link_id = :link'], [':language' => $language, ':link' => $link])
+                ->delete(static::TABLE_MENU_TRANSLATIONS, ['and', 'language = :language', 'link_id = :link'], [':language' => $language, ':link' => $link])
                 ->execute();
+    }
+
+    protected function validateSourceParams($params)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        foreach ($params as $category => $messages) {
+            if (!is_string($category) || !is_array($messages)) {
+                return false;
+            }
+
+            foreach ($messages as $message) {
+                if (!is_string($message)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     protected function sourceUp($params)
     {
-        //check is valid $params
+        if (!$this->validateSourceParams($params)) {
+            $title = $this->ansiFormat('Error: ', Console::FG_RED, Console::BOLD);
+            echo "*** " . $title . "Invalid source message parameters in the file. Skipping..." . PHP_EOL;
+            return false;
+        }
 
         if ($this->mode === static::MODE_HARD) {
             $this->removeSourceCategory(array_keys($params));
@@ -192,9 +389,34 @@ class I18nController extends Controller
         }
     }
 
+    protected function validateTranslationParams($params)
+    {
+        if (!is_array($params)) {
+            return false;
+        }
+
+        foreach ($params as $category => $messages) {
+            if (!is_string($category) || !is_array($messages)) {
+                return false;
+            }
+
+            foreach ($messages as $message => $translation) {
+                if (!is_string($message) || !is_string($translation)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     protected function translationUp($params)
     {
-        //check is valid $params
+        if (!$this->validateTranslationParams($params)) {
+            $title = $this->ansiFormat('Error: ', Console::FG_RED, Console::BOLD);
+            echo "*** " . $title . "Invalid message translation parameters in the file. Skipping..." . PHP_EOL;
+            return false;
+        }
 
         if ($this->mode === static::MODE_UPDATE) {
             foreach ($params as $category => $messages) {
@@ -211,156 +433,51 @@ class I18nController extends Controller
                     }
                 } else {
                     $title = $this->ansiFormat('Warning: ', Console::FG_YELLOW, Console::BOLD);
-                    echo $title . "Cannot add translation. Source message \"{$message}\" doesn't exist in category \"{$category}\"." . PHP_EOL;
+                    echo "*** " . $title . "Cannot add translation. Source message \"{$message}\" doesn't exist in category \"{$category}\"." . PHP_EOL;
                 }
             }
         }
     }
 
-    protected function menuUp($messages)
+    protected function validateMenuParams($params)
     {
-        //check is valid $params
+        if (!is_array($params)) {
+            return false;
+        }
 
-        if ($this->mode === static::MODE_UPDATE) {
-            foreach ($messages as $link => $translation) {
+        foreach ($params as $link => $translation) {
+            if (!is_string($link) || !is_string($translation)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected function menuUp($params)
+    {
+        if (!$this->validateMenuParams($params)) {
+            $title = $this->ansiFormat('Error: ', Console::FG_RED, Console::BOLD);
+            echo "*** " . $title . "Invalid menu link translation parameters in the file. Skipping..." . PHP_EOL;
+            return false;
+        }
+
+        if (in_array($this->mode, [static::MODE_UPDATE, static::MODE_HARD])) {
+            foreach ($params as $link => $translation) {
                 $this->removeMenuLinkTranslation($link, $this->language);
             }
         }
 
-        foreach ($messages as $link => $translation) {
+        foreach ($params as $link => $translation) {
             if ($this->existsMenuLink($link)) {
                 if (!$this->existsMenuLinkTranslation($link, $this->language)) {
                     $this->addMenuLinkTranslation($link, $this->language, $translation);
                 }
             } else {
                 $title = $this->ansiFormat('Warning: ', Console::FG_YELLOW, Console::BOLD);
-                echo $title . "Cannot add menu link translation. Menu link with id \"{$link}\" doesn't exist." . PHP_EOL;
+                echo "*** " . $title . "Cannot add menu link translation. Menu link with id \"{$link}\" doesn't exist." . PHP_EOL;
             }
         }
-    }
-
-    public function actionIndex()
-    {
-
-        print_r($this->lookup);
-
-        $files = $this->findFiles();
-
-        print_r($files);
-        
-        $this->update($files);
-
-
-
-
-
-//        if ($this->confirm('Apply i18n translations?')) {
-//            echo PHP_EOL . "Updated successfully." . PHP_EOL;
-//        }
-
-
-
-
-        echo $this->mode . ' - ' . $this->path . ' - ' . $this->language . PHP_EOL;
-    }
-
-    /**
-     * Upgrades with the specified migration class.
-     *
-     * @param array $files the migration class name
-     *
-     * @return boolean whether the migration is successful
-     */
-    protected function update($files)
-    {
-        echo "*** applying \n";
-        $start = microtime(true);
-
-        if (isset($files['source']) && is_array($files['source'])) {
-            foreach ($files['source'] as $alias) {
-                $this->sourceUp(require(Yii::getAlias($alias)));
-            }
-        }
-
-        $time = microtime(true) - $start;
-        echo "*** applied source (time: " . sprintf("%.3f", $time) . "s)\n\n";
-
-        if (isset($files['translation']) && is_array($files['translation'])) {
-            foreach ($files['translation'] as $alias) {
-                $this->translationUp(require(Yii::getAlias($alias)));
-            }
-        }
-        
-        $time = microtime(true) - $start;
-        echo "*** applied translation (time: " . sprintf("%.3f", $time) . "s)\n\n";
-
-        if (isset($files['menu']) && is_array($files['menu'])) {
-            foreach ($files['menu'] as $alias) {
-                $this->menuUp(require(Yii::getAlias($alias)));
-            }
-        }
-        
-        $time = microtime(true) - $start;
-        echo "*** applied menu (time: " . sprintf("%.3f", $time) . "s)\n\n";
- 
-        return true;
-    }
-
-    /**
-     * Creates a new migration instance.
-     *
-     * @param string $class the migration class name
-     *
-     * @return \yii\db\Migration the migration instance
-     */
-    protected function createMigration($class, $alias)
-    {
-        $file = $class . '.php';
-        require_once(\Yii::getAlias($alias) . '/' . $file);
-
-        return new $class(['db' => $this->db]);
-    }
-
-    /**
-     * Returns the migrations that are not applied.
-     * @return array list of new migrations, (key: migration version; value: alias)
-     */
-    protected function findFiles()
-    {
-        $directories = ArrayHelper::merge([$this->path], $this->lookup);
-
-        if ($this->language) {
-            $directories[] = rtrim($this->path, '/') . '/' . $this->language;
-            foreach ($this->lookup as $lookup) {
-                $directories[] = rtrim($lookup, '/') . '/' . $this->language;
-            }
-        }
-
-        print_r($directories);
-
-        $migrations = [];
-
-        foreach ($directories AS $alias) {
-            $dir = Yii::getAlias($alias);
-
-            if (is_dir($dir)) {
-                $handle = opendir($dir);
-                while (($file = readdir($handle)) !== false) {
-                    if ($file === '.' || $file === '..') {
-                        continue;
-                    }
-                    $path = $dir . DIRECTORY_SEPARATOR . $file;
-                    if (preg_match('/^.*?_(source|translation|menu)\.php$/', $file, $matches) && is_file($path)) {
-//                        print_r($matches);
-                        $migrations[$matches[1]][] = rtrim($alias, '/') . '/' . $matches[0];
-                    }
-                }
-                closedir($handle);
-            }
-        }
-
-
-        return $migrations;
     }
 
 }
