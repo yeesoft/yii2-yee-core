@@ -3,11 +3,11 @@
 namespace yeesoft\grid\columns;
 
 use yii\grid\DataColumn;
-use yii\helpers\Html;
 use yii\jui\DatePicker;
 
 class DateFilterColumn extends DataColumn
 {
+
     /**
      * @var array
      */
@@ -33,29 +33,15 @@ class DateFilterColumn extends DataColumn
         $model = $this->grid->filterModel;
 
         if ($this->filter !== false && $this->attribute !== null && $model->isAttributeActive($this->attribute)) {
-            if ($model->hasErrors($this->attribute)) {
-                Html::addCssClass($this->filterOptions, 'has-error');
-                $error = ' ' . Html::error($model, $this->attribute,
-                        $this->grid->filterErrorOptions);
-            } else {
-                $error = '';
-            }
-
-            $filterOptions = ['=' => '=', '>' => '>', '<' => '<'];
-            Html::addCssClass($this->filterInputOptions, 'date-filter-input');
-
-            $dropDown = Html::activeDropDownList($model,
-                $this->attribute . '_operand', $filterOptions, [
-                    'class' => 'form-control pull-left',
-                    'style' => 'width: 32px; appearance: none; -moz-appearance: none; -webkit-appearance: none;',
-                    ]);
-            $dropDown = '';
-            $field = DatePicker::widget(['model' => $model, 'attribute' => $this->attribute,
-                'options' => $this->filterInputOptions, 'dateFormat' => 'yyyy-MM-dd',]);
-
-            return $dropDown . $field . $error;
+            return DatePicker::widget([
+                        'model' => $model,
+                        'attribute' => $this->attribute,
+                        'options' => $this->filterInputOptions,
+                        'dateFormat' => 'yyyy-MM-dd'
+            ]);
         } else {
             return parent::renderFilterCellContent();
         }
     }
+
 }

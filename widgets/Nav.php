@@ -137,9 +137,6 @@ class Nav extends \yii\bootstrap\Nav
         if (is_string($item)) {
             return $item;
         }
-        if (!isset($item['label'])) {
-            throw new InvalidConfigException("The 'label' option is required.");
-        }
         
         if(!ArrayHelper::getValue($item, 'url') && !ArrayHelper::getValue($item, 'items')){
             return Html::tag('li', $item['label'], ['class' => 'header']);

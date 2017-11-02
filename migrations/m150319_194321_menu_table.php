@@ -2,7 +2,7 @@
 
 use yii\db\Schema;
 
-class m150319_194321_init_menus extends yii\db\Migration
+class m150319_194321_menu_table extends yii\db\Migration
 {
 
     const TABLE_NAME = '{{%menu}}';
@@ -45,7 +45,7 @@ class m150319_194321_init_menus extends yii\db\Migration
             'link' => $this->string(255),
             'parent_id' => $this->string(64)->defaultValue(''),
             'image' => $this->string(24),
-            'alwaysVisible' => $this->integer(1)->notNull()->defaultValue(0),
+            'always_visible' => $this->integer(1)->notNull()->defaultValue(0),
             'order' => $this->integer(),
             'created_at' => $this->integer(),
             'updated_at' => $this->integer(),
@@ -71,10 +71,7 @@ class m150319_194321_init_menus extends yii\db\Migration
         $this->addForeignKey('fk_menu_link_lang', self::TABLE_LINK_LANG_NAME, 'link_id', self::TABLE_LINK_NAME, 'id', 'CASCADE', 'CASCADE');
 
         $this->insert(self::TABLE_NAME, ['id' => 'admin-menu', 'created_by' => 1]);
-        $this->insert(self::TABLE_LANG_NAME, ['menu_id' => 'admin-menu', 'language' => 'en-US', 'title' => 'Control Panel Menu']);
-
-        $this->insert(self::TABLE_LINK_NAME, ['id' => 'dashboard', 'menu_id' => 'admin-menu', 'link' => '/', 'image' => 'th', 'created_by' => 1, 'order' => 1]);
-        $this->insert(self::TABLE_LINK_LANG_NAME, ['link_id' => 'dashboard', 'label' => 'Dashboard', 'language' => 'en-US']);
+        $this->insert(self::TABLE_LANG_NAME, ['menu_id' => 'admin-menu', 'language' => 'en-US', 'title' => 'Dashboard Menu']);
     }
 
     public function down()

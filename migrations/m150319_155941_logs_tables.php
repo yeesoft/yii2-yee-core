@@ -1,11 +1,10 @@
 <?php
 
-class m150319_155941_create_user_tables extends \yii\db\Migration
+class m150319_155941_logs_tables extends \yii\db\Migration
 {
 
     const USER_TABLE = '{{%user}}';
     const USER_VISIT_LOG_TABLE = '{{%user_visit_log}}';
-    const USER_SETTING_TABLE = '{{%user_setting}}';
 
     public function up()
     {
@@ -29,22 +28,13 @@ class m150319_155941_create_user_tables extends \yii\db\Migration
         $this->createIndex('visit_log_user_id', self::USER_VISIT_LOG_TABLE, 'user_id');
         $this->addForeignKey('fk_user_id_user_visit_log_table', self::USER_VISIT_LOG_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'SET NULL', 'CASCADE');
 
-        $this->createTable(self::USER_SETTING_TABLE, [
-            'id' => $this->primaryKey(),
-            'user_id' => $this->integer()->notNull(),
-            'key' => $this->string(64)->notNull(),
-            'value' => $this->text(),
-                ], $tableOptions);
 
-        $this->createIndex('user_setting_user_key', self::USER_SETTING_TABLE, ['user_id', 'key']);
-        $this->addForeignKey('fk_user_id_user_setting_table', self::USER_SETTING_TABLE, ['user_id'], self::USER_TABLE, ['id'], 'CASCADE', 'CASCADE');
 
         $this->insert(self::USER_TABLE, ['id' => 1, 'username' => 'admin', 'auth_key' => '', 'password_hash' => '', 'email' => '', 'superadmin' => 1, 'created_at' => 0, 'updated_at' => 0]);
     }
 
     public function down()
     {
-        $this->dropTable(self::USER_SETTING_TABLE);
         $this->dropTable(self::USER_VISIT_LOG_TABLE);
     }
 

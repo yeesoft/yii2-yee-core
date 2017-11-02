@@ -145,7 +145,7 @@ class Menu extends ActiveRecord
             'label' => $link->label,
         ];
 
-        if (isset($link->alwaysVisible) && $link->alwaysVisible) {
+        if (isset($link->always_visible) && $link->always_visible) {
             $item['visible'] = true;
         }
 

@@ -20,7 +20,7 @@ use yeesoft\multilingual\db\MultilingualLabelsTrait;
  * @property string $link
  * @property string $label
  * @property string $parent_id
- * @property integer $alwaysVisible
+ * @property integer $always_visible
  * @property string $image
  * @property integer $order
  * @property integer $created_at
@@ -75,7 +75,7 @@ class MenuLink extends ActiveRecord
         return [
             [['menu_id', 'label'], 'required'],
             ['id', 'unique'],
-            [['order', 'alwaysVisible', 'created_by', 'updated_by', 'created_at', 'updated_at',], 'integer'],
+            [['order', 'always_visible', 'created_by', 'updated_by', 'created_at', 'updated_at',], 'integer'],
             [['id', 'menu_id', 'parent_id'], 'string', 'max' => 64],
             [['link', 'label'], 'string', 'max' => 255],
             [['image'], 'string', 'max' => 128],
@@ -95,7 +95,7 @@ class MenuLink extends ActiveRecord
             'link' => Yii::t('yee', 'Link'),
             'label' => Yii::t('yee', 'Label'),
             'parent_id' => Yii::t('yee', 'Parent Link'),
-            'alwaysVisible' => Yii::t('yee', 'Always Visible'),
+            'always_visible' => Yii::t('yee', 'Always Visible'),
             'image' => Yii::t('yee', 'Icon'),
             'order' => Yii::t('yee', 'Order'),
             'created_by' => Yii::t('yee', 'Created By'),
