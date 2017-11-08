@@ -191,40 +191,7 @@ class User extends UserIdentity
         return $result;
     }
 
-    /**
-     * @param string|array $roles
-     * @param bool $superAdminAllowed
-     *
-     * @return bool
-     */
-    public static function hasRole($roles, $superAdminAllowed = true)
-    {
-        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
-            return true;
-        }
-        $roles = (array) $roles;
 
-        AuthHelper::ensurePermissionsUpToDate();
-
-        return array_intersect($roles, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES, [])) !== [];
-    }
-
-    /**
-     * @param string $permission
-     * @param bool $superAdminAllowed
-     *
-     * @return bool
-     */
-    public static function hasPermission($permission, $superAdminAllowed = true)
-    {
-        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
-            return true;
-        }
-
-        AuthHelper::ensurePermissionsUpToDate();
-
-        return in_array($permission, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_PERMISSIONS, []));
-    }
 
     /**
      * Useful for Menu widget
@@ -240,26 +207,46 @@ class User extends UserIdentity
      *
      * @return bool
      */
-    public static function canRoute($route, $superAdminAllowed = true)
+    public static function canRoute($url, $superAdminAllowed = true)
     {
+        return true;
+//        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
+//            return true;
+//        }
+        
+        if (is_array($url)) {
+            $user = Yii::$app->user;
+            $request = Yii::$app->request;
+            $rules = Yii::$app->authManager->getRouteRules();
+            $action = \yeesoft\helpers\Html::getActionByRoute($url);
+
+            /* @var $rule AccessRule */
+            foreach ($rules as $rule) {
+                if ($allow = $rule->allows($action, $user, $request)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        
         //return true;
-        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
-            return true;
-        }
 
-        $baseRoute = AuthHelper::unifyRoute($route);
 
-        if (substr($baseRoute, 0, 4) === "http") {
-            return true;
-        }
+        //$baseRoute = AuthHelper::unifyRoute($route);
 
-        if (Route::isFreeAccess($baseRoute)) {
-            return true;
-        }
-
-        AuthHelper::ensurePermissionsUpToDate();
-
-        return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
+//        if (substr($baseRoute, 0, 4) === "http") {
+//            return true;
+//        }
+//
+//        if (Route::isFreeAccess($baseRoute)) {
+//            return true;
+//        }
+//
+//        AuthHelper::ensurePermissionsUpToDate();
+//
+//        return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
     }
 
     /**

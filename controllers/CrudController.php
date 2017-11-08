@@ -96,7 +96,7 @@ abstract class CrudController extends BaseController
     {
         parent::init();
 
-        if ($this->modelPrimaryKey === null) {
+        if ($this->modelClass !== null && $this->modelPrimaryKey === null) {
             $modelClass = $this->modelClass;
             $primaryKey = $modelClass::primaryKey();
 

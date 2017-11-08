@@ -2,18 +2,13 @@
 
 namespace yeesoft\helpers;
 
-use yeesoft\models\AuthItem;
-use yeesoft\models\AuthPermission;
-use yeesoft\models\AuthRole;
-use yeesoft\models\AuthRoute;
 use Yii;
-use yii\base\InvalidParamException;
-use yii\helpers\Inflector;
-use yii\helpers\Url;
 use yii\rbac\DbManager;
+use yeesoft\models\AuthRole;
 
 class AuthHelper
 {
+
     const SESSION_PREFIX_LAST_UPDATE = '__auth_last_update';
     const SESSION_PREFIX_ROLES = '__userRoles';
     const SESSION_PREFIX_PERMISSIONS = '__userPermissions';
@@ -34,16 +29,12 @@ class AuthHelper
         $session->remove(self::SESSION_PREFIX_ROUTES);
 
         // Set permissions last mod time
-        $session->set(self::SESSION_PREFIX_LAST_UPDATE,
-            filemtime(self::getPermissionsLastModFile()));
+        $session->set(self::SESSION_PREFIX_LAST_UPDATE, filemtime(self::getPermissionsLastModFile()));
 
         // Save roles, permissions and routes in session
-        $session->set(self::SESSION_PREFIX_ROLES,
-            array_keys(AuthRole::getUserRoles($identity->id)));
-        $session->set(self::SESSION_PREFIX_PERMISSIONS,
-            array_keys(Permission::getUserPermissions($identity->id)));
-        $session->set(self::SESSION_PREFIX_ROUTES,
-            Route::getUserRoutes($identity->id));
+        $session->set(self::SESSION_PREFIX_ROLES, array_keys(AuthRole::getUserRoles($identity->id)));
+        $session->set(self::SESSION_PREFIX_PERMISSIONS, array_keys(Permission::getUserPermissions($identity->id)));
+        $session->set(self::SESSION_PREFIX_ROUTES, Route::getUserRoutes($identity->id));
     }
 
     /**
@@ -84,58 +75,6 @@ class AuthHelper
     }
 
     /**
-     * Return route without baseUrl and start it with slash
-     *
-     * @param string|array $route
-     *
-     * @return string
-     */
-    public static function unifyRoute($route)
-    {
-        // If its like Html::a('Create', ['create'])
-        if (is_array($route) AND strpos($route[0], '/') === false) {
-            $route = Url::toRoute($route);
-        }
-
-        // URL starts with http
-        if (!is_array($route) && (substr($route, 0, 4) === "http")) {
-            return $route;
-        }
-
-        if (Yii::$app->getUrlManager()->showScriptName === true) {
-            $baseUrl = Yii::$app->getRequest()->scriptUrl;
-        } else {
-            $baseUrl = Yii::$app->getRequest()->baseUrl;
-        }
-
-        // Check if $route has been passed as array or as string with params (or without)
-        if (!is_array($route)) {
-            $route = explode('?', $route);
-        }
-
-        $routeAsString = $route[0];
-
-        // If it's not clean url like localhost/folder/index.php/bla-bla then remove
-        // baseUrl and leave only relative path 'bla-bla'
-        if ($baseUrl) {
-            if (strpos($routeAsString, $baseUrl) === 0) {
-                $routeAsString = substr_replace($routeAsString, '', 0,
-                    strlen($baseUrl));
-            }
-        }
-
-        $languagePrefix = '/' . Yii::$app->language . '/';
-
-        // Remove language prefix
-        if (strpos($routeAsString, $languagePrefix) === 0) {
-            $routeAsString = substr_replace($routeAsString, '', 0,
-                strlen($languagePrefix));
-        }
-
-        return '/' . ltrim($routeAsString, '/');
-    }
-
-    /**
      * Get child routes, permissions or roles
      *
      * @param string $itemName
@@ -158,61 +97,4 @@ class AuthHelper
         return $result;
     }
 
-    /**
-     * Select items that has "/" in permissions
-     *
-     * @param array $allPermissions
-     *
-     * @return object
-     */
-    public static function separateRoutesAndPermissions($allPermissions)
-    {
-        $arrayOfPermissions = $allPermissions;
-
-        $routes = [];
-        $permissions = [];
-
-        foreach ($arrayOfPermissions as $id => $item) {
-            $permissions[$id] = $item;
-        }
-
-        return (object)compact('routes', 'permissions');
-    }
-
-    /**
-     * @return array
-     */
-    public static function getAllModules()
-    {
-        $result = [];
-
-        $currentEnvModules = \Yii::$app->getModules();
-
-        foreach ($currentEnvModules as $moduleId => $uselessStuff) {
-            $result[$moduleId] = \Yii::$app->getModule($moduleId);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param \yii\base\Controller $controller
-     * @param Array $result all controller action.
-     */
-    private static function getActionRoutes($controller, &$result)
-    {
-        $prefix = '/' . $controller->uniqueId . '/';
-        foreach ($controller->actions() as $id => $value) {
-            $result[] = $prefix . $id;
-        }
-        $class = new \ReflectionClass($controller);
-        foreach ($class->getMethods() as $method) {
-            $name = $method->getName();
-            if ($method->isPublic() && !$method->isStatic() && strpos($name,
-                    'action') === 0 && $name !== 'actions'
-            ) {
-                $result[] = $prefix . Inflector::camel2id(substr($name, 6));
-            }
-        }
-    }
 }

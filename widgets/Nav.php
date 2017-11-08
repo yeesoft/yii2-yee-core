@@ -83,7 +83,7 @@ class Nav extends \yii\bootstrap\Nav
 
         foreach ($items as &$item) {
             if (isset($item['url']) AND ! isset($item['visible']) AND ! in_array($item['url'], ['', '#'])) {
-                $item['visible'] = User::canRoute($item['url']);
+               // $item['visible'] = User::canRoute($item['url']);
             }
 
             if (isset($item['items'])) {
