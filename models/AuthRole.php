@@ -6,7 +6,6 @@ use Yii;
 use Exception;
 use yii\rbac\DbManager;
 use yii\helpers\ArrayHelper;
-use yeesoft\helpers\AuthHelper;
 
 class AuthRole extends AuthItem
 {
@@ -61,79 +60,13 @@ class AuthRole extends AuthItem
      */
     public static function getAvailableRoles($showAll = false, $asArray = false)
     {
-        $condition = (Yii::$app->user->isSuperAdmin OR $showAll) ? [] : ['name' => Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROLES)];
+        $condition = (Yii::$app->user->isSuperAdmin OR $showAll) ? [] : ['name' => []];
 
         $result = static::find()->andWhere($condition)->all();
 
         return $asArray ? ArrayHelper::map($result, 'name', 'name') : $result;
     }
 
-    /**
-     * Assign route to role via permission and create permission or route if it don't exists
-     * Helper mainly for migrations
-     *
-     * @param string $roleName
-     * @param string $permissionName
-     * @param array $routes
-     * @param null|string $permissionDescription
-     * @param null|string $groupName
-     *
-     * @throws \InvalidArgumentException
-     * @return true|static|string
-     */
-    public static function assignRoutesViaPermission($roleName, $permissionName, $routes, $permissionDescription = null, $groupName = null)
-    {
-        $role = static::findOne(['name' => $roleName]);
-
-        if (!$role) {
-            throw new \InvalidArgumentException("Role with name = {$roleName} not found");
-        }
-
-        $permission = Permission::findOne(['name' => $permissionName]);
-
-        if (!$permission) {
-            $permission = Permission::create($permissionName, $permissionDescription, $groupName);
-
-            if ($permission->hasErrors()) {
-                return $permission;
-            }
-        }
-
-        try {
-            Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->authManager->itemChildTable, [
-                        'parent' => $role->name,
-                        'child' => $permission->name,
-                    ])->execute();
-        } catch (Exception $e) {
-            // Don't throw Exception because we may have this permission for this role,
-            // but need to add new routes to it
-        }
-
-        $routes = (array) $routes;
-
-        foreach ($routes as $route) {
-            $route = '/' . ltrim($route, '/');
-
-            Route::create($route);
-
-            try {
-                Yii::$app->db->createCommand()
-                        ->insert(Yii::$app->authManager->itemChildTable, [
-                            'parent' => $permission->name,
-                            'child' => $route,
-                        ])->execute();
-            } catch (Exception $e) {
-                // Don't throw Exception because this permission may already have this route,
-                // so just go to the next route
-            }
-        }
-
-        AuthHelper::invalidatePermissions();
-
-        return true;
-    }
-    
     /**
      * 
      * @param array $exclude

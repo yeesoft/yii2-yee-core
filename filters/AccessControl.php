@@ -45,9 +45,8 @@ class AccessControl extends \yii\filters\AccessControl
      */
     public function beforeAction($action)
     {
-        return true;
-        
-        
+        //return true;
+                
         /* @var $auth \yeesoft\rbac\DbManager */
         $user = $this->user;
         $auth = Yii::$app->authManager;
@@ -68,7 +67,7 @@ class AccessControl extends \yii\filters\AccessControl
         }
 
         if ($user->isSuperadmin) {
-            //return true;
+            return true;
         }
 
         return parent::beforeAction($action);

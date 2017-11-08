@@ -2,13 +2,13 @@
 
 namespace yeesoft\widgets;
 
-use yeesoft\models\User;
+use Yii;
 
 /**
  * Class Menu
  *
  * Show only those items in navigation menu which user can see
- * If item has no "visible" key, than "visible"=>User::canRoute($item['url') will be added
+ * If item has no "visible" key, than "visible"=> Yii::$app->user->canRoute($item['url') will be added
  *
  * @package yeesoft\widgets
  */
@@ -33,7 +33,7 @@ class Menu extends \yii\widgets\Menu
 
         foreach ($items as &$item) {
             if (isset($item['url']) AND !in_array($item['url'], ['', '#']) AND !isset($item['visible'])) {
-                $item['visible'] = User::canRoute($item['url']);
+                $item['visible'] = Yii::$app->user->canRoute($item['url']);
             }
 
             if (isset($item['items'])) {

@@ -2,7 +2,6 @@
 
 namespace yeesoft\models;
 
-use yeesoft\helpers\AuthHelper;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yeesoft\db\ActiveRecord;
@@ -228,7 +227,6 @@ abstract class AuthItem extends ActiveRecord
             }
         }
 
-        AuthHelper::invalidatePermissions();
     }
 
     /**
@@ -245,7 +243,7 @@ abstract class AuthItem extends ActiveRecord
                     ->execute();
         }
 
-        AuthHelper::invalidatePermissions();
+
     }
 
     /**
@@ -298,7 +296,7 @@ abstract class AuthItem extends ActiveRecord
     {
         parent::afterDelete();
 
-        AuthHelper::invalidatePermissions();
+
     }
 
     public function resetRuleName()

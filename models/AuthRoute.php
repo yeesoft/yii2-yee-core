@@ -6,7 +6,6 @@ use Yii;
 use yii\base\Action;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-use yeesoft\helpers\AuthHelper;
 
 /**
  * This is the model class for table "auth_route".
@@ -91,120 +90,8 @@ class AuthRoute extends \yeesoft\db\ActiveRecord
         return $rule;
     }
 
-    /**
-     * Get all routes available for this user
-     *
-     * @param int $userId
-     * @param bool $withSubRoutes
-     *
-     * @return array
-     */
-    public static function getUserRoutes($userId, $withSubRoutes = true)
-    {
-        $permissions = array_keys(Permission::getUserPermissions($userId));
+    
 
-        if (!$permissions) {
-            return [];
-        }
-
-        $auth_item = Yii::$app->authManager->itemTable;
-        $auth_item_child = Yii::$app->authManager->itemChildTable;
-
-        $routes = (new Query)
-                ->select(['name'])
-                ->from($auth_item)
-                ->innerJoin($auth_item_child, '(' . $auth_item_child . '.child = ' . $auth_item . '.name AND ' . $auth_item . '.type = :type)')
-                ->params([':type' => self::TYPE_ROUTE])
-                ->where([$auth_item_child . '.parent' => $permissions])
-                ->column();
-
-        return $withSubRoutes ? static::withSubRoutes($routes, ArrayHelper::map(Route::find()->asArray()->all(), 'name', 'name')) : $routes;
-    }
-
-    /**
-     * Return given route with all they sub-routes
-     *
-     * @param array $givenRoutes
-     * @param array $allRoutes
-     *
-     * @return array
-     */
-    public static function withSubRoutes($givenRoutes, $allRoutes)
-    {
-        $result = [];
-
-        foreach ($allRoutes as $route) {
-            foreach ($givenRoutes as $givenRoute) {
-                if (static::isSubRoute($givenRoute, $route)) {
-                    $result[] = $route;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Checks if "candidate" is sub-route of "route". For example:
-     *
-     * "/module/controller/action" is sub-route of "/module/*"
-     *
-     * @param string $route
-     * @param string $candidate
-     *
-     * @return bool
-     */
-    public static function isSubRoute($route, $candidate)
-    {
-        if ($route == $candidate) {
-            return true;
-        }
-
-        // If it's full access to module or controller
-        if (substr($route, -2) == '/*') {
-            $route = rtrim($route, '*');
-
-            if (strpos($candidate, $route) === 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if route is in array of allowed routes
-     *
-     * @param string $route
-     * @param array $allowedRoutes
-     *
-     * @return boolean
-     */
-    public static function isRouteAllowed($route, $allowedRoutes)
-    {
-        $route = rtrim(Yii::$app->getRequest()->getBaseUrl(), '/') . $route;
-
-        if (in_array($route, $allowedRoutes)) {
-            return true;
-        }
-
-        foreach ($allowedRoutes as $allowedRoute) {
-            // If some controller fully allowed (wildcard)
-            if (substr($allowedRoute, -1) == '*') {
-                $routeArray = explode('/', $route);
-                array_splice($routeArray, -1);
-
-                $allowedRouteArray = explode('/', $allowedRoute);
-                array_splice($allowedRouteArray, -1);
-
-                if (array_diff($routeArray, $allowedRouteArray) === array()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Check if controller has $freeAccess = true or $action in $freeAccessActions

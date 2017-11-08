@@ -3,7 +3,6 @@
 namespace yeesoft\widgets;
 
 use Yii;
-use yeesoft\models\User;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -13,7 +12,7 @@ use yeesoft\helpers\FA;
  * Class Nav
  *
  * Show only those items in navigation menu which user can see.
- * If item has no "visible" key, than "visible" => User::canRoute($item['url') will be added.
+ * If item has no "visible" key, than "visible" => Yii::$app->user->canRoute($item['url') will be added.
  *
  * Nav support submenus. Submenus has no nested level limit.
  *
@@ -82,8 +81,8 @@ class Nav extends \yii\bootstrap\Nav
         $allVisible = false;
 
         foreach ($items as &$item) {
-            if (isset($item['url']) AND ! isset($item['visible']) AND ! in_array($item['url'], ['', '#'])) {
-               // $item['visible'] = User::canRoute($item['url']);
+            if (isset($item['url']) AND ! isset($item['visible']) AND !in_array($item['url'], ['', '#'])) {
+               // $item['visible'] = Yii::$app->user->canRoute($item['url']);
             }
 
             if (isset($item['items'])) {

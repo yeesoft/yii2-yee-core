@@ -3,7 +3,6 @@
 namespace yeesoft\web;
 
 use Yii;
-use yeesoft\helpers\AuthHelper;
 
 class User extends \yii\web\User
 {
@@ -51,16 +50,6 @@ class User extends \yii\web\User
     public function getUsername()
     {
         return @Yii::$app->user->identity->username;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function afterLogin($identity, $cookieBased, $duration)
-    {
-        //AuthHelper::updatePermissions($identity);
-
-        parent::afterLogin($identity, $cookieBased, $duration);
     }
 
     /**
@@ -117,6 +106,42 @@ class User extends \yii\web\User
         }
         
         return parent::can($permissionName, $params, $allowCaching);
+    }
+    
+    public function canRoute($url, $superAdminAllowed = true) {
+        return true;
+        
+//        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
+//            return true;
+//        }
+
+        if (is_array($url)) {
+            $request = Yii::$app->request;
+            $rules = Yii::$app->authManager->getRouteRules();
+            $action = \yeesoft\helpers\Html::getActionByRoute($url);
+
+            /* @var $rule AccessRule */
+            foreach ($rules as $rule) {
+                if ($allow = $rule->allows($action, $this->identity, $request)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        //return true;
+//        if (substr($baseRoute, 0, 4) === "http") {
+//            return true;
+//        }
+//
+//        if (Route::isFreeAccess($baseRoute)) {
+//            return true;
+//        }
+//
+//
+//        return Route::isRouteAllowed($baseRoute);
     }
 
 }

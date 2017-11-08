@@ -6,7 +6,6 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
 use yeesoft\helpers\YeeHelper;
-use yeesoft\helpers\AuthHelper;
 
 /**
  * This is the model class for table "user".
@@ -26,8 +25,7 @@ use yeesoft\helpers\AuthHelper;
  * @property integer $created_at
  * @property integer $updated_at
  */
-class User extends UserIdentity
-{
+class User extends UserIdentity {
 
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 0;
@@ -55,16 +53,14 @@ class User extends UserIdentity
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return '{{%user}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
             TimestampBehavior::className(),
         ];
@@ -73,276 +69,41 @@ class User extends UserIdentity
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
-            [['username', 'email'], 'required'],
-            ['username', 'unique'],
-            ['username', 'match', 'pattern' => Yii::$app->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
-            ['username', 'match', 'not' => true, 'pattern' => Yii::$app->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
-            [['username', 'email', 'bind_to_ip'], 'trim'],
-            [['status', 'email_confirmed'], 'integer'],
-            ['email', 'email'],
-            ['email', 'validateEmailUnique'],
-            ['bind_to_ip', 'validateBindToIp'],
-            ['bind_to_ip', 'string', 'max' => 255],
-            [['first_name', 'last_name'], 'string', 'max' => 124],
-            [['skype'], 'string', 'max' => 64],
-            [['phone'], 'string', 'max' => 24],
-            [['bind_to_ip', 'info'], 'string', 'max' => 255],
-            ['gender', 'integer'],
-            ['birth_day', 'integer', 'max' => 31],
-            ['birth_month', 'integer', 'max' => 12],
-            ['birth_year', 'integer', 'max' => 2099],
-            [['birth_month', 'birth_day'], 'integer', 'min' => 1],
-            ['birth_year', 'integer', 'min' => 1880],
-            ['password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
-            ['password', 'string', 'max' => 255, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
-            ['password', 'string', 'min' => 6, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
-            ['password', 'trim', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
-            ['repeat_password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
-            ['repeat_password', 'compare', 'compareAttribute' => 'password'],
+                [['username', 'email'], 'required'],
+                ['username', 'unique'],
+                ['username', 'match', 'pattern' => Yii::$app->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
+                ['username', 'match', 'not' => true, 'pattern' => Yii::$app->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
+                [['username', 'email', 'bind_to_ip'], 'trim'],
+                [['status', 'email_confirmed'], 'integer'],
+                ['email', 'email'],
+                ['email', 'validateEmailUnique'],
+                ['bind_to_ip', 'validateBindToIp'],
+                ['bind_to_ip', 'string', 'max' => 255],
+                [['first_name', 'last_name'], 'string', 'max' => 124],
+                [['skype'], 'string', 'max' => 64],
+                [['phone'], 'string', 'max' => 24],
+                [['bind_to_ip', 'info'], 'string', 'max' => 255],
+                ['gender', 'integer'],
+                ['birth_day', 'integer', 'max' => 31],
+                ['birth_month', 'integer', 'max' => 12],
+                ['birth_year', 'integer', 'max' => 2099],
+                [['birth_month', 'birth_day'], 'integer', 'min' => 1],
+                ['birth_year', 'integer', 'min' => 1880],
+                ['password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+                ['password', 'string', 'max' => 255, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+                ['password', 'string', 'min' => 6, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+                ['password', 'trim', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+                ['repeat_password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
+                ['repeat_password', 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
     /**
-     * Store result in session to prevent multiple db requests with multiple calls
-     *
-     * @param bool $fromSession
-     *
-     * @return static
-     */
-    public static function getCurrentUser($fromSession = true)
-    {
-        if (!$fromSession) {
-            return static::findOne(Yii::$app->user->id);
-        }
-
-        $user = Yii::$app->session->get('__currentUser');
-
-        if (!$user) {
-            $user = static::findOne(Yii::$app->user->id);
-
-            Yii::$app->session->set('__currentUser', $user);
-        }
-
-        return $user;
-    }
-
-    /**
-     * Assign role to user
-     *
-     * @param int $userId
-     * @param string $roleName
-     *
-     * @return bool
-     */
-    public static function assignRole($userId, $roleName)
-    {
-        try {
-            Yii::$app->db->createCommand()
-                    ->insert(Yii::$app->authManager->assignmentTable, [
-                        'user_id' => $userId,
-                        'item_name' => $roleName,
-                        'created_at' => time(),
-                    ])->execute();
-
-            AuthHelper::invalidatePermissions();
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Assign roles to user
-     *
-     * @param int $userId
-     * @param array $roles
-     *
-     * @return bool
-     */
-    public function assignRoles(array $roles)
-    {
-        foreach ($roles as $role) {
-            User::assignRole($this->id, $role);
-        }
-    }
-
-    /**
-     * Revoke role from user
-     *
-     * @param int $userId
-     * @param string $roleName
-     *
-     * @return bool
-     */
-    public static function revokeRole($userId, $roleName)
-    {
-        $result = Yii::$app->db->createCommand()
-                        ->delete(Yii::$app->authManager->assignmentTable, ['user_id' => $userId, 'item_name' => $roleName])
-                        ->execute() > 0;
-
-        if ($result) {
-            AuthHelper::invalidatePermissions();
-        }
-
-        return $result;
-    }
-
-
-
-    /**
-     * Useful for Menu widget
-     *
-     * <example>
-     *    ...
-     *        [ 'label'=>'Some label', 'url'=>['/site/index'], 'visible'=>User::canRoute(['/site/index']) ]
-     *    ...
-     * </example>
-     *
-     * @param string|array $route
-     * @param bool $superAdminAllowed
-     *
-     * @return bool
-     */
-    public static function canRoute($url, $superAdminAllowed = true)
-    {
-        return true;
-//        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
-//            return true;
-//        }
-        
-        if (is_array($url)) {
-            $user = Yii::$app->user;
-            $request = Yii::$app->request;
-            $rules = Yii::$app->authManager->getRouteRules();
-            $action = \yeesoft\helpers\Html::getActionByRoute($url);
-
-            /* @var $rule AccessRule */
-            foreach ($rules as $rule) {
-                if ($allow = $rule->allows($action, $user, $request)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        
-        
-        //return true;
-
-
-        //$baseRoute = AuthHelper::unifyRoute($route);
-
-//        if (substr($baseRoute, 0, 4) === "http") {
-//            return true;
-//        }
-//
-//        if (Route::isFreeAccess($baseRoute)) {
-//            return true;
-//        }
-//
-//        AuthHelper::ensurePermissionsUpToDate();
-//
-//        return Route::isRouteAllowed($baseRoute, Yii::$app->session->get(AuthHelper::SESSION_PREFIX_ROUTES, []));
-    }
-
-    /**
-     * getStatusList
      * @return array
      */
-    public static function getStatusList()
-    {
-        return array(
-            self::STATUS_ACTIVE => Yii::t('yee', 'Active'),
-            self::STATUS_INACTIVE => Yii::t('yee', 'Inactive'),
-            self::STATUS_BANNED => Yii::t('yee', 'Banned'),
-        );
-    }
-
-    /**
-     * Get gender list
-     * @return array
-     */
-    public static function getGenderList()
-    {
-        return array(
-            self::GENDER_NOT_SET => Yii::t('yii', '(not set)'),
-            self::GENDER_MALE => Yii::t('yee', 'Male'),
-            self::GENDER_FEMALE => Yii::t('yee', 'Female'),
-        );
-    }
-
-    /**
-     * getUsersList
-     *
-     * @return array
-     */
-    public static function getUsersList()
-    {
-        $users = static::find()->select(['id', 'username'])->asArray()->all();
-        return ArrayHelper::map($users, 'id', 'username');
-    }
-
-    /**
-     * getStatusValue
-     *
-     * @param string $val
-     *
-     * @return string
-     */
-    public static function getStatusValue($val)
-    {
-        $ar = self::getStatusList();
-
-        return isset($ar[$val]) ? $ar[$val] : $val;
-    }
-
-    /**
-     * Generates new password reset token
-     */
-    public function generatePasswordResetToken()
-    {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
-    }
-
-    /**
-     * Check that there is no such confirmed E-mail in the system
-     */
-    public function validateEmailUnique()
-    {
-        if ($this->email) {
-            $exists = User::findOne(['email' => $this->email]);
-
-            if ($exists AND $exists->id != $this->id) {
-                $this->addError('email', Yii::t('yee', 'This e-mail already exists'));
-            }
-        }
-    }
-
-    /**
-     * Validate bind_to_ip attr to be in correct format
-     */
-    public function validateBindToIp()
-    {
-        if ($this->bind_to_ip) {
-            $ips = explode(',', $this->bind_to_ip);
-
-            foreach ($ips as $ip) {
-                if (!filter_var(trim($ip), FILTER_VALIDATE_IP)) {
-                    $this->addError('bind_to_ip', Yii::t('yee', "Wrong format. Enter valid IPs separated by comma"));
-                }
-            }
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => Yii::t('yee', 'ID'),
             'username' => Yii::t('yee', 'Login'),
@@ -371,10 +132,116 @@ class User extends UserIdentity
     }
 
     /**
+     * @inheritdoc
+     * @return UserQuery the active query used by this AR class.
+     */
+    public static function find() {
+        return new UserQuery(get_called_class());
+    }
+
+    /**
+     * Assign roles to user
+     *
+     * @param int $userId
+     * @param array $roles
+     *
+     * @return bool
+     */
+    public function assignRoles(array $roles) {
+        /* @var $authManager \yeesoft\rbac\DbManager */
+        $authManager = Yii::$app->authManager;
+
+        foreach ($roles as $role) {
+            $authManager->assign($authManager->getRole($role), $this->id);
+        }
+    }
+
+    /**
+     * getStatusList
+     * @return array
+     */
+    public static function getStatusList() {
+        return array(
+            self::STATUS_ACTIVE => Yii::t('yee', 'Active'),
+            self::STATUS_INACTIVE => Yii::t('yee', 'Inactive'),
+            self::STATUS_BANNED => Yii::t('yee', 'Banned'),
+        );
+    }
+
+    /**
+     * Get gender list
+     * @return array
+     */
+    public static function getGenderList() {
+        return array(
+            self::GENDER_NOT_SET => Yii::t('yii', '(not set)'),
+            self::GENDER_MALE => Yii::t('yee', 'Male'),
+            self::GENDER_FEMALE => Yii::t('yee', 'Female'),
+        );
+    }
+
+    /**
+     * getUsersList
+     *
+     * @return array
+     */
+    public static function getUsersList() {
+        $users = static::find()->select(['id', 'username'])->asArray()->all();
+        return ArrayHelper::map($users, 'id', 'username');
+    }
+
+    /**
+     * getStatusValue
+     *
+     * @param string $val
+     *
+     * @return string
+     */
+    public static function getStatusValue($val) {
+        $ar = self::getStatusList();
+
+        return isset($ar[$val]) ? $ar[$val] : $val;
+    }
+
+    /**
+     * Generates new password reset token
+     */
+    public function generatePasswordResetToken() {
+        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
+
+    /**
+     * Check that there is no such confirmed E-mail in the system
+     */
+    public function validateEmailUnique() {
+        if ($this->email) {
+            $exists = User::findOne(['email' => $this->email]);
+
+            if ($exists AND $exists->id != $this->id) {
+                $this->addError('email', Yii::t('yee', 'This e-mail already exists'));
+            }
+        }
+    }
+
+    /**
+     * Validate bind_to_ip attr to be in correct format
+     */
+    public function validateBindToIp() {
+        if ($this->bind_to_ip) {
+            $ips = explode(',', $this->bind_to_ip);
+
+            foreach ($ips as $ip) {
+                if (!filter_var(trim($ip), FILTER_VALIDATE_IP)) {
+                    $this->addError('bind_to_ip', Yii::t('yee', "Wrong format. Enter valid IPs separated by comma"));
+                }
+            }
+        }
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRoles()
-    {
+    public function getRoles() {
         return $this->hasMany(AuthRole::className(), ['name' => 'item_name'])
                         ->viaTable(Yii::$app->authManager->assignmentTable, ['user_id' => 'id']);
     }
@@ -385,8 +252,7 @@ class User extends UserIdentity
      *
      * @inheritdoc
      */
-    public function beforeSave($insert)
-    {
+    public function beforeSave($insert) {
         if ($insert) {
             if (php_sapi_name() != 'cli') {
                 $this->registration_ip = YeeHelper::getRealIp();
@@ -426,8 +292,7 @@ class User extends UserIdentity
      *
      * @inheritdoc
      */
-    public function beforeDelete()
-    {
+    public function beforeDelete() {
         // Console doesn't have Yii::$app->user, so we skip it for console
         if (php_sapi_name() != 'cli') {
             // Don't let delete yourself
@@ -445,21 +310,11 @@ class User extends UserIdentity
     }
 
     /**
-     * @inheritdoc
-     * @return PostQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new UserQuery(get_called_class());
-    }
-
-    /**
      * Get created date
      *
      * @return string
      */
-    public function getCreatedDate()
-    {
+    public function getCreatedDate() {
         return Yii::$app->formatter->asDate(($this->isNewRecord) ? time() : $this->created_at);
     }
 
@@ -468,8 +323,7 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getUpdatedDate()
-    {
+    public function getUpdatedDate() {
         return Yii::$app->formatter->asDate(($this->isNewRecord) ? time() : $this->updated_at);
     }
 
@@ -478,8 +332,7 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getCreatedTime()
-    {
+    public function getCreatedTime() {
         return Yii::$app->formatter->asTime(($this->isNewRecord) ? time() : $this->updated_at);
     }
 
@@ -488,8 +341,7 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getUpdatedTime()
-    {
+    public function getUpdatedTime() {
         return Yii::$app->formatter->asTime(($this->isNewRecord) ? time() : $this->updated_at);
     }
 
@@ -498,8 +350,7 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getCreatedDatetime()
-    {
+    public function getCreatedDatetime() {
         return "{$this->createdDate} {$this->createdTime}";
     }
 
@@ -508,8 +359,7 @@ class User extends UserIdentity
      *
      * @return string
      */
-    public function getUpdatedDatetime()
-    {
+    public function getUpdatedDatetime() {
         return "{$this->updatedDate} {$this->updatedTime}";
     }
 
@@ -518,8 +368,7 @@ class User extends UserIdentity
      * @param string $size
      * @return boolean|string
      */
-    public function getAvatar($size = 'small')
-    {
+    public function getAvatar($size = 'small') {
         if (!empty($this->avatar)) {
             $avatars = json_decode($this->avatar);
 
@@ -535,8 +384,7 @@ class User extends UserIdentity
      *
      * @param array $avatars
      */
-    public function setAvatars($avatars)
-    {
+    public function setAvatars($avatars) {
         $this->avatar = json_encode($avatars);
         return $this->save();
     }
@@ -544,8 +392,7 @@ class User extends UserIdentity
     /**
      *
      */
-    public function removeAvatar()
-    {
+    public function removeAvatar() {
         $this->avatar = '';
         return $this->save();
     }
