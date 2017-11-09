@@ -81,8 +81,8 @@ class Nav extends \yii\bootstrap\Nav
         $allVisible = false;
 
         foreach ($items as &$item) {
-            if (isset($item['url']) AND ! isset($item['visible']) AND !in_array($item['url'], ['', '#'])) {
-               // $item['visible'] = Yii::$app->user->canRoute($item['url']);
+            if (isset($item['url']) AND ! isset($item['visible']) AND ! in_array($item['url'], ['', '#'])) {
+                $item['visible'] = Yii::$app->user->canRoute($item['url']);
             }
 
             if (isset($item['items'])) {
@@ -136,8 +136,8 @@ class Nav extends \yii\bootstrap\Nav
         if (is_string($item)) {
             return $item;
         }
-        
-        if(!ArrayHelper::getValue($item, 'url') && !ArrayHelper::getValue($item, 'items')){
+
+        if (!ArrayHelper::getValue($item, 'url') && !ArrayHelper::getValue($item, 'items')) {
             return Html::tag('li', $item['label'], ['class' => 'header']);
         }
 

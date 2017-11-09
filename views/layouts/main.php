@@ -13,6 +13,9 @@ use yeesoft\theme\assets\AdminThemeAsset;
 CheckboxAsset::register($this);
 AdminThemeAsset::register($this);
 
+//$logoAsset = LogoAsset::register($this);
+//$logo = $logoAsset->baseUrl . '/images/yee-logo.png';
+
 //Show Flashes
 foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
     $this->registerJs("Notification.show('{$key}', '{$message}');");
@@ -53,21 +56,21 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
             .example-modal .modal {
                 background: transparent !important;
             }
-            
+
             .logo-1, .logo-2 {
                 display: inline-block;
                 font-size: 26px;
                 font-weight: bold;
             }
-            
+
             .logo-1 {
                 color: #4d74b0;
             }
-            
+
             .logo-2 {
                 color: #fff;
             }
-            
+
             .logo-block {
                 display: inline-block;
                 height: 22px;
@@ -79,7 +82,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                 font-weight: bold;
                 text-transform: uppercase;
             }
-            
+
             a:hover .logo-block {
                 background: #4d74b0;
                 color: #fff;
@@ -95,20 +98,20 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
 
             <header class="main-header">
                 <div class="logo">
-                    
-                    <a class="logo-title" href="/admin">
+
+                    <a class="logo-title" href="<?= Yii::$app->homeUrl ?>">
                         <img style="height: 26px; margin-top: -10px;" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgdmVyc2lvbj0iMS4xIgogICBpZD0ic3ZnMiIKICAgdmlld0JveD0iMCAwIDE0OS45OTk5MSAxMjkuOTk5OTMiCiAgIGhlaWdodD0iMTMwIgogICB3aWR0aD0iMTUwIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkxIHIxMzcyNSIKICAgc29kaXBvZGk6ZG9jbmFtZT0ieWVlLWJpcmQtbG9nby5zdmciPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiCiAgICAgYm9yZGVyb3BhY2l0eT0iMSIKICAgICBvYmplY3R0b2xlcmFuY2U9IjEwIgogICAgIGdyaWR0b2xlcmFuY2U9IjEwIgogICAgIGd1aWRldG9sZXJhbmNlPSIxMCIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMCIKICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTkyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMDMxIgogICAgIGlkPSJuYW1lZHZpZXcxNSIKICAgICBzaG93Z3JpZD0iZmFsc2UiCiAgICAgdW5pdHM9InB4IgogICAgIGlua3NjYXBlOnpvb209IjEuNzk0MDU5MSIKICAgICBpbmtzY2FwZTpjeD0iODUuMDcwNzAyIgogICAgIGlua3NjYXBlOmN5PSIxNTAuMzUwODkiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9IjAiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjEwODAiCiAgICAgaW5rc2NhcGU6d2luZG93LW1heGltaXplZD0iMSIKICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJzdmcyIiAvPgogIDxkZWZzCiAgICAgaWQ9ImRlZnM0Ij4KICAgIDxzdHlsZQogICAgICAgaWQ9InN0eWxlNDE0MCI+LmNscy0xe2ZpbGw6dXJsKCNsaW5lYXItZ3JhZGllbnQpO30uY2xzLTJ7ZmlsbDojMjY4MWZmO308L3N0eWxlPgogICAgPGxpbmVhckdyYWRpZW50CiAgICAgICBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKC01Ljg5MTg2NzIsLTExLjc4MzczNSkiCiAgICAgICBpZD0ibGluZWFyLWdyYWRpZW50IgogICAgICAgeDE9IjQwLjk1MTgyIgogICAgICAgeTE9IjE1MC45ODMiCiAgICAgICB4Mj0iNDIuNTIxNjc5IgogICAgICAgeTI9IjE0NS4wNTIyOCIKICAgICAgIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3AKICAgICAgICAgb2Zmc2V0PSIwIgogICAgICAgICBzdG9wLWNvbG9yPSIjMDA1MmNjIgogICAgICAgICBpZD0ic3RvcDQxNDMiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8bWV0YWRhdGEKICAgICBpZD0ibWV0YWRhdGE3Ij4KICAgIDxyZGY6UkRGPgogICAgICA8Y2M6V29yawogICAgICAgICByZGY6YWJvdXQ9IiI+CiAgICAgICAgPGRjOmZvcm1hdD5pbWFnZS9zdmcreG1sPC9kYzpmb3JtYXQ+CiAgICAgICAgPGRjOnR5cGUKICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPgogICAgICAgIDxkYzp0aXRsZSAvPgogICAgICA8L2NjOldvcms+CiAgICA8L3JkZjpSREY+CiAgPC9tZXRhZGF0YT4KICA8ZwogICAgIGlkPSJsYXllcjEiCiAgICAgdHJhbnNmb3JtPSJtYXRyaXgoMC44OTczNTM2LDAsMCwwLjkxNDE1MDQzLC0zMTkuNDk2OTEsLTM1My4xNDU2NCkiPgogICAgPGcKICAgICAgIHRyYW5zZm9ybT0ibWF0cml4KDAuNzcxNTE4NzksMCwwLC0wLjc3MTUxODc5LDM4Mi41MTM5MSw1MjguNzMxMDQpIgogICAgICAgaWQ9IkxheWVyXzIiCiAgICAgICBkYXRhLW5hbWU9IkxheWVyIDIiPgogICAgICA8ZwogICAgICAgICBpZD0iQmx1ZSI+CiAgICAgICAgPHBhdGgKICAgICAgICAgICBzdHlsZT0iZmlsbDojNGQ3NGIwO2ZpbGwtb3BhY2l0eToxIgogICAgICAgICAgIGNsYXNzPSJjbHMtMiIKICAgICAgICAgICBkPSJNIDY0LjUwNzk4MSwwLjI3NTI4Nzk1IDIxLjcyNTc4OCwwLjM4MTA4NzcxIEMgMTIuOTc3ODY4LDAuMjE3NDI0NzMgMTMuMDU0MDAzLDIuNzA3MDY1NSAxNi4zMjUwOTgsOC42MDM4MjI0IEwgOTEuOTM2NTU2LDE0Ny4wNjc4NCBjIDEzLjg1MzA3NCwyNy4wNTc1NiAzMS45MDg0ODQsMzQuMDA3MjYgNDQuMTI3MjU0LDM1LjQwMzYxIEwgMTc3LDE4Mi4yNCBjIDMuOTcyNjMsMC4wMDQgNi41NTgwMiwtNC4xNzc0NyA0Ljc4LC03LjczIEwgMTIzLjUzNjI2LDU1LjAzODQyMSBDIDExMy4yNTc0NiwzNi41NjM5ODQgOTAuNTU4NTE2LDEuNTU0MDQzIDY0LjUwNzk4MSwwLjI3NTI4Nzk1IFoiCiAgICAgICAgICAgaWQ9InBhdGg0MTUzIgogICAgICAgICAgIGlua3NjYXBlOmNvbm5lY3Rvci1jdXJ2YXR1cmU9IjAiIC8+CiAgICAgIDwvZz4KICAgIDwvZz4KICAgIDxnCiAgICAgICB0cmFuc2Zvcm09Im1hdHJpeCgtMC4zNjczODQ1MSwwLjY3ODQzMTkyLDAuNjc4NDMxOTIsMC4zNjczODQ1MSwzNTguODQ3ODIsMjg3LjI4MTQ3KSIKICAgICAgIGlkPSJMYXllcl8yLTciCiAgICAgICBkYXRhLW5hbWU9IkxheWVyIDIiPgogICAgICA8ZwogICAgICAgICBpZD0iQmx1ZS01Ij4KICAgICAgICA8cGF0aAogICAgICAgICAgIHN0eWxlPSJmaWxsOiMzODUzN2U7ZmlsbC1vcGFjaXR5OjEiCiAgICAgICAgICAgY2xhc3M9ImNscy0yIgogICAgICAgICAgIGQ9Ik0gMTExLjg2MDMsNjIuOTgzMzk5IDkyLjQ0NjY1OSw5OS40MjEwNTYgQyA3OC44Mzg3NSwxMjQuNzI5NTggODkuNTExMTcyLDEzNi44NjU4MiA5NS4yNTk0ODEsMTQ5Ljg3MzczIEwgMTA5Ljk5LDE3OS4yNCBjIDAuODkxNjMsMS44MjkwMyAyLjc0NTIzLDIuOTkyMzcgNC43OCwzIGwgNTQuNjk4NTQsLTIuNTg5NDggYyAzLjk3MjYzLDAuMDA0IDYuNTU4MDIsLTQuMTc3NDcgNC43OCwtNy43MyBMIDEyNi44MjE5Miw2Ny40NTM1NTIgYyAtMi44NzIyNywtNS45NzU4OTYgLTguOTI1ODQsLTkuMDg3OCAtMTQuOTYxNjIsLTQuNDcwMTUzIHoiCiAgICAgICAgICAgaWQ9InBhdGg0MTUzLTUiCiAgICAgICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIgLz4KICAgICAgPC9nPgogICAgPC9nPgogIDwvZz4KPC9zdmc+Cg=="/>
                         <span style="margin-left: -8px; margin-top: 1px;" class="logo-1">ee</span>
                         <span class="logo-2">cms</span>
                     </a>
-                    
-<!--                    <a class="logo-title" href="/admin">
-                        <span class="logo-block">Y</span>
-                        <span class="logo-block">e</span>
-                        <span class="logo-block">e</span>
-                        
-                        CMS
-                    </a>-->
+
+                    <!--                    <a class="logo-title" href="/admin">
+                                            <span class="logo-block">Y</span>
+                                            <span class="logo-block">e</span>
+                                            <span class="logo-block">e</span>
+                                            
+                                            CMS
+                                        </a>-->
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="icon-bar"></span>
@@ -120,6 +123,7 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                 <!-- Header Navbar: style can be found in header.less -->
                 <nav class="navbar navbar-static-top">
 
+                    <!--['label' => str_replace('http://', '', Yii::$app->urlManager->hostInfo), 'url' => Yii::$app->urlManager->hostInfo]-->
 
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
@@ -133,34 +137,18 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                                     <!-- User image -->
                                     <li class="user-header">
                                         <img src="https://www.iconexperience.com/_img/o_collection_png/green_dark_grey/512x512/plain/user.png" class="img-circle" alt="User Image">
-
                                         <p>
-                                            Alexander Pierce - Web Developer
-                                            <small>Member since Nov. 2012</small>
+                                            <?= @Yii::$app->user->identity->username ?>
+                                            <small>Member since <?= @Yii::$app->user->identity->createdDate ?></small>
                                         </p>
-                                    </li>
-                                    <!-- Menu Body -->
-                                    <li class="user-body">
-                                        <div class="row">
-                                            <div class="col-xs-4 text-center">
-                                                <a href="#">Followers</a>
-                                            </div>
-                                            <div class="col-xs-4 text-center">
-                                                <a href="#">Sales</a>
-                                            </div>
-                                            <div class="col-xs-4 text-center">
-                                                <a href="#">Friends</a>
-                                            </div>
-                                        </div>
-                                        <!-- /.row -->
                                     </li>
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
                                         <div class="pull-left">
-                                            <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                            <?= Html::a('Profile', ['/auth/profile/index'], ['class' => 'btn btn-default btn-flat']) ?>
                                         </div>
-                                        <div class="pull-right">
-                                            <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                                        <div class="pull-right">                                
+                                            <?= Html::a('Sign out', ['/auth/default/logout'], ['class' => 'btn btn-default btn-flat', 'data' => ['method' => 'post']]) ?>
                                         </div>
                                     </li>
                                 </ul>
@@ -173,15 +161,12 @@ foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
                 </nav>
             </header>
 
-            <!-- =============================================== -->
-
+            <!-- Main Sidebar -->
             <aside class="main-sidebar">
                 <section class="sidebar">
                     <?= Nav::widget(['items' => Menu::getMenuItems('admin-menu')]) ?>
                 </section>
             </aside>
-
-            <!-- =============================================== -->
 
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">

@@ -12,18 +12,26 @@ use yeesoft\helpers\YeeHelper;
  *
  * @property integer $id
  * @property string $username
- * @property string $email
- * @property integer $email_confirmed
  * @property string $auth_key
  * @property string $password_hash
- * @property string $confirmation_token
- * @property string $bind_to_ip
- * @property string $registration_ip
+ * @property string $password_reset_token
+ * @property string $email
  * @property integer $status
- * @property integer $superadmin
- * @property string $avatar
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $superadmin
+ * @property string $avatar
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $birthday
+ * @property integer $gender
+ * @property string $phone
+ * @property string $skype
+ * @property string $about
+ * @property string $registration_ip
+ * @property string $bind_to_ip
+ * @property integer $email_confirmed
+ * @property string $confirmation_token
  */
 class User extends UserIdentity {
 
@@ -76,7 +84,7 @@ class User extends UserIdentity {
                 ['username', 'match', 'pattern' => Yii::$app->usernameRegexp, 'message' => Yii::t('yee/auth', 'The username should contain only Latin letters, numbers and the following characters: "-" and "_".')],
                 ['username', 'match', 'not' => true, 'pattern' => Yii::$app->usernameBlackRegexp, 'message' => Yii::t('yee/auth', 'Username contains not allowed characters or words.')],
                 [['username', 'email', 'bind_to_ip'], 'trim'],
-                [['status', 'email_confirmed'], 'integer'],
+                [['status', 'email_confirmed', 'gender'], 'integer'],
                 ['email', 'email'],
                 ['email', 'validateEmailUnique'],
                 ['bind_to_ip', 'validateBindToIp'],
@@ -84,19 +92,15 @@ class User extends UserIdentity {
                 [['first_name', 'last_name'], 'string', 'max' => 124],
                 [['skype'], 'string', 'max' => 64],
                 [['phone'], 'string', 'max' => 24],
-                [['bind_to_ip', 'info'], 'string', 'max' => 255],
-                ['gender', 'integer'],
-                ['birth_day', 'integer', 'max' => 31],
-                ['birth_month', 'integer', 'max' => 12],
-                ['birth_year', 'integer', 'max' => 2099],
-                [['birth_month', 'birth_day'], 'integer', 'min' => 1],
-                ['birth_year', 'integer', 'min' => 1880],
+                [['bind_to_ip'], 'string', 'max' => 255],
+                [['birthday'], 'safe'],
                 ['password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
                 ['password', 'string', 'max' => 255, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
                 ['password', 'string', 'min' => 6, 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
                 ['password', 'trim', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
                 ['repeat_password', 'required', 'on' => [self::SCENARIO_NEW_USER, 'changePassword']],
                 ['repeat_password', 'compare', 'compareAttribute' => 'password'],
+                [['avatar', 'about'], 'string'],
         ];
     }
 
@@ -117,17 +121,15 @@ class User extends UserIdentity {
             'updated_at' => Yii::t('yee', 'Updated'),
             'password' => Yii::t('yee', 'Password'),
             'repeat_password' => Yii::t('yee', 'Repeat password'),
-            'email_confirmed' => Yii::t('yee', 'E-mail confirmed'),
+            'email_confirmed' => Yii::t('yee', 'Confirmed'),
             'email' => Yii::t('yee', 'E-mail'),
             'first_name' => Yii::t('yee', 'First Name'),
             'last_name' => Yii::t('yee', 'Last Name'),
             'skype' => Yii::t('yee', 'Skype'),
             'phone' => Yii::t('yee', 'Phone'),
             'gender' => Yii::t('yee', 'Gender'),
-            'birth_day' => Yii::t('yee', 'Birthday'),
-            'birth_month' => Yii::t('yee', 'Birth month'),
-            'birth_year' => Yii::t('yee', 'Birth year'),
-            'info' => Yii::t('yee', 'Short Info'),
+            'birthday' => Yii::t('yee', 'Birthday'),
+            'about' => Yii::t('yee', 'About'),
         ];
     }
 

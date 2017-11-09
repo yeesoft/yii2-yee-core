@@ -3,6 +3,7 @@
 namespace yeesoft\web;
 
 use Yii;
+use yeesoft\helpers\Url;
 
 class User extends \yii\web\User
 {
@@ -95,34 +96,44 @@ class User extends \yii\web\User
 
         $this->setSettings($settings);
     }
-    
+
     /**
      * @inheritdoc
      */
     public function can($permissionName, $params = [], $allowCaching = true)
     {
         if ($this->isSuperadmin) {
-           // return true;
+            return true;
         }
-        
+
         return parent::can($permissionName, $params, $allowCaching);
     }
-    
-    public function canRoute($url, $superAdminAllowed = true) {
-        return true;
-        
-//        if ($superAdminAllowed AND Yii::$app->user->isSuperadmin) {
+
+    /**
+     * Checks if the user can access the route.
+     *
+     * Note that you must configure "authManager" application component in order to use this method.
+     *
+     * @param string|array $route value that represent a route (e.g. `index`, `site/index`),
+     * @return bool whether the user can access given route.
+     */
+    public function canRoute($route)
+    {
+        if ($this->isSuperadmin) {
+            return true;
+        }
+
+//        if (Route::isFreeAccess($route)) {
 //            return true;
 //        }
 
-        if (is_array($url)) {
-            $request = Yii::$app->request;
+        if (is_array($route)) {
             $rules = Yii::$app->authManager->getRouteRules();
-            $action = \yeesoft\helpers\Html::getActionByRoute($url);
+            $action = Url::createAction($route);
 
-            /* @var $rule AccessRule */
+            /* @var $rule \yeesoft\filters\AccessRule */
             foreach ($rules as $rule) {
-                if ($allow = $rule->allows($action, $this->identity, $request)) {
+                if ($allow = $rule->allows($action, $this, Yii::$app->request)) {
                     return true;
                 }
             }
@@ -130,18 +141,7 @@ class User extends \yii\web\User
             return false;
         }
 
-
-        //return true;
-//        if (substr($baseRoute, 0, 4) === "http") {
-//            return true;
-//        }
-//
-//        if (Route::isFreeAccess($baseRoute)) {
-//            return true;
-//        }
-//
-//
-//        return Route::isRouteAllowed($baseRoute);
+        return true;
     }
 
 }

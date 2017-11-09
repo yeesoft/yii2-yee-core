@@ -22,16 +22,6 @@ class AuthRole extends AuthItem
     }
 
     /**
-     * @param int $userId
-     *
-     * @return array|\yii\rbac\Role[]
-     */
-    public static function getUserRoles($userId)
-    {
-        return (new DbManager())->getRolesByUser($userId);
-    }
-
-    /**
      * Get permissions assigned to this role or its children
      *
      * @param string $roleName
