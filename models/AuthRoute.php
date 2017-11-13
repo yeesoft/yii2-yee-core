@@ -4,7 +4,6 @@ namespace yeesoft\models;
 
 use Yii;
 use yii\base\Action;
-use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -66,7 +65,7 @@ class AuthRoute extends \yeesoft\db\ActiveRecord
     public function getPermissions()
     {
         return $this->hasMany(AuthPermission::className(), ['name' => 'item_name'])
-                        ->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
+            ->viaTable('{{%auth_item_route}}', ['route_id' => 'id']);
     }
 
     public function getName()
@@ -88,45 +87,6 @@ class AuthRoute extends \yeesoft\db\ActiveRecord
         }
 
         return $rule;
-    }
-
-    
-
-
-    /**
-     * Check if controller has $freeAccess = true or $action in $freeAccessActions
-     * Or it's login, logout, error page
-     *
-     * @param string $route
-     * @param Action|null $action
-     *
-     * @return bool
-     */
-    public static function isFreeAccess($route, $action = null)
-    {
-        if ($action) {
-            $controller = $action->controller;
-
-            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess === true) {
-                return true;
-            }
-
-            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions)) {
-                return true;
-            }
-        }
-
-        $systemPages = [
-            '/auth/logout',
-            //Yii::$app->errorHandler->errorAction,
-            Yii::$app->user->loginUrl,
-        ];
-
-        if (in_array($route, $systemPages)) {
-            return true;
-        }
-
-        return false;
     }
 
     public static function getRoutes()

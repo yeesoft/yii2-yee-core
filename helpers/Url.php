@@ -2,6 +2,8 @@
 
 namespace yeesoft\helpers;
 
+use Yii;
+
 class Url extends \yii\helpers\BaseUrl
 {
 
@@ -29,6 +31,42 @@ class Url extends \yii\helpers\BaseUrl
                         'uniqueId' => $uniqueId
                     ]
         ];
+    }
+    
+        /**
+     * Check if controller has $freeAccess = true or $action in $freeAccessActions
+     * Or it's login, logout, error page
+     *
+     * @param string $route
+     * @param Action|null $action
+     *
+     * @return bool
+     */
+    public static function isFreeAccess($route, $action = null)
+    {
+        if ($action) {
+            $controller = $action->controller;
+
+            if ($controller->hasProperty('freeAccess') AND $controller->freeAccess === true) {
+                return true;
+            }
+
+            if ($controller->hasProperty('freeAccessActions') AND in_array($action->id, $controller->freeAccessActions)) {
+                return true;
+            }
+        }
+
+        $systemPages = [
+            '/auth/logout',
+            //Yii::$app->errorHandler->errorAction,
+            Yii::$app->user->loginUrl,
+        ];
+
+        if (in_array($route, $systemPages)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

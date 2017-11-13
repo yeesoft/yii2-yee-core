@@ -123,7 +123,7 @@ class User extends \yii\web\User
             return true;
         }
 
-//        if (Route::isFreeAccess($route)) {
+//        if (Url::isFreeAccess($route)) {
 //            return true;
 //        }
 
