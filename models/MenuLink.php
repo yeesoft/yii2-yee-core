@@ -133,6 +133,19 @@ class MenuLink extends ActiveRecord
     }
 
     /**
+     * Get list of children links.
+     * @return array
+     */
+    public function getChildren()
+    {
+        return MenuLink::find()->joinWith('translations')
+                        ->andFilterWhere(['=', 'menu_id', $this->menu_id])
+                        ->andFilterWhere(['=', 'parent_id', $this->id])
+                        ->orderBy('order')
+                        ->all();
+    }
+
+    /**
      * @inheritdoc
      * @return MultilingualQuery the active query used by this AR class.
      */
