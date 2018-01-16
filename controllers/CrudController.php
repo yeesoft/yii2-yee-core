@@ -7,12 +7,12 @@ use yii\base\Model;
 use yii\web\Cookie;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
-use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yeesoft\db\ActiveRecord;
 use yeesoft\db\FilterableQuery;
+use yeesoft\data\ActiveDataProvider;
 
 abstract class CrudController extends BaseController
 {

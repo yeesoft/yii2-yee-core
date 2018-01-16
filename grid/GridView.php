@@ -76,12 +76,8 @@ class GridView extends \yii\grid\GridView
      * @inheritdoc
      */
     public $layout = '<div class="row head-row">'
-            . '<div class="col-xs-6">{quickFilters}</div>'
-            . '<div class="col-xs-6 text-right">{filterCleaner} {summary}</div>'
-            . '</div>'
-            . '<div class="row head-row">'
-            . '<div class="col-xs-12 col-md-6">{bulkActions}</div>'
-            . '<div class="col-xs-12 col-md-6 text-right">{extraActions}</div>'
+            . '<div class="col-xs-12 col-md-6">{bulkActions}{quickFilters}</div>'
+            . '<div class="col-xs-12 col-md-6 text-right">{extraActions} {filterCleaner} {summary}</div>'
             . '</div>'
             . '<div class="row">'
             . '<div class="col-xs-12">{items}</div>'
