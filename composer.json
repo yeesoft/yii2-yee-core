@@ -12,7 +12,7 @@
         "yiisoft/yii2": "~2.0",
         "ikimea/browser": "~1.14",
         "yiisoft/yii2-jui": "~2.0",
-        "bower-asset/metisMenu": "*",
+        "bower-asset/metismenu": "*",
         "omgdef/yii2-multilingual-behavior": "~2.0",
         "rmrevin/yii2-fontawesome": "~2.12"
     },
