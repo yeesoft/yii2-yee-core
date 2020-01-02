@@ -2,14 +2,14 @@
 
 namespace yeesoft\widgets;
 
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\helpers\Inflector;
 
 /**
  * MultilinualFieldContainer
  *
  */
-class MultilingualFieldContainer extends Object
+class MultilingualFieldContainer extends BaseObject
 {
     public $fields;
 
